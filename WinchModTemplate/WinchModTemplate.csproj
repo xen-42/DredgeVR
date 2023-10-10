@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyName>WinchModTemplate</AssemblyName>
+		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+		<PlatformTarget>x86</PlatformTarget>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>default</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="mod_meta.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="WinchModTemplate.csproj.user" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <PackageReference Include="DredgeGameLibs" Version="1.3.0" />
+    <PackageReference Include="Winch" Version="0.2.3" />
+  </ItemGroup>
+
+</Project>
