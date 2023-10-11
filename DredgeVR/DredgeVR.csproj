@@ -30,8 +30,6 @@
     <PackageReference Include="HarmonyX" Version="2.10.2" />
     <PackageReference Include="Winch" Version="0.2.3" />
 		<Reference Include="../dlls/*" />
-		<Reference Include="../dlls/UnityEngine.XR.*.dll" />
-		<Reference Include="../dlls/XRSDKOpenVR.dll" />
   </ItemGroup>
 
 	<ItemGroup>

@@ -23,35 +23,37 @@ namespace DredgeVR
 
 		public void Start()
 		{
+			var mainCamera = Camera.main;
+			mainCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
+
 			var displays = new List<XRDisplaySubsystem>();
 			SubsystemManager.GetInstances(displays);
 			VRDisplay = displays[0];
-
-			var vrCamera = Camera.main.gameObject;
-			vrCamera.AddComponent<SteamVR_TrackedObject>();
-
+			
 			var leftCamera = new GameObject("LeftCamera");
 			LeftCamera = leftCamera.AddComponent<Camera>();
-			leftCamera.transform.parent = vrCamera.transform;
+			LeftCamera.CopyFrom(mainCamera);
+			leftCamera.transform.parent = mainCamera.transform;
 
 			var rightCamera = new GameObject("RightCamera");
 			RightCamera = rightCamera.AddComponent<Camera>();
-			rightCamera.transform.parent = vrCamera.transform;
-		}
+			RightCamera.CopyFrom(mainCamera);
+			rightCamera.transform.parent = mainCamera.transform;
 
-		public void Update()
-		{
 			LeftCamera.fieldOfView = SteamVR.instance.fieldOfView;
 			LeftCamera.stereoTargetEye = StereoTargetEyeMask.Left;
 			LeftCamera.projectionMatrix = LeftCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left);
 			LeftCamera.targetTexture = VRDisplay.GetRenderTextureForRenderPass(0);
-			LeftCamera.enabled = true;
 
 			RightCamera.fieldOfView = SteamVR.instance.fieldOfView;
 			RightCamera.stereoTargetEye = StereoTargetEyeMask.Right;
 			RightCamera.projectionMatrix = RightCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
 			RightCamera.targetTexture = VRDisplay.GetRenderTextureForRenderPass(1);
-			RightCamera.enabled = true;
+		}
+
+		public void Update()
+		{
+
 		}
 	}
 }
