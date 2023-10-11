@@ -27,8 +27,7 @@ namespace DredgeVR
 			SubsystemManager.GetInstances(displays);
 			VRDisplay = displays[0];
 
-			/*
-			var vrCamera = new GameObject("VRCamera");
+			var vrCamera = Camera.main.gameObject;
 			vrCamera.AddComponent<SteamVR_TrackedObject>();
 
 			var leftCamera = new GameObject("LeftCamera");
@@ -38,16 +37,6 @@ namespace DredgeVR
 			var rightCamera = new GameObject("RightCamera");
 			RightCamera = rightCamera.AddComponent<Camera>();
 			rightCamera.transform.parent = vrCamera.transform;
-			*/
-
-			LeftCamera = Camera.main;
-			var rightCamera = new GameObject("SecondCamera");
-			RightCamera = rightCamera.AddComponent<Camera>();
-			RightCamera.CopyFrom(LeftCamera);
-			rightCamera.transform.parent = LeftCamera.transform;
-
-			//LeftCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
-			//RightCamera.gameObject.AddComponent<SteamVR_TrackedObject>();
 		}
 
 		public void Update()

@@ -47,6 +47,7 @@ namespace DredgeVR
 
 			var settings = OpenVRSettings.GetSettings();
 			settings.StereoRenderingMode = OpenVRSettings.StereoRenderingModes.MultiPass;
+			OpenXRSettings.Instance.renderMode = OpenXRSettings.RenderMode.MultiPass;
 
 			generalSettings.Manager = managerSettings;
 
