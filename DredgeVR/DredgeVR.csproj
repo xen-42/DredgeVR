@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<AssemblyName>WinchModTemplate</AssemblyName>
+		<AssemblyName>DredgeVR</AssemblyName>
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x86</PlatformTarget>
 		<TargetFramework>net48</TargetFramework>
@@ -20,14 +20,22 @@
 
 	<ItemGroup>
 		<None Include="mod_meta.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Include="WinchModTemplate.csproj.user" />
+		<None Include="DredgeVR.csproj.user" />
 	</ItemGroup>
 
 	<ItemGroup>
     <PackageReference Include="DredgeGameLibs" Version="1.3.0" />
+    <PackageReference Include="HarmonyX" Version="2.10.2" />
     <PackageReference Include="Winch" Version="0.2.3" />
+		<Reference Include="../dlls/*" />
+		<Reference Include="../dlls/UnityEngine.XR.*.dll" />
+		<Reference Include="../dlls/XRSDKOpenVR.dll" />
   </ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="VRCamera\Patches\" />
+	</ItemGroup>
 
 </Project>
