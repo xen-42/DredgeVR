@@ -9,6 +9,7 @@ internal class HarvestPOIPatches
 	[HarmonyPostfix]
 	public static void HarvestPOI_Update(HarvestPOI __instance)
 	{
+		// Trying to reduce lag
 		__instance.harvestParticles.enabled = false;
 	}
 }

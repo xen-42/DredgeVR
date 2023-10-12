@@ -13,11 +13,11 @@ namespace DredgeVR
 		{
 			new Harmony("DredgeVR").PatchAll();
 
+			SetUpXr();
+
 			var gameObject = new GameObject(nameof(DredgeVRCore));
 			gameObject.AddComponent<DredgeVRCore>();
 			GameObject.DontDestroyOnLoad(gameObject);
-
-			SetUpXr();
 		}
 
 		private static void SetUpXr()
