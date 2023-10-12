@@ -32,11 +32,11 @@ public class VRCameraManager : MonoBehaviour
 	{
 		// Make the player look towards the lighthouse
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
-		var worldPos = new Vector3(lightHouse.position.x, 0, lightHouse.position.z);
+		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
 
 		_resetTransform = new GameObject("ResetTransform").transform;
+		_resetTransform.position = new Vector3(-6.5f, 0.5f, 0);
 		_resetTransform.LookAt(worldPos);
-		_resetTransform.position = new Vector3(-6.5f, 0, 0);
 
 		_pivot = new GameObject("VRCameraPivot").transform;
 		VRPlayer.origin = _pivot;
