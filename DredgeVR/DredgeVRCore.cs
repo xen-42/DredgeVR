@@ -11,12 +11,17 @@ namespace DredgeVR
 		public static DredgeVRCore Instance { get; private set; }
 
 		public static Action GameSceneStart;
+		public static Action TitleSceneStart;
 
 		public void Awake()
 		{
 			Instance = this;
 			WinchCore.Log.Debug($"{nameof(DredgeVRCore)} has loaded!");
+
+			Camera.main.gameObject.AddComponent<VRCameraManager>();
+
 			SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
+			SceneManager_activeSceneChanged(default, SceneManager.GetActiveScene());
 		}
 
 		public void OnDestroy()
@@ -36,11 +41,25 @@ namespace DredgeVR
 			{
 				GameSceneStart?.Invoke();
 			}
-		}
 
-		public void Start()
-		{
-			Camera.main.gameObject.AddComponent<VRCameraManager>();
+			if (arg1.name == "Title")
+			{
+				TitleSceneStart?.Invoke();
+
+				var canvas = GameObject.Find("Canvases");
+
+				canvas.transform.position = new Vector3(1.5f, 0.2f, -3f);
+				canvas.transform.rotation = Quaternion.Euler(0, 180, 0);
+				canvas.transform.localScale = Vector3.one * 0.002f;
+			}
+
+			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+			{
+				canvas.renderMode = RenderMode.WorldSpace;
+				canvas.worldCamera = VRCameraManager.Camera;
+				canvas.scaleFactor = 1f;
+				canvas.planeDistance = 1;
+			}
 		}
 	}
 }
