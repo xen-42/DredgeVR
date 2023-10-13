@@ -2,6 +2,7 @@
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using DredgeVR.VRUI;
+using DredgeVR.World;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace DredgeVR
 	{
 		public static DredgeVRCore Instance { get; private set; }
 
+		public static Action<string> SceneStart;
 		public static Action GameSceneStart;
 		public static Action TitleSceneStart;
 
@@ -33,6 +35,7 @@ namespace DredgeVR
 			gameObject.AddComponent<VRInputManager>();
 			gameObject.AddComponent<VRInputModule>();
 			gameObject.AddComponent<VRUIManager>();
+			gameObject.AddComponent<WorldManager>();
 
 			SceneManager.activeSceneChanged += OnActiveSceneChanged;
 			OnActiveSceneChanged(default, SceneManager.GetActiveScene());
@@ -45,17 +48,7 @@ namespace DredgeVR
 
 		private void OnActiveSceneChanged(Scene arg0, Scene arg1)
 		{
-			// Heightmap terrain causes massive lag in VR
-			foreach (var terrain in GameObject.FindObjectsOfType<Terrain>())
-			{
-				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 1);
-			}
-
-			foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
-			{
-				particleSystem.enableEmission = false;
-				particleSystem.gameObject.SetActive(false);
-			}
+			SceneStart?.Invoke(arg1.name);
 
 			if (arg1.name == "Game")
 			{
