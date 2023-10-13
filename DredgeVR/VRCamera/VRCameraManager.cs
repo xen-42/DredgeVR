@@ -31,11 +31,20 @@ public class VRCameraManager : MonoBehaviour
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
+		// Set up hands
 		LeftHand = new GameObject("LeftHand").AddComponent<VRHand>();
 		LeftHand.hand = SteamVR_Input_Sources.LeftHand;
 
 		RightHand = new GameObject("RightHand").AddComponent<VRHand>();
 		RightHand.hand = SteamVR_Input_Sources.RightHand;
+
+		// Parent everything to a new "pivot" object
+		_pivot = new GameObject("VRCameraPivot").transform;
+		VRPlayer.origin = _pivot;
+
+		transform.parent = _pivot;
+		LeftHand.transform.parent = _pivot;
+		RightHand.transform.parent = _pivot;
 
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
@@ -57,34 +66,25 @@ public class VRCameraManager : MonoBehaviour
 		_resetTransform.position = new Vector3(-6.5f, 0.5f, 0);
 		_resetTransform.LookAt(worldPos);
 
-		ResetPivot();
-
 		Delay.FireOnNextUpdate(ResetPosition);
 	}
 
 	private void OnGameSceneStart()
 	{
-		// Make the player follow the boat
-		_resetTransform = new GameObject("ResetTransform").transform;
-		_resetTransform.parent = GameManager.Instance.Player.transform;
-		_resetTransform.position = new Vector3(0, 1, -2);
-		_resetTransform.rotation = Quaternion.identity;
+		// Boat takes a frame to exist
+		Delay.RunWhen(
+			() => GameManager.Instance.Player != null,
+			() =>
+			{
+				// Make the player follow the boat
+				_resetTransform = new GameObject("ResetTransform").transform;
+				_resetTransform.parent = GameManager.Instance.Player.transform;
+				_resetTransform.localPosition = new Vector3(0, 1, -2);
+				_resetTransform.localRotation = Quaternion.identity;
 
-		ResetPivot();
-
-		Delay.FireOnNextUpdate(ResetPosition);
-	}
-
-	/// <summary>
-	/// Have to recreate the pivot when the scene changes
-	/// </summary>
-	private void ResetPivot()
-	{
-		_pivot = new GameObject("VRCameraPivot").transform;
-		VRPlayer.origin = _pivot;
-
-		LeftHand.transform.parent = _pivot;
-		RightHand.transform.parent = _pivot;
+				Delay.FireOnNextUpdate(ResetPosition);
+			}
+		);
 	}
 
 	public void Update()

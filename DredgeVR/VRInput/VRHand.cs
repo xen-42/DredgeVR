@@ -43,6 +43,9 @@ public class VRHand : MonoBehaviour
 		_lineEnd.name = "Dot";
 	}
 
+	/// <summary>
+	/// First time the title scene loads we'll steal some buoys and shaders for our hand graphics
+	/// </summary>
 	private void AddBuoyGraphics()
 	{
 		DredgeVRCore.TitleSceneStart -= AddBuoyGraphics;
