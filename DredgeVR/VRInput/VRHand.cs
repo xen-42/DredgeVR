@@ -2,15 +2,17 @@
 using UnityEngine;
 using UnityEngine.ResourceManagement;
 using Valve.VR;
+using Winch.Core;
 
 namespace DredgeVR.VRInput;
 
 public class VRHand : MonoBehaviour
 {
 	public Camera RaycastCamera { get; private set; }
-	private LineRenderer _lineRenderer;
+	private GameObject _line;
 	private GameObject _lineEnd;
 	private bool _graphicsInitialized;
+	private static bool _flagTitleSceneAcquire;
 
 	public float defaultLength = 5.0f;
 	public SteamVR_Input_Sources hand;
@@ -33,23 +35,22 @@ public class VRHand : MonoBehaviour
 		RaycastCamera.farClipPlane = 1000f;
 		RaycastCamera.enabled = false;
 
-		_lineRenderer = gameObject.AddComponent<LineRenderer>();
-		_lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-		_lineRenderer.allowOcclusionWhenDynamic = false;
-		_lineRenderer.endColor = Color.white;
-		_lineRenderer.startWidth = 0.01f;
-		_lineRenderer.alignment = LineAlignment.TransformZ;
-
 		_lineEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		Component.DestroyImmediate(_lineEnd.GetComponent<SphereCollider>());
 		_lineEnd.transform.parent = transform;
-		_lineRenderer.transform.localPosition = Vector3.zero;
 		_lineEnd.transform.localScale = Vector3.one * 0.025f;
 		_lineEnd.name = "Dot";
 
+		// Tried using a line renderer for this but it did not behave in VR
+		_line = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+		Component.DestroyImmediate(_line.GetComponent<Collider>());
+		_line.transform.parent = transform;
+		_line.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+		_line.name = "Line";
+
 		// Disable rendering until the graphics are initialized
-		_lineRenderer.enabled = false;
 		_lineEnd.SetActive(false);
+		_line.SetActive(false);
 
 		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
 		OnDominantHandChanged(VRInputModule.Instance.DominantHand);
@@ -73,28 +74,41 @@ public class VRHand : MonoBehaviour
 		buoy.transform.localRotation = Quaternion.identity;
 		buoy.transform.localScale = Vector3.one * 0.1f;
 
-		// Need a fresh material for our lines
+		// Need a fresh material for our laser pointer
 		var material = new Material(buoy.GetComponent<MeshRenderer>().material.shader);
-		_lineRenderer.material = material;
+		_line.GetComponent<MeshRenderer>().material = material;
 		_lineEnd.GetComponent<MeshRenderer>().material = material;
 
 		_graphicsInitialized = true;
 
 		// Need to keep the addressables loaded else we lose our buoys
-		DredgeVRCore.Instance.StartCoroutine(KeepTitleSceneAddressablesLoaded());
+		if (!_flagTitleSceneAcquire)
+		{
+			_flagTitleSceneAcquire = true;
+			DredgeVRCore.Instance.StartCoroutine(KeepTitleSceneAddressablesLoaded());
+		}
 	}
 
 	private IEnumerator KeepTitleSceneAddressablesLoaded()
 	{
+		var time = 0f;
 		var failed = true;
 		while (failed)
 		{
+			if (time > 10f)
+			{
+				WinchCore.Log.Error($"Couldn't keep title scene addressables loaded, timed out after 10 seconds");
+				yield return null;
+			}
+
 			try
 			{
 				new ResourceManager().Acquire(GameManager.Instance._sceneLoader.titleSceneHandle);
 				failed = false;
 			}
 			catch { }
+
+			time += 0.5f;
 			yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
@@ -121,8 +135,8 @@ public class VRHand : MonoBehaviour
 
 			_lineEnd.transform.position = endPosition;
 
-			_lineRenderer.SetPosition(0, transform.position);
-			_lineRenderer.SetPosition(1, endPosition);
+			_line.transform.position = (transform.position + endPosition) / 2f;
+			_line.transform.localScale = new Vector3(0.005f, (transform.position - endPosition).magnitude / 2f, 0.005f);
 		}
 
 		// Only show pointers when in use
@@ -130,10 +144,10 @@ public class VRHand : MonoBehaviour
 		{
 			_lineEnd.SetActive(IsDominantHand);
 		}
-
-		if (_lineRenderer.enabled != IsDominantHand)
+		
+		if (_line.activeInHierarchy != IsDominantHand)
 		{
-			_lineRenderer.enabled = IsDominantHand;
+			_line.SetActive(IsDominantHand);
 		}
 	}
 
