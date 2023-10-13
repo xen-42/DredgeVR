@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
+using DredgeVR.VRUI;
 using System;
 using System.IO;
 using System.Reflection;
@@ -31,17 +32,18 @@ namespace DredgeVR
 
 			gameObject.AddComponent<VRInputManager>();
 			gameObject.AddComponent<VRInputModule>();
+			gameObject.AddComponent<VRUIManager>();
 
-			SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
-			SceneManager_activeSceneChanged(default, SceneManager.GetActiveScene());
+			SceneManager.activeSceneChanged += OnActiveSceneChanged;
+			OnActiveSceneChanged(default, SceneManager.GetActiveScene());
 		}
 
 		public void OnDestroy()
 		{
-			SceneManager.activeSceneChanged -= SceneManager_activeSceneChanged;
+			SceneManager.activeSceneChanged -= OnActiveSceneChanged;
 		}
 
-		private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
+		private void OnActiveSceneChanged(Scene arg0, Scene arg1)
 		{
 			// Heightmap terrain causes massive lag in VR
 			foreach (var terrain in GameObject.FindObjectsOfType<Terrain>())
@@ -57,20 +59,6 @@ namespace DredgeVR
 			if (arg1.name == "Title")
 			{
 				TitleSceneStart?.Invoke();
-
-				var canvas = GameObject.Find("Canvases");
-
-				canvas.transform.position = new Vector3(-5.4f, 0.35f, 1.6f);
-				canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
-				canvas.transform.localScale = Vector3.one * 0.002f;
-			}
-
-			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
-			{
-				canvas.renderMode = RenderMode.WorldSpace;
-				canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
-				canvas.scaleFactor = 1f;
-				canvas.planeDistance = 1;
 			}
 		}
 	}

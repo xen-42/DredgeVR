@@ -91,11 +91,13 @@ public class VRCameraManager : MonoBehaviour
 	{
 		Camera.fieldOfView = SteamVR.instance.fieldOfView;
 
-		if (VRPlayer?.origin?.parent != null)
+		if (_resetTransform != null)
 		{
 			// Don't take on origin pitch rotation because that is turbo motion sickness
-			var forwardOnPlane = VRPlayer.origin.parent.forward.ProjectOntoPlane(Vector3.up);
+			var forwardOnPlane = _resetTransform.forward.ProjectOntoPlane(Vector3.up);
 			VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+
+			VRPlayer.origin.transform.position = _resetTransform.position;
 		}
 	}
 
