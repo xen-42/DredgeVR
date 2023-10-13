@@ -1,5 +1,4 @@
-﻿using AeLa.EasyFeedback.APIs;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 using Winch.Core;
 
@@ -7,8 +6,6 @@ namespace DredgeVR.Helpers;
 
 public class AssetLoader
 {
-	private static readonly Shader standardShader = Shader.Find("Standard");
-
 	public static GameObject LeftHandBase;
 	public static GameObject RightHandBase;
 
@@ -24,32 +21,6 @@ public class AssetLoader
 		var asset = bundle.LoadAsset<T>($"Assets/{prefabName}");
 		if (asset)
 		{
-			// I live in hell
-			// Repair materials
-			if (asset is GameObject go)
-			{
-				foreach (var renderer in go.GetComponentsInChildren<MeshRenderer>())
-				{
-					foreach (var mat in renderer.materials)
-					{
-						mat.shader = standardShader;
-						mat.renderQueue = 2000;
-					}
-				}
-				foreach (Transform child in go.transform)
-				{
-					foreach (var renderer in child.GetComponentsInChildren<MeshRenderer>())
-					{
-						foreach (var mat in renderer.materials)
-						{
-							mat.shader = standardShader;
-							mat.renderQueue = 2000;
-						}
-					}
-				}
-			}
-
-
 			return asset;
 		}
 		else

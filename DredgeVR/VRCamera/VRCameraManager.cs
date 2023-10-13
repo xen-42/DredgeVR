@@ -1,11 +1,9 @@
-﻿using Cinemachine.Utility;
-using DG.Tweening;
+﻿using Cinemachine;
+using Cinemachine.Utility;
 using DredgeVR.Helpers;
-using System;
+using DredgeVR.VRInput;
 using UnityEngine;
 using Valve.VR;
-using Winch.Config;
-using Winch.Core;
 
 namespace DredgeVR.VRCamera;
 
@@ -28,24 +26,22 @@ public class VRCameraManager : MonoBehaviour
 
 	public void Start()
 	{
-		try
-		{
-			Camera = GetComponent<Camera>();
-			VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
+		Camera = GetComponent<Camera>();
 
-			LeftHand = GameObject.Instantiate(AssetLoader.LeftHandBase, Vector3.zero, Quaternion.identity);
-			RightHand = GameObject.Instantiate(AssetLoader.RightHandBase, Vector3.zero, Quaternion.identity);
+		// This thing tries to take over and breaks our tracking
+		GetComponent<CinemachineBrain>().enabled = false;
 
-			LeftHand.name = "LeftHand";
-			RightHand.name = "RightHand";
+		// Adds tracking to the head
+		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
-			DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
-			DredgeVRCore.GameSceneStart += OnGameSceneStart;
-		}
-		catch (Exception e)
-		{
-			WinchCore.Log.Error($"{e}");
-		}
+		LeftHand = new GameObject("LeftHand");
+		LeftHand.AddComponent<VRHand>().hand = SteamVR_Input_Sources.LeftHand;
+
+		RightHand = new GameObject("RightHand");
+		RightHand.AddComponent<VRHand>().hand = SteamVR_Input_Sources.RightHand;
+
+		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
+		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 	}
 
 	public void OnDestroy()

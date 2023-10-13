@@ -7,7 +7,7 @@ using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
-//[HarmonyPatch]
+[HarmonyPatch]
 internal static class TryCatchPatch
 {
 	[HarmonyTargetMethods]
@@ -22,15 +22,12 @@ internal static class TryCatchPatch
 	}
 
 	[HarmonyFinalizer]
-	public static void HandleException(Exception __exception)
+	public static Exception HandleException(Exception __exception)
 	{
-		if (__exception == null)
-		{
-			WinchCore.Log.Error($"\nException is somehow null. StackTrace: {Environment.StackTrace}\n");
-		}
-		else
+		if (__exception != null)
 		{
 			WinchCore.Log.Error(__exception);
 		}
+		return __exception;
 	}
 }
