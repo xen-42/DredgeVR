@@ -51,6 +51,12 @@ namespace DredgeVR
 				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 1);
 			}
 
+			foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
+			{
+				particleSystem.enableEmission = false;
+				particleSystem.gameObject.SetActive(false);
+			}
+
 			if (arg1.name == "Game")
 			{
 				GameSceneStart?.Invoke();
