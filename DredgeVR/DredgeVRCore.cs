@@ -28,7 +28,9 @@ namespace DredgeVR
 
 			// Dredge uses one camera for all time and between scenes, which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
-			Camera.main.gameObject.AddComponent<VRInputManager>();
+
+			gameObject.AddComponent<VRInputManager>();
+			gameObject.AddComponent<VRInputModule>();
 
 			SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
 			SceneManager_activeSceneChanged(default, SceneManager.GetActiveScene());
@@ -66,7 +68,7 @@ namespace DredgeVR
 			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 			{
 				canvas.renderMode = RenderMode.WorldSpace;
-				canvas.worldCamera = VRCameraManager.Camera;
+				canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 				canvas.scaleFactor = 1f;
 				canvas.planeDistance = 1;
 			}

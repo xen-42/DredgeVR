@@ -14,18 +14,15 @@ public class VRCameraManager : MonoBehaviour
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
 	public static Camera Camera { get; private set; }
 
-	public static GameObject LeftHand { get; private set; }
-	public static GameObject RightHand { get; private set; }
+	public static VRHand LeftHand { get; private set; }
+	public static VRHand RightHand { get; private set; }
 
 	private Transform _resetTransform, _pivot;
 
 	public void Awake()
 	{
 		Instance = this;
-	}
 
-	public void Start()
-	{
 		Camera = GetComponent<Camera>();
 
 		// This thing tries to take over and breaks our tracking
@@ -34,11 +31,11 @@ public class VRCameraManager : MonoBehaviour
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
-		LeftHand = new GameObject("LeftHand");
-		LeftHand.AddComponent<VRHand>().hand = SteamVR_Input_Sources.LeftHand;
+		LeftHand = new GameObject("LeftHand").AddComponent<VRHand>();
+		LeftHand.hand = SteamVR_Input_Sources.LeftHand;
 
-		RightHand = new GameObject("RightHand");
-		RightHand.AddComponent<VRHand>().hand = SteamVR_Input_Sources.RightHand;
+		RightHand = new GameObject("RightHand").AddComponent<VRHand>();
+		RightHand.hand = SteamVR_Input_Sources.RightHand;
 
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;

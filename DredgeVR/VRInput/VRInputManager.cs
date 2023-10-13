@@ -1,5 +1,6 @@
 ﻿using DredgeVR.VRCamera;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Valve.VR;
 
 namespace DredgeVR.VRInput;
@@ -8,7 +9,7 @@ public class VRInputManager : MonoBehaviour
 {
 	public void Awake()
 	{
-		SteamVR_Actions._default.LeftTrigger.AddOnStateDownListener(LeftTriggerDown, SteamVR_Input_Sources.Any);
+		//SteamVR_Actions._default.LeftTrigger.AddOnStateDownListener(LeftTriggerDown, SteamVR_Input_Sources.Any);
 
 		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, LeftHandUpdate);
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, RightHandUpdate);

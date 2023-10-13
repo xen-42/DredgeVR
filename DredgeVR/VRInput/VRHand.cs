@@ -3,9 +3,9 @@ using Valve.VR;
 
 namespace DredgeVR.VRInput;
 
-internal class VRHand : MonoBehaviour
+public class VRHand : MonoBehaviour
 {
-	private Camera _camera;
+	public Camera RaycastCamera { get; private set; }
 	private LineRenderer _lineRenderer;
 	private GameObject _lineEnd;
 
@@ -23,10 +23,10 @@ internal class VRHand : MonoBehaviour
 		handSkeleton.skeletonRoot = transform;
 		handSkeleton.enabled = true;
 
-		_camera = gameObject.AddComponent<Camera>();
-		_camera.nearClipPlane = 0.01f;
-		_camera.farClipPlane = 1000f;
-		_camera.enabled = false;
+		RaycastCamera = gameObject.AddComponent<Camera>();
+		RaycastCamera.nearClipPlane = 0.01f;
+		RaycastCamera.farClipPlane = 1000f;
+		RaycastCamera.enabled = false;
 
 		_lineRenderer = gameObject.AddComponent<LineRenderer>();
 		_lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -60,7 +60,11 @@ internal class VRHand : MonoBehaviour
 
 	public void Update()
 	{
-		var targetLength = defaultLength;
+		// Use raycast from input data if it's hitting something, else default then do our own raycast
+		var inputRaycastDistance = VRInputModule.Instance?.Data == null 
+			? 0f : VRInputModule.Instance.Data.pointerCurrentRaycast.distance;
+
+		var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance; 
 
 		var hit = CreateRaycast(targetLength);
 
