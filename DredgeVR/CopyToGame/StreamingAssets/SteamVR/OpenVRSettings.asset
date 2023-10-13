@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a32bfe54d957ec4581fa4a630f1647a, type: 3}
   m_Name: Open VR Settings
   m_EditorClassIdentifier: 
-  PromptToUpgradePackage: 0
-  PromptToUpgradePreviewPackages: 0
+  PromptToUpgradePackage: 1
+  PromptToUpgradePreviewPackages: 1
   SkipPromptForVersion: 
   StereoRenderingMode: 0
   InitializationType: 1
-  EditorAppKey: application.generated.unity.dredge.exe
+  EditorAppKey: application.generated.unity.dredgevrsetup2.exe
   ActionManifestFileRelativeFilePath: StreamingAssets\SteamVR\actions.json
-  MirrorView: 3
+  MirrorView: 2
   HasCopiedDefaults: 0

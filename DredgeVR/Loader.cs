@@ -14,13 +14,13 @@ namespace DredgeVR
 	{
 		public static void Initialize()
 		{
-			new Harmony("DredgeVR").PatchAll();
-
 			SetUpXr();
 
 			var gameObject = new GameObject(nameof(DredgeVRCore));
 			gameObject.AddComponent<DredgeVRCore>();
 			GameObject.DontDestroyOnLoad(gameObject);
+
+			new Harmony("DredgeVR").PatchAll();
 		}
 
 		private static void SetUpXr()
@@ -47,7 +47,8 @@ namespace DredgeVR
 
 			managerSettings.StartSubsystems();
 
-			SteamVR_Settings.instance.pauseGameWhenDashboardVisible = true;
+			// Don't pause because it puts us back on the original camera and kills tracking and becomes turbo sickness
+			// SteamVR_Settings.instance.pauseGameWhenDashboardVisible = true;
 
 			// Makes it so that Dredge appears as a VR game in your Steam Home
 			var dredgeFolder = Directory.GetParent(Assembly.GetExecutingAssembly().Location).Parent.Parent.FullName;

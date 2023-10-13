@@ -1,5 +1,9 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
+using DredgeVR.VRInput;
 using System;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Winch.Core;
@@ -13,12 +17,18 @@ namespace DredgeVR
 		public static Action GameSceneStart;
 		public static Action TitleSceneStart;
 
+		public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
 		public void Awake()
 		{
 			Instance = this;
 			WinchCore.Log.Debug($"{nameof(DredgeVRCore)} has loaded!");
 
+			new AssetLoader();
+
+			// Dredge uses one camera for all time and between scenes, which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
+			Camera.main.gameObject.AddComponent<VRInputManager>();
 
 			SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
 			SceneManager_activeSceneChanged(default, SceneManager.GetActiveScene());

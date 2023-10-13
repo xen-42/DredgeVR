@@ -1,0 +1,66 @@
+ManifestFileVersion: 0
+CRC: 1114172133
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 5c580e75a6caf7e7f1dc8f0a9d4f239f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 98adf697c6833b5b33b6c58fabd5743d
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 90
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 00f6c0d7b5a00aa4a8d38a09a0480032, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e7418c7dd8f977d4e969202d3fa7e926, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e90911e410742a1498a167540c7865bf, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Action_Boolean
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Action_Single
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Action_Skeleton
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Behaviour_SkeletonEvent
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Behaviour_Skeleton_ConnectedChangedEvent
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Behaviour_Skeleton_TrackingChangedEvent
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Skeleton_HandMask
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Skeleton_Pose_Hand
+- AssemblyName: SteamVR
+  ClassName: Valve.VR.SteamVR_Skeleton_Poser/PoseBlendingBehaviour
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+Assets:
+- Assets/SteamVR/Prefabs/vr_glove_right.prefab
+- Assets/SteamVR/Prefabs/vr_glove_left.prefab
+Dependencies: []

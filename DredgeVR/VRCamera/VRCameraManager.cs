@@ -1,25 +1,51 @@
 ﻿using Cinemachine.Utility;
 using DG.Tweening;
+using DredgeVR.Helpers;
+using System;
 using UnityEngine;
 using Valve.VR;
+using Winch.Config;
+using Winch.Core;
 
 namespace DredgeVR.VRCamera;
 
 [RequireComponent(typeof(Camera))]
 public class VRCameraManager : MonoBehaviour
 {
+	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
 	public static Camera Camera { get; private set; }
 
+	public static GameObject LeftHand { get; private set; }
+	public static GameObject RightHand { get; private set; }
+
 	private Transform _resetTransform, _pivot;
+
+	public void Awake()
+	{
+		Instance = this;
+	}
 
 	public void Start()
 	{
-		Camera = GetComponent<Camera>();
-		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
+		try
+		{
+			Camera = GetComponent<Camera>();
+			VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
-		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
-		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+			LeftHand = GameObject.Instantiate(AssetLoader.LeftHandBase, Vector3.zero, Quaternion.identity);
+			RightHand = GameObject.Instantiate(AssetLoader.RightHandBase, Vector3.zero, Quaternion.identity);
+
+			LeftHand.name = "LeftHand";
+			RightHand.name = "RightHand";
+
+			DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
+			DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		}
+		catch (Exception e)
+		{
+			WinchCore.Log.Error($"{e}");
+		}
 	}
 
 	public void OnDestroy()
@@ -38,10 +64,9 @@ public class VRCameraManager : MonoBehaviour
 		_resetTransform.position = new Vector3(-6.5f, 0.5f, 0);
 		_resetTransform.LookAt(worldPos);
 
-		_pivot = new GameObject("VRCameraPivot").transform;
-		VRPlayer.origin = _pivot;
+		ResetPivot();
 
-		ResetPosition();
+		Delay.FireOnNextUpdate(ResetPosition);
 	}
 
 	private void OnGameSceneStart()
@@ -52,10 +77,21 @@ public class VRCameraManager : MonoBehaviour
 		_resetTransform.position = new Vector3(0, 1, -2);
 		_resetTransform.rotation = Quaternion.identity;
 
+		ResetPivot();
+
+		Delay.FireOnNextUpdate(ResetPosition);
+	}
+
+	/// <summary>
+	/// Have to recreate the pivot when the scene changes
+	/// </summary>
+	private void ResetPivot()
+	{
 		_pivot = new GameObject("VRCameraPivot").transform;
 		VRPlayer.origin = _pivot;
 
-		ResetPosition();
+		LeftHand.transform.parent = _pivot;
+		RightHand.transform.parent = _pivot;
 	}
 
 	public void Update()
