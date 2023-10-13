@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace DredgeVR.Fish.Patches;
+namespace DredgeVR.World.Patches;
 
 [HarmonyPatch(typeof(HarvestPOI))]
 internal class HarvestPOIPatches
