@@ -1,5 +1,4 @@
 ﻿using DredgeVR.VRCamera;
-using System.Linq;
 using UnityEngine;
 using Valve.VR;
 
@@ -26,6 +25,7 @@ public class VRInputManager : MonoBehaviour
 		if (VRCameraManager.LeftHand)
 		{
 			VRCameraManager.LeftHand.transform.localPosition = SteamVR_Actions._default.LeftHandPose.localPosition;
+			VRCameraManager.LeftHand.transform.localRotation = SteamVR_Actions._default.LeftHandPose.localRotation;
 		}
 	}
 	private void RightHandUpdate(SteamVR_Action_Pose fromAction, SteamVR_Input_Sources fromSource)
@@ -33,6 +33,7 @@ public class VRInputManager : MonoBehaviour
 		if (VRCameraManager.RightHand)
 		{
 			VRCameraManager.RightHand.transform.localPosition = SteamVR_Actions._default.RightHandPose.localPosition;
+			VRCameraManager.RightHand.transform.localRotation = SteamVR_Actions._default.RightHandPose.localRotation;
 		}
 	}
 }

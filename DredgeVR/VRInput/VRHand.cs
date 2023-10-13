@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.ResourceManagement;
 using Valve.VR;
 
 namespace DredgeVR.VRInput;
@@ -8,9 +10,12 @@ public class VRHand : MonoBehaviour
 	public Camera RaycastCamera { get; private set; }
 	private LineRenderer _lineRenderer;
 	private GameObject _lineEnd;
+	private bool _graphicsInitialized;
 
 	public float defaultLength = 5.0f;
 	public SteamVR_Input_Sources hand;
+
+	public bool IsDominantHand { get; private set; }
 
 	public void Start()
 	{
@@ -41,6 +46,18 @@ public class VRHand : MonoBehaviour
 		_lineRenderer.transform.localPosition = Vector3.zero;
 		_lineEnd.transform.localScale = Vector3.one * 0.025f;
 		_lineEnd.name = "Dot";
+
+		// Disable rendering until the graphics are initialized
+		_lineRenderer.enabled = false;
+		_lineEnd.SetActive(false);
+
+		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
+		OnDominantHandChanged(VRInputModule.Instance.DominantHand);
+	}
+
+	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
+	{
+		IsDominantHand = dominantHand == hand;
 	}
 
 	/// <summary>
@@ -56,27 +73,68 @@ public class VRHand : MonoBehaviour
 		buoy.transform.localRotation = Quaternion.identity;
 		buoy.transform.localScale = Vector3.one * 0.1f;
 
-		var material = new Material(buoy.GetComponentInChildren<MeshRenderer>().material.shader);
+		// Need a fresh material for our lines
+		var material = new Material(buoy.GetComponent<MeshRenderer>().material.shader);
 		_lineRenderer.material = material;
 		_lineEnd.GetComponent<MeshRenderer>().material = material;
+
+		_graphicsInitialized = true;
+
+		// Need to keep the addressables loaded else we lose our buoys
+		DredgeVRCore.Instance.StartCoroutine(KeepTitleSceneAddressablesLoaded());
+	}
+
+	private IEnumerator KeepTitleSceneAddressablesLoaded()
+	{
+		var failed = true;
+		while (failed)
+		{
+			try
+			{
+				new ResourceManager().Acquire(GameManager.Instance._sceneLoader.titleSceneHandle);
+				failed = false;
+			}
+			catch { }
+			yield return new WaitForSeconds(0.5f);
+		}
+		yield return null;
 	}
 
 	public void Update()
 	{
-		// Use raycast from input data if it's hitting something, else default then do our own raycast
-		var inputRaycastDistance = VRInputModule.Instance?.Data == null 
-			? 0f : VRInputModule.Instance.Data.pointerCurrentRaycast.distance;
+		if (!_graphicsInitialized)
+		{
+			return;
+		}
 
-		var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance; 
+		if (IsDominantHand)
+		{
+			// Use raycast from input data if it's hitting something, else default then do our own raycast
+			var inputRaycastDistance = VRInputModule.Instance?.Data == null
+				? 0f : VRInputModule.Instance.Data.pointerCurrentRaycast.distance;
 
-		var hit = CreateRaycast(targetLength);
+			var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance;
 
-		var endPosition = hit.collider != null ? hit.point : transform.position + (transform.forward * (targetLength - 0.1f));
+			var hit = CreateRaycast(targetLength);
 
-		_lineEnd.transform.position = endPosition;
+			var endPosition = hit.collider != null ? hit.point : transform.position + (transform.forward * (targetLength - 0.1f));
 
-		_lineRenderer.SetPosition(0, transform.position);
-		_lineRenderer.SetPosition(1, endPosition);
+			_lineEnd.transform.position = endPosition;
+
+			_lineRenderer.SetPosition(0, transform.position);
+			_lineRenderer.SetPosition(1, endPosition);
+		}
+
+		// Only show pointers when in use
+		if (_lineEnd.activeInHierarchy != IsDominantHand)
+		{
+			_lineEnd.SetActive(IsDominantHand);
+		}
+
+		if (_lineRenderer.enabled != IsDominantHand)
+		{
+			_lineRenderer.enabled = IsDominantHand;
+		}
 	}
 
 	private RaycastHit CreateRaycast(float targetLength)
@@ -86,5 +144,4 @@ public class VRHand : MonoBehaviour
 
 		return hit;
 	}
-
 }

@@ -1,24 +1,24 @@
 ﻿using DredgeVR.VRCamera;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
-using Winch.Config;
 using Winch.Core;
 
 namespace DredgeVR.VRInput;
 
+/// <summary>
+/// Based on Youtube tutorial https://www.youtube.com/watch?v=vNqHRD4sqPc&ab_channel=Andrew
+/// </summary>
 internal class VRInputModule : BaseInputModule
 {											    
 	public static VRInputModule Instance { get; private set; }
 
 	// For raycasting
 	public Camera RaycastCamera;
-	public SteamVR_Input_Sources TargetSource;
+	public SteamVR_Input_Sources DominantHand { get; private set; }
+	public Action<SteamVR_Input_Sources> DominantHandChanged;
+
 	public SteamVR_Action_Boolean UIClickAction;
 
 	private GameObject _currentObject;
@@ -36,7 +36,8 @@ internal class VRInputModule : BaseInputModule
 		base.Start();
 
 		RaycastCamera = VRCameraManager.LeftHand.RaycastCamera;
-		TargetSource = SteamVR_Input_Sources.LeftHand;
+		DominantHand = SteamVR_Input_Sources.LeftHand;
+		DominantHandChanged?.Invoke(DominantHand);
 		UIClickAction = SteamVR_Actions._default.LeftTrigger;
 
 		Data = new PointerEventData(eventSystem);
@@ -56,8 +57,7 @@ internal class VRInputModule : BaseInputModule
 
 		HandlePointerExitAndEnter(Data, _currentObject);
 
-		// Thank you Youtube tutorial https://www.youtube.com/watch?v=vNqHRD4sqPc&ab_channel=Andrew
-		if (UIClickAction.GetStateDown(TargetSource))
+		if (UIClickAction.GetStateDown(DominantHand))
 		{
 			Data.pointerPressRaycast = Data.pointerCurrentRaycast;
 			var newPointerPress = ExecuteEvents.ExecuteHierarchy(_currentObject, Data, ExecuteEvents.pointerDownHandler) 
@@ -69,7 +69,7 @@ internal class VRInputModule : BaseInputModule
 			WinchCore.Log.Info("Clicked");
 		}
 
-		if (UIClickAction.GetStateUp(TargetSource))
+		if (UIClickAction.GetStateUp(DominantHand))
 		{
 			ExecuteEvents.Execute(Data.pointerPress, Data, ExecuteEvents.pointerUpHandler);
 
