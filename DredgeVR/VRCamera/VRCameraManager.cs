@@ -17,7 +17,8 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
 
-	private Transform _resetTransform, _pivot;
+	public static Transform ResetTransform { get; private set; }
+	private Transform _pivot;
 
 	public void Awake()
 	{
@@ -62,9 +63,9 @@ public class VRCameraManager : MonoBehaviour
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
 		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
 
-		_resetTransform = new GameObject("ResetTransform").transform;
-		_resetTransform.position = new Vector3(-6.5f, 0.5f, 0);
-		_resetTransform.LookAt(worldPos);
+		ResetTransform = new GameObject("ResetTransform").transform;
+		ResetTransform.position = new Vector3(-6.5f, 0.5f, 0);
+		ResetTransform.LookAt(worldPos);
 
 		Delay.FireOnNextUpdate(ResetPosition);
 	}
@@ -77,10 +78,10 @@ public class VRCameraManager : MonoBehaviour
 			() =>
 			{
 				// Make the player follow the boat
-				_resetTransform = new GameObject("ResetTransform").transform;
-				_resetTransform.parent = GameManager.Instance.Player.transform;
-				_resetTransform.localPosition = new Vector3(0, 1, -2);
-				_resetTransform.localRotation = Quaternion.identity;
+				ResetTransform = new GameObject("ResetTransform").transform;
+				ResetTransform.parent = GameManager.Instance.Player.transform;
+				ResetTransform.localPosition = new Vector3(0, 1, -2);
+				ResetTransform.localRotation = Quaternion.identity;
 
 				Delay.FireOnNextUpdate(ResetPosition);
 			}
@@ -91,22 +92,22 @@ public class VRCameraManager : MonoBehaviour
 	{
 		Camera.fieldOfView = SteamVR.instance.fieldOfView;
 
-		if (_resetTransform != null)
+		if (ResetTransform != null)
 		{
 			// Don't take on origin pitch rotation because that is turbo motion sickness
-			var forwardOnPlane = _resetTransform.forward.ProjectOntoPlane(Vector3.up);
+			var forwardOnPlane = ResetTransform.forward.ProjectOntoPlane(Vector3.up);
 			VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
 
-			VRPlayer.origin.transform.position = _resetTransform.position;
+			VRPlayer.origin.transform.position = ResetTransform.position;
 		}
 	}
 
 	public void ResetPosition()
 	{
-		var rotationAngleY = _resetTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
+		var rotationAngleY = ResetTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
 		_pivot.Rotate(0, rotationAngleY, 0);
 
-		var distanceDiff = _resetTransform.position - _pivot.position;
+		var distanceDiff = ResetTransform.position - _pivot.position;
 		_pivot.transform.position += distanceDiff;
 	}
 }

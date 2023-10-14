@@ -44,6 +44,9 @@ internal class VRUIManager : MonoBehaviour
 		canvas.transform.position = new Vector3(-5.4f, 0.35f, 1.6f);
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
+
+		// Make the loading screen UI show in front of the player too
+		GameObject.Find("Canvas").AddComponent<GameSceneUI>();
 	}
 
 	private void OnGameSceneStart()
