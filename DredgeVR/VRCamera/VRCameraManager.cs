@@ -3,6 +3,7 @@ using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.VRInput;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Valve.VR;
 
 namespace DredgeVR.VRCamera;
@@ -97,6 +98,13 @@ public class VRCameraManager : MonoBehaviour
 			// Don't take on origin pitch rotation because that is turbo motion sickness
 			var forwardOnPlane = ResetTransform.forward.ProjectOntoPlane(Vector3.up);
 			VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+
+			// In the game scene force a constant ResetTransform y position
+			// Else you bump into something and dear god
+			if (SceneManager.GetActiveScene().name == "Game")
+			{
+				ResetTransform.position = new Vector3(ResetTransform.position.x, 0.66f, ResetTransform.position.z);
+			}
 
 			VRPlayer.origin.transform.position = ResetTransform.position;
 		}
