@@ -6,16 +6,19 @@ namespace DredgeVR.VRInput;
 
 public class VRInputManager : MonoBehaviour
 {
+	public static Vector2 RightThumbStick { get; private set; }
+
 	public void Awake()
 	{
-		SteamVR_Actions._default.RightTrigger.AddOnStateDownListener(RightTriggerDown, SteamVR_Input_Sources.Any);
-		//SteamVR_Actions._default.LeftTrigger.AddOnStateDownListener(LeftTriggerDown, SteamVR_Input_Sources.Any);
+		SteamVR_Actions._default.LeftTrigger.AddOnStateDownListener(ResetPositionButton, SteamVR_Input_Sources.Any);
 
 		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, LeftHandUpdate);
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, RightHandUpdate);
+
+		SteamVR_Actions._default.RightThumbStick.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.RightHand);
 	}
 
-	private void RightTriggerDown(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+	private void ResetPositionButton(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
 		VRCameraManager.Instance.ResetPosition();
 	}
@@ -35,5 +38,10 @@ public class VRInputManager : MonoBehaviour
 			VRCameraManager.RightHand.transform.localPosition = SteamVR_Actions._default.RightHandPose.localPosition;
 			VRCameraManager.RightHand.transform.localRotation = SteamVR_Actions._default.RightHandPose.localRotation;
 		}
+	}
+
+	private void RightThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
+	{
+		RightThumbStick = axis;
 	}
 }
