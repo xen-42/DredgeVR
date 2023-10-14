@@ -16,10 +16,13 @@ internal class GameSceneUI : MonoBehaviour
 
 	public void Update()
 	{
-		var uiParent = VRCameraManager.ResetTransform.transform;
+		var uiParent = VRCameraManager.ResetTransform;
 
-		transform.position = uiParent.transform.TransformPoint(Offset);
-		transform.rotation = Quaternion.Euler(0f, uiParent.rotation.eulerAngles.y, 0f);
-		transform.localScale = Vector3.one * 0.001f;
+		if (uiParent != null)
+		{
+			transform.position = uiParent.transform.TransformPoint(Offset);
+			transform.rotation = Quaternion.Euler(0f, uiParent.rotation.eulerAngles.y, 0f);
+			transform.localScale = Vector3.one * 0.001f;
+		}
 	}
 }
