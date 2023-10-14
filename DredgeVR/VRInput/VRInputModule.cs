@@ -35,13 +35,19 @@ internal class VRInputModule : BaseInputModule
 	{
 		base.Start();
 
-		RaycastCamera = VRCameraManager.LeftHand.RaycastCamera;
-		DominantHand = SteamVR_Input_Sources.LeftHand;
-		DominantHandChanged?.Invoke(DominantHand);
-		UIClickAction = SteamVR_Actions._default.LeftTrigger;
+		SetDominantHand(false);
 
 		Data = new PointerEventData(eventSystem);
-	}		   
+	}		 
+	
+	public void SetDominantHand(bool left)
+	{
+		RaycastCamera = left ? VRCameraManager.LeftHand.RaycastCamera : VRCameraManager.RightHand.RaycastCamera;
+		DominantHand = left ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
+		UIClickAction = left ? SteamVR_Actions._default.LeftTrigger : SteamVR_Actions._default.RightTrigger;
+
+		DominantHandChanged?.Invoke(DominantHand);
+	}
 
 	public override void Process()
 	{
