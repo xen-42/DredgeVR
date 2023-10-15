@@ -21,16 +21,34 @@ public class VRInputManager : MonoBehaviour
 			this.vrAction = vrAction;
 			this.hand = hand;
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is VRBinding otherVRBinding)
+			{
+				return otherVRBinding.vrAction == vrAction && otherVRBinding.hand == hand;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return hand.GetHashCode() + vrAction.GetHashCode() * 15;
+		}
 	}
 
+	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
 	public static Dictionary<Key, VRBinding> KeyMapping = new()
 	{
-		{ Key.F, new VRBinding(SteamVR_Actions._default.A, SteamVR_Input_Sources.LeftHand) },
-		{ Key.X, new VRBinding(SteamVR_Actions._default.B, SteamVR_Input_Sources.LeftHand) },
-		{ Key.E, new VRBinding(SteamVR_Actions._default.A, SteamVR_Input_Sources.RightHand) },
-		{ Key.Q, new VRBinding(SteamVR_Actions._default.B, SteamVR_Input_Sources.RightHand) }
+		{ Key.F, new VRBinding(SteamVR_Actions._default.A_Left, SteamVR_Input_Sources.LeftHand) },
+		{ Key.X, new VRBinding(SteamVR_Actions._default.B_Left, SteamVR_Input_Sources.LeftHand) },
+		{ Key.E, new VRBinding(SteamVR_Actions._default.A_Right, SteamVR_Input_Sources.RightHand) },
+		{ Key.Q, new VRBinding(SteamVR_Actions._default.B_Right, SteamVR_Input_Sources.RightHand) }
 	};
 
 	public static Dictionary<VRBinding, bool> State = new();
@@ -43,15 +61,15 @@ public class VRInputManager : MonoBehaviour
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, RightHandUpdate);
 
 		SteamVR_Actions._default.RightThumbStick.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.RightHand);
+		SteamVR_Actions._default.LeftThumbStick.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.LeftHand);
 
 		foreach (var vrButton in KeyMapping.Values)
 		{
 			State.Add(vrButton, false);
-			vrButton.vrAction.AddOnStateDownListener(VRButtonUpdate_Pressed, SteamVR_Input_Sources.Any);
-			vrButton.vrAction.AddOnStateUpListener(VRButtonUpdate_Released, SteamVR_Input_Sources.Any);
-		}
 
-		SteamVR_Actions._default.LeftTrigger.AddOnStateDownListener(VRButtonUpdate_Pressed, SteamVR_Input_Sources.Any);
+			vrButton.vrAction.AddOnStateDownListener(VRButtonUpdate_Pressed, vrButton.hand);
+			vrButton.vrAction.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
+		}
 	}
 
 	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
@@ -91,5 +109,10 @@ public class VRInputManager : MonoBehaviour
 	private void RightThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
 	{
 		RightThumbStick = axis;
+	}	  	
+	
+	private void LeftThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
+	{
+		LeftThumbStick = axis;
 	}
 }
