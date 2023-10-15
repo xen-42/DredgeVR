@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using System;
-using UnityEngine;
 
 namespace DredgeVR.VRInput.Patches;
 
@@ -8,12 +6,10 @@ namespace DredgeVR.VRInput.Patches;
 public static class DredgeInputManagerPatches
 {
 	[HarmonyPostfix]
-	[HarmonyPatch(nameof(DredgeInputManager.GetValue), new Type[] { typeof(DredgePlayerActionTwoAxis) })]
-	public static void DredgeInputManager_GetValue_DredgePlayerActionTwoAxis(DredgeInputManager __instance, DredgePlayerActionTwoAxis playerActionAxis, ref Vector2 __result)
+	[HarmonyPatch(nameof(DredgeInputManager.IsUsingController), MethodType.Getter)]
+	public static void DredgeInputManager_IsUsingController(DredgeInputManager __instance, ref bool __result)
 	{
-		if (playerActionAxis == GameManager.Instance?.Player?.Controller?.MoveAction && VRInputManager.RightThumbStick != Vector2.zero)
-		{
-			__result = VRInputManager.RightThumbStick;
-		}
+		// There's some places where the sticks don't get checked if it doesn't think we're using a controller
+		__result = true;
 	}
 }

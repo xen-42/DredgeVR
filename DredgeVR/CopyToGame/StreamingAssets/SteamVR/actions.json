@@ -43,12 +43,22 @@
       "type": "vector2"
     },
     {
-      "name": "/actions/default/in/B",
+      "name": "/actions/default/in/B Left",
       "type": "boolean",
       "requirement": "suggested"
     },
     {
-      "name": "/actions/default/in/A",
+      "name": "/actions/default/in/A Left",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
+      "name": "/actions/default/in/B Right",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
+      "name": "/actions/default/in/A Right",
       "type": "boolean"
     },
     {
@@ -171,8 +181,10 @@
       "/actions/default/in/RightHandPose": "Right Hand Pose",
       "/actions/default/in/LeftThumbStick": "Left Thumb Stick",
       "/actions/default/in/RightThumbStick": "Right Thumb Stick",
-      "/actions/default/in/B": "B Button",
-      "/actions/default/in/A": "A Button"
+      "/actions/default/in/A Left": "A (Left)",
+      "/actions/default/in/B Left": "B (Left)",
+      "/actions/default/in/A Right": "A (Right)",
+      "/actions/default/in/B Right": "B (Right)"
     }
   ]
 }

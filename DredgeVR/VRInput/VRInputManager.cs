@@ -1,10 +1,6 @@
-﻿using DredgeVR.Helpers;
-using DredgeVR.VRCamera;
-using DredgeVR.VRInput.VRBindingSource;
+﻿using DredgeVR.VRCamera;
 using InControl;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Valve.VR;
 using Winch.Core;
@@ -15,28 +11,51 @@ public class VRInputManager : MonoBehaviour
 {
 	public struct VRBinding
 	{
-		public SteamVR_Action_Boolean vrAction;
+		public SteamVR_Action_Boolean action;
 		public SteamVR_Input_Sources hand;
 
-		public VRBinding(SteamVR_Action_Boolean vrAction, SteamVR_Input_Sources hand)
+		public bool state;
+
+		public VRBinding(SteamVR_Action_Boolean action, SteamVR_Input_Sources hand)
 		{
-			this.vrAction = vrAction;
+			this.action = action;
 			this.hand = hand;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is VRBinding otherVRBinding)
+			{
+				return otherVRBinding.action == action && otherVRBinding.hand == hand;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return hand.GetHashCode() + action.GetHashCode() * 15;
 		}
 	}
 
+	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
-	private Dictionary<Key, VRBinding> _keyMapping = new()
+	public static Dictionary<Key, VRBinding> KeyMapping = new()
 	{
-		{ Key.F, new VRBinding(SteamVR_Actions._default.A, SteamVR_Input_Sources.LeftHand) },
-		{ Key.X, new VRBinding(SteamVR_Actions._default.B, SteamVR_Input_Sources.LeftHand) },
-		{ Key.E, new VRBinding(SteamVR_Actions._default.A, SteamVR_Input_Sources.RightHand) },
-		{ Key.Q, new VRBinding(SteamVR_Actions._default.B, SteamVR_Input_Sources.RightHand) }
+		{ Key.F, new VRBinding(SteamVR_Actions._default.A_Left, SteamVR_Input_Sources.LeftHand) },
+		{ Key.X, new VRBinding(SteamVR_Actions._default.B_Left, SteamVR_Input_Sources.LeftHand) },
+		{ Key.E, new VRBinding(SteamVR_Actions._default.A_Right, SteamVR_Input_Sources.RightHand) },
+		{ Key.Q, new VRBinding(SteamVR_Actions._default.B_Right, SteamVR_Input_Sources.RightHand) },
+		{ Key.Z, new VRBinding(SteamVR_Actions._default.LeftTrigger, SteamVR_Input_Sources.LeftHand) },
+		{ Key.T, new VRBinding(SteamVR_Actions._default.RightTrigger, SteamVR_Input_Sources.RightHand) },
+		// TODO: need to do mouse wheel to triggers
+		// Should map controller stuff instead
 	};
 
-	private Dictionary<Key, List<PlayerAction>> _keyboardControls = new();
-
+	public static Dictionary<VRBinding, bool> State = new();
 
 	public void Awake()
 	{
@@ -46,30 +65,27 @@ public class VRInputManager : MonoBehaviour
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, RightHandUpdate);
 
 		SteamVR_Actions._default.RightThumbStick.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.RightHand);
+		SteamVR_Actions._default.LeftThumbStick.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.LeftHand);
 
-		// Modify input bindings
-		foreach (var fieldInfo in typeof(DredgeControlBindings).GetFields().Where(x => x.FieldType.IsAssignableFrom(typeof(PlayerAction))))
+		foreach (var vrButton in KeyMapping.Values)
 		{
-			try
-			{
-				var playerAction = fieldInfo.GetValue(GameManager.Instance.Input.Controls) as PlayerAction;
+			State.Add(vrButton, false);
 
-				var key = ((playerAction.GetValue<List<BindingSource>>("defaultBindings")).FirstOrDefault(x => x is KeyBindingSource) as KeyBindingSource).Control.GetInclude(0);
-
-				if (_keyMapping.TryGetValue(key, out var vrBinding))
-				{
-					var vrBindingSource = new VRBindingSourceBoolean(vrBinding.vrAction, vrBinding.hand);
-					playerAction.AddDefaultBinding(vrBindingSource);
-					playerAction.AddBinding(vrBindingSource);
-
-					playerAction.ClearBindings();
-					playerAction.AddBinding(new KeyBindingSource(Key.P));
-
-					WinchCore.Log.Info($"Added new VR control binding {key} to {vrBindingSource.Name}");
-				}
-			}
-			catch { }
+			vrButton.action.AddOnStateDownListener(VRButtonUpdate_Pressed, vrButton.hand);
+			vrButton.action.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
 		}
+	}
+
+	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+	{
+		WinchCore.Log.Info($"Pressed button {fromAction.GetShortName()}");
+		State[new VRBinding(fromAction, fromSource)] = true;
+	}
+
+	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
+	{
+		WinchCore.Log.Info($"Released button {fromAction.GetShortName()}");
+		State[new VRBinding(fromAction, fromSource)] = false;
 	}
 
 	private void ResetPositionButton(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
@@ -97,5 +113,10 @@ public class VRInputManager : MonoBehaviour
 	private void RightThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
 	{
 		RightThumbStick = axis;
+	}	  	
+	
+	private void LeftThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
+	{
+		LeftThumbStick = axis;
 	}
 }

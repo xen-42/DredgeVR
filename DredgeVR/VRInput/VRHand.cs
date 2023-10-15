@@ -129,12 +129,6 @@ public class VRHand : MonoBehaviour
 
 			var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance;
 
-			/*
-			var hit = CreateRaycast(targetLength);
-
-			var endPosition = hit.collider != null ? hit.point : transform.position + (transform.forward * (targetLength - 0.1f));
-			*/
-
 			// Only collide with UI
 			var endPosition = transform.position + transform.forward * targetLength;
 
@@ -154,13 +148,5 @@ public class VRHand : MonoBehaviour
 		{
 			_line.SetActive(IsDominantHand);
 		}
-	}
-
-	private RaycastHit CreateRaycast(float targetLength)
-	{
-		var ray = new Ray(transform.position, transform.forward);
-		Physics.Raycast(ray, out var hit, targetLength);
-
-		return hit;
 	}
 }
