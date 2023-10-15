@@ -9,9 +9,9 @@ public static class DredgeInputManagerPatches
 {
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(DredgeInputManager.GetValue), new Type[] { typeof(DredgePlayerActionTwoAxis) })]
-	public static void DredgeInputManager_GetValue(DredgeInputManager __instance, DredgePlayerActionTwoAxis playerActionAxis, ref Vector2 __result)
+	public static void DredgeInputManager_GetValue_DredgePlayerActionTwoAxis(DredgeInputManager __instance, DredgePlayerActionTwoAxis playerActionAxis, ref Vector2 __result)
 	{
-		if (playerActionAxis == GameManager.Instance?.Player?.Controller?.MoveAction)
+		if (playerActionAxis == GameManager.Instance?.Player?.Controller?.MoveAction && VRInputManager.RightThumbStick != Vector2.zero)
 		{
 			__result = VRInputManager.RightThumbStick;
 		}

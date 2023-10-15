@@ -43,6 +43,15 @@
       "type": "vector2"
     },
     {
+      "name": "/actions/default/in/B",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
+      "name": "/actions/default/in/A",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     },
@@ -161,7 +170,9 @@
       "/actions/default/in/LeftHandPose": "Left Hand Pose",
       "/actions/default/in/RightHandPose": "Right Hand Pose",
       "/actions/default/in/LeftThumbStick": "Left Thumb Stick",
-      "/actions/default/in/RightThumbStick": "Right Thumb Stick"
+      "/actions/default/in/RightThumbStick": "Right Thumb Stick",
+      "/actions/default/in/B": "B Button",
+      "/actions/default/in/A": "A Button"
     }
   ]
 }

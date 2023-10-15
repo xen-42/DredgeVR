@@ -35,4 +35,14 @@ public static class TypeExtensions
 				break;
 		}
 	}
+
+	public static T GetValue<T>(this object obj, string name)
+	{
+		return obj.GetType().GetAnyMember(name) switch
+		{
+			FieldInfo field => (T)field.GetValue(obj),
+			PropertyInfo property => (T)property.GetValue(obj),
+			_ => throw new Exception($"Type {obj.GetType()} has no field or property named {name}"),
+		};
+	}
 }

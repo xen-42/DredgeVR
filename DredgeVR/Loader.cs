@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using Unity.XR.OpenVR;
 using UnityEngine;
+using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using Valve.VR;
 
@@ -30,7 +31,7 @@ namespace DredgeVR
 			var generalSettings = ScriptableObject.CreateInstance<XRGeneralSettings>();
 			var managerSettings = ScriptableObject.CreateInstance<XRManagerSettings>();
 
-			var xrLoader = ScriptableObject.CreateInstance<OpenVRLoader>();
+			var vrLoader = ScriptableObject.CreateInstance<OpenVRLoader>();
 
 			generalSettings.Manager = managerSettings;
 #pragma warning disable CS0618
@@ -39,7 +40,7 @@ namespace DredgeVR
 			 * Should be fine unless the game's Unity version gets majorly updated, in which case the whole mod will be
 			 * broken, so I'll have to update it anyway.
 			 */
-			managerSettings.loaders.Add(xrLoader);
+			managerSettings.loaders.Add(vrLoader);
 #pragma warning restore CS0618
 
 			managerSettings.InitializeLoaderSync();

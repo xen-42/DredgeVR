@@ -129,9 +129,14 @@ public class VRHand : MonoBehaviour
 
 			var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance;
 
+			/*
 			var hit = CreateRaycast(targetLength);
 
 			var endPosition = hit.collider != null ? hit.point : transform.position + (transform.forward * (targetLength - 0.1f));
+			*/
+
+			// Only collide with UI
+			var endPosition = transform.position + transform.forward * targetLength;
 
 			_lineEnd.transform.position = endPosition;
 

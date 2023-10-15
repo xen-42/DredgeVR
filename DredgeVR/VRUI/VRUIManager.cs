@@ -54,5 +54,8 @@ internal class VRUIManager : MonoBehaviour
 				canvas.gameObject.AddComponent<GameSceneUI>();
 			}
 		}
+
+		// The slide panel still shows when "off screen"
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<PlayerSlidePanelFixer>();
 	}
 }

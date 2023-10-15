@@ -20,10 +20,19 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnSceneStart(string scene)
 	{
+		// TODO: Make this a setting
 		// Heightmap terrain causes massive lag in VR
 		foreach (var terrain in GameObject.FindObjectsOfType<Terrain>())
 		{
-			terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 1);
+			terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
+		}
+
+		// TODO: Make this a setting
+		// Force lower all LOD
+		foreach (var lodGroup in GameObject.FindObjectsOfType<LODGroup>())
+		{
+			lodGroup.ForceLOD(lodGroup.GetLODs().Count() - 1);
+			lodGroup.enabled = false;
 		}
 	}
 
