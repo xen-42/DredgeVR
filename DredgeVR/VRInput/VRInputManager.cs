@@ -11,14 +11,14 @@ public class VRInputManager : MonoBehaviour
 {
 	public struct VRBinding
 	{
-		public SteamVR_Action_Boolean vrAction;
+		public SteamVR_Action_Boolean action;
 		public SteamVR_Input_Sources hand;
 
 		public bool state;
 
-		public VRBinding(SteamVR_Action_Boolean vrAction, SteamVR_Input_Sources hand)
+		public VRBinding(SteamVR_Action_Boolean action, SteamVR_Input_Sources hand)
 		{
-			this.vrAction = vrAction;
+			this.action = action;
 			this.hand = hand;
 		}
 
@@ -26,7 +26,7 @@ public class VRInputManager : MonoBehaviour
 		{
 			if (obj is VRBinding otherVRBinding)
 			{
-				return otherVRBinding.vrAction == vrAction && otherVRBinding.hand == hand;
+				return otherVRBinding.action == action && otherVRBinding.hand == hand;
 			}
 			else
 			{
@@ -36,7 +36,7 @@ public class VRInputManager : MonoBehaviour
 
 		public override int GetHashCode()
 		{
-			return hand.GetHashCode() + vrAction.GetHashCode() * 15;
+			return hand.GetHashCode() + action.GetHashCode() * 15;
 		}
 	}
 
@@ -48,7 +48,11 @@ public class VRInputManager : MonoBehaviour
 		{ Key.F, new VRBinding(SteamVR_Actions._default.A_Left, SteamVR_Input_Sources.LeftHand) },
 		{ Key.X, new VRBinding(SteamVR_Actions._default.B_Left, SteamVR_Input_Sources.LeftHand) },
 		{ Key.E, new VRBinding(SteamVR_Actions._default.A_Right, SteamVR_Input_Sources.RightHand) },
-		{ Key.Q, new VRBinding(SteamVR_Actions._default.B_Right, SteamVR_Input_Sources.RightHand) }
+		{ Key.Q, new VRBinding(SteamVR_Actions._default.B_Right, SteamVR_Input_Sources.RightHand) },
+		{ Key.Z, new VRBinding(SteamVR_Actions._default.LeftTrigger, SteamVR_Input_Sources.LeftHand) },
+		{ Key.T, new VRBinding(SteamVR_Actions._default.RightTrigger, SteamVR_Input_Sources.RightHand) },
+		// TODO: need to do mouse wheel to triggers
+		// Should map controller stuff instead
 	};
 
 	public static Dictionary<VRBinding, bool> State = new();
@@ -67,8 +71,8 @@ public class VRInputManager : MonoBehaviour
 		{
 			State.Add(vrButton, false);
 
-			vrButton.vrAction.AddOnStateDownListener(VRButtonUpdate_Pressed, vrButton.hand);
-			vrButton.vrAction.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
+			vrButton.action.AddOnStateDownListener(VRButtonUpdate_Pressed, vrButton.hand);
+			vrButton.action.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
 		}
 	}
 
