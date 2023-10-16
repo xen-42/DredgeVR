@@ -50,7 +50,8 @@ internal class VRUIManager : MonoBehaviour
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
 			// When finding objects of type make sure they are in the game scene, could be on Manager or DontDestroyOnLoad or whatever
-			if (canvas.gameObject.scene.name == "Game")
+			// Also ignore canvases that have parent canvases, since they will inherit their position
+			if (canvas.gameObject.scene.name == "Game" && canvas.transform.parent?.GetComponentInParent<Canvas>() == null)
 			{
 				canvas.gameObject.AddComponent<GameCanvasFixer>();
 			}
