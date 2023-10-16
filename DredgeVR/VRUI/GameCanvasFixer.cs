@@ -3,11 +3,10 @@ using UnityEngine;
 
 namespace DredgeVR.VRUI;
 
-internal class GameSceneUI : MonoBehaviour
+internal class GameCanvasFixer : MonoBehaviour
 {
+	// Public for testing in UnityExplorer
 	public Vector3 Offset = new (0f, 1f, 2f);
-	public Vector3 RotationEuler = Quaternion.identity.eulerAngles;
-	public bool doRotation = true;
 
 	public void Start()
 	{

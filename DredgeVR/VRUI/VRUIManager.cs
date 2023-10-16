@@ -41,7 +41,7 @@ internal class VRUIManager : MonoBehaviour
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
 		// Make the loading screen UI show in front of the player too
-		GameObject.Find("Canvas").AddComponent<GameSceneUI>();
+		GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
 	}
 
 	private void OnGameSceneStart()
@@ -49,9 +49,10 @@ internal class VRUIManager : MonoBehaviour
 		// Add a component to orient game UI relative to the player camera
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
+			// When finding objects of type make sure they are in the game scene, could be on Manager or DontDestroyOnLoad or whatever
 			if (canvas.gameObject.scene.name == "Game")
 			{
-				canvas.gameObject.AddComponent<GameSceneUI>();
+				canvas.gameObject.AddComponent<GameCanvasFixer>();
 			}
 		}
 

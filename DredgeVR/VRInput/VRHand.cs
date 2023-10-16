@@ -10,7 +10,7 @@ public class VRHand : MonoBehaviour
 {
 	public Camera RaycastCamera { get; private set; }
 	private GameObject _line;
-	private GameObject _lineEnd;
+	public GameObject LaserPointerEnd { get; private set; }
 	private bool _graphicsInitialized;
 	private static bool _flagTitleSceneAcquire;
 
@@ -18,6 +18,8 @@ public class VRHand : MonoBehaviour
 	public SteamVR_Input_Sources hand;
 
 	public bool IsDominantHand { get; private set; }
+
+	public static VRHand DominantHand { get; private set; }
 
 	public void Start()
 	{
@@ -35,11 +37,11 @@ public class VRHand : MonoBehaviour
 		RaycastCamera.farClipPlane = 1000f;
 		RaycastCamera.enabled = false;
 
-		_lineEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-		Component.DestroyImmediate(_lineEnd.GetComponent<SphereCollider>());
-		_lineEnd.transform.parent = transform;
-		_lineEnd.transform.localScale = Vector3.one * 0.025f;
-		_lineEnd.name = "Dot";
+		LaserPointerEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		Component.DestroyImmediate(LaserPointerEnd.GetComponent<SphereCollider>());
+		LaserPointerEnd.transform.parent = transform;
+		LaserPointerEnd.transform.localScale = Vector3.one * 0.025f;
+		LaserPointerEnd.name = "Dot";
 
 		// Tried using a line renderer for this but it did not behave in VR
 		_line = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -49,7 +51,7 @@ public class VRHand : MonoBehaviour
 		_line.name = "Line";
 
 		// Disable rendering until the graphics are initialized
-		_lineEnd.SetActive(false);
+		LaserPointerEnd.SetActive(false);
 		_line.SetActive(false);
 
 		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
@@ -59,6 +61,7 @@ public class VRHand : MonoBehaviour
 	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
 	{
 		IsDominantHand = dominantHand == hand;
+		DominantHand = this;
 	}
 
 	/// <summary>
@@ -77,7 +80,7 @@ public class VRHand : MonoBehaviour
 		// Need a fresh material for our laser pointer
 		var material = new Material(buoy.GetComponent<MeshRenderer>().material.shader);
 		_line.GetComponent<MeshRenderer>().material = material;
-		_lineEnd.GetComponent<MeshRenderer>().material = material;
+		LaserPointerEnd.GetComponent<MeshRenderer>().material = material;
 
 		_graphicsInitialized = true;
 
@@ -132,16 +135,16 @@ public class VRHand : MonoBehaviour
 			// Only collide with UI
 			var endPosition = transform.position + transform.forward * targetLength;
 
-			_lineEnd.transform.position = endPosition;
+			LaserPointerEnd.transform.position = endPosition;
 
 			_line.transform.position = (transform.position + endPosition) / 2f;
 			_line.transform.localScale = new Vector3(0.005f, (transform.position - endPosition).magnitude / 2f, 0.005f);
 		}
 
 		// Only show pointers when in use
-		if (_lineEnd.activeInHierarchy != IsDominantHand)
+		if (LaserPointerEnd.activeInHierarchy != IsDominantHand)
 		{
-			_lineEnd.SetActive(IsDominantHand);
+			LaserPointerEnd.SetActive(IsDominantHand);
 		}
 		
 		if (_line.activeInHierarchy != IsDominantHand)
