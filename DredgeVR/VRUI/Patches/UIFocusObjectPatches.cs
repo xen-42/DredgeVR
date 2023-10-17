@@ -12,8 +12,7 @@ public static class UIFocusObjectPatches
 	{
 		if (__instance.hasTargetObject)
 		{
-			//var offset = __instance.targetObject.GetComponent<RectTransform>().rect.center;
-			__instance.transform.position = __instance.targetObject.transform.position;
+			__instance.transform.position = __instance.targetObject.transform.TransformPoint(__instance.targetObject.GetComponent<RectTransform>().rect.center);
 			__instance.transform.rotation = __instance.targetObject.transform.rotation;
 			__instance.container.transform.localPosition = Vector3.zero;
 			var scaleFactor = __instance.targetObject.transform.lossyScale.x / __instance.transform.lossyScale.x;
