@@ -42,6 +42,10 @@ internal class VRUIManager : MonoBehaviour
 
 		// Make the loading screen UI show in front of the player too
 		GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
+
+		// Make these a bit easier to target
+		GameObject.Find("Canvas/ControlPromptPanel").transform.localScale = Vector3.one * 1.5f;
+		GameObject.Find("Canvas/ControlPromptPanel").transform.localScale = Vector3.one * 1.5f;
 	}
 
 	private void OnGameSceneStart()
@@ -59,5 +63,8 @@ internal class VRUIManager : MonoBehaviour
 
 		// The slide panel still shows when "off screen"
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<PlayerSlidePanelFixer>();
+
+		// Make it easier to target
+		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
 	}
 }

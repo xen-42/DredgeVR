@@ -17,6 +17,7 @@ public class PlayerSlidePanelFixer : MonoBehaviour
 		_slidePanel = GetComponent<SlidePanel>();
 		_funds = transform.Find("Funds").gameObject;
 		_backplate = transform.Find("Backplate").gameObject;
+		transform.Find("SlidePanelTab").transform.localScale = Vector3.one * 1.5f;
 
 		_slidePanel.OnHideFinish.AddListener(Hide);
 		_slidePanel.OnShowStart.AddListener(Show);
