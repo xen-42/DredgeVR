@@ -1,9 +1,5 @@
 ﻿using DredgeVR.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DredgeVR.World;
@@ -38,13 +34,6 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnGameSceneStart()
 	{
-		// Disable particle systems
-		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
-		{
-			particleSystem.enableEmission = false;
-			particleSystem.gameObject.SetActive(false);
-		}
-
 		// Ghost rocks only work in one eye, have to change their shader to one that works in both
 		// Unfortunately this gets rid of their cool effect and just makes them regular rocks
 		foreach (var ghostRock in GameObject.FindObjectsOfType<GhostRock>())
