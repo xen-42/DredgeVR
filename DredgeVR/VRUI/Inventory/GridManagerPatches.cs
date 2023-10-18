@@ -32,7 +32,6 @@ public static class GridManagerPatches
 
 		foreach (var result in __instance.results)
 		{
-			WinchCore.Log.Info($"{result.gameObject.name}");
 			if (__instance.gridCellLayer.Contains(result.gameObject.layer))
 			{
 				var component = result.gameObject.GetComponent<GridCell>();
