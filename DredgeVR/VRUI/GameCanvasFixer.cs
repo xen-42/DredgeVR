@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace DredgeVR.VRUI;
 
+/// <summary>
+/// This component places Canvases at a fixed position in from of the VR player's base transform
+/// </summary>
 internal class GameCanvasFixer : MonoBehaviour
 {
 	// Public for testing in UnityExplorer

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace DredgeVR.VRUI.Patches;
 
+/// <summary>
+/// These are the buttons for the fishmonger, dry dock, etc, in port
+/// </summary>
 [HarmonyPatch(typeof(DestinationButton))]
 public static class DestinationButtonPatches
 {

@@ -9,6 +9,7 @@ namespace DredgeVR.Helpers;
 
 /// <summary>
 /// From NomaiVR
+/// The application manifest tells SteamVR about our mod
 /// </summary>
 internal class ApplicationManifestHelper
 {

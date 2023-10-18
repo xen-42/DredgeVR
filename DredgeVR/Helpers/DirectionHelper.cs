@@ -14,6 +14,6 @@ public static class DirectionHelper
 		var playerPos = VRCameraManager.VRPlayer.transform.position;
 		var worldPosInPlane = new Vector3(playerPos.x, transform.position.y, playerPos.z);
 		var direction = worldPosInPlane - transform.position;
-		transform.rotation = Quaternion.LookRotation(flipDirection ? -direction : direction);
+		transform.rotation = Quaternion.LookRotation(flipDirection ? -direction : direction, Vector3.up);
 	}
 }

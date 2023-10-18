@@ -7,6 +7,13 @@ using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
+/// <summary>
+/// Not sure why, but Winch does not log when exceptions are thrown by methods
+/// This patch doesn't report proper line numbers unfortunately, but it will record which method is throwing the exception at least
+/// 
+/// This patching will decrease performance, so do not include it in release builds
+/// </summary>
+# if DEBUG
 [HarmonyPatch]
 internal static class TryCatchPatch
 {
@@ -31,3 +38,4 @@ internal static class TryCatchPatch
 		return __exception;
 	}
 }
+#endif

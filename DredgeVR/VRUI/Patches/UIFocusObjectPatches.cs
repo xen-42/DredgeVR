@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace DredgeVR.VRUI.Patches;
 
+/// <summary>
+/// This is the focus/highlight rectangle that appears over the currently hovered UI
+/// </summary>
 [HarmonyPatch(typeof(UIFocusObject))]
 public static class UIFocusObjectPatches
 {

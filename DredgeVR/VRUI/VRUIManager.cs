@@ -1,9 +1,15 @@
-﻿using DredgeVR.VRInput;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
+using DredgeVR.VRInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace DredgeVR.VRUI;
 
+/// <summary>
+/// This behaviour is responsible for applying all VR ui fixes on each game scene
+/// Either by directly modifying components or adding fixers to them
+/// </summary>
 internal class VRUIManager : MonoBehaviour
 {
 	public void Awake()
@@ -11,6 +17,7 @@ internal class VRUIManager : MonoBehaviour
 		SceneManager.activeSceneChanged += OnActiveSceneChanged;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.IntroCutsceneStart += OnIntroCutsceneStart;
 	}
 
 	public void OnDestroy()
@@ -18,6 +25,7 @@ internal class VRUIManager : MonoBehaviour
 		SceneManager.activeSceneChanged -= OnActiveSceneChanged;
 		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.IntroCutsceneStart -= OnIntroCutsceneStart;
 	}
 
 	private void OnActiveSceneChanged(Scene prev, Scene current)
@@ -25,6 +33,7 @@ internal class VRUIManager : MonoBehaviour
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
 			canvas.renderMode = RenderMode.WorldSpace;
+			// TODO: If the dominant hand is changed while ingame, we'd have to reset this on all canvases
 			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 			canvas.scaleFactor = 1f;
 			canvas.planeDistance = 1;
@@ -62,9 +71,30 @@ internal class VRUIManager : MonoBehaviour
 		}
 
 		// The slide panel still shows when "off screen"
-		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<PlayerSlidePanelFixer>();
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "Funds", "Backplate" };
+		GameObject.Find("GameCanvases/GameCanvas/DestinationUI/MarketDestinationUI/MarketSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "TitleContainer", "Backplate" };
+
+		// Make the tab button easier to target
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").transform.localScale = Vector3.one * 1.5f;
 
 		// Make it easier to target
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
+	}
+
+	private void OnIntroCutsceneStart()
+	{
+		// Reposition Scene1Container, Scene2Container, Scene3Container
+		var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
+
+		cutscene.transform.Find("Camera").gameObject.SetActive(false);
+
+		cutscene.transform.position = VRCameraManager.ResetTransform.position + VRCameraManager.ResetTransform.forward * 40f - VRCameraManager.ResetTransform.up * 10f;
+		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.ResetTransform.rotation.y, 0);
+
+		var scenes = new Transform[] { cutscene.transform.Find("Scene1Container"), cutscene.transform.Find("Scene2Container"), cutscene.transform.Find("Scene3Container") };
+		foreach (var scene in scenes)
+		{
+			scene.transform.localPosition = Vector3.zero;
+		}
 	}
 }

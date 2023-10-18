@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace DredgeVR.VRUI.Patches;
 
+/// <summary>
+/// These are the undock/sleep/research buttons
+/// </summary>
 [HarmonyPatch(typeof(BoatActionsDestinationUI))]
 public static class BoatActionsDestinationUIPatches
 {

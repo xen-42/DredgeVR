@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace DredgeVR.Helpers;
 
+/// <summary>
+/// Taken from New Horizons.
+/// It's not stealing when you steal from yourself.
+/// 
+/// These coroutines will not persist between scenes.
+/// </summary>
 internal static class Delay
 {
 	public static void FireOnNextUpdate(Action action) => DredgeVRCore.Instance.StartCoroutine(FireOnNextUpdateEnumerator(action));
