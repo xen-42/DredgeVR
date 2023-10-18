@@ -48,6 +48,9 @@ namespace DredgeVR
 
 		private void OnActiveSceneChanged(Scene arg0, Scene arg1)
 		{
+			// Stop all the coroutines set in Delay
+			StopAllCoroutines();
+
 			SceneStart?.Invoke(arg1.name);
 
 			if (arg1.name == "Game")

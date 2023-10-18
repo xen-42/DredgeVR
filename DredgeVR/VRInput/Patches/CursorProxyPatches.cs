@@ -1,6 +1,4 @@
-﻿using Cinemachine.Utility;
-using DredgeVR.VRCamera;
-using DredgeVR.VRInput;
+﻿using DredgeVR.VRInput;
 using HarmonyLib;
 using UnityEngine;
 
@@ -26,15 +24,12 @@ public static class CursorProxyPatches
 
 		if (VRHand.DominantHand?.LaserPointerEnd?.transform?.position is Vector3 laserPointerPos)
 		{
-			/*
-			var localPos = _canvas.transform.InverseTransformPoint(laserPointerPos.ProjectOntoPlane(_canvas.transform.forward));
-			__instance.cursorSquare.transform.position = __instance.transform.TransformPoint(localPos);
-			*/
 			__instance.cursorSquare.transform.position = laserPointerPos;
 			var localLaserPosition = __instance.cursorSquare.transform.localPosition;
 			__instance.cursorPos = localLaserPosition + pixelHalfSize;
 		}
 
+		// If we were to try and implement XBox controller support, we'd still need to convert it's cursor pos into the new VR screen space
 		var localPosition = __instance.cursorPos - pixelHalfSize;
 		__instance.cursorSquare.transform.position = __instance.transform.TransformPoint(localPosition);
 	}

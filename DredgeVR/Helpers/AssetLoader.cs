@@ -4,6 +4,9 @@ using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
+/// <summary>
+/// Loads assets from external bundles and contains their prefabs
+/// </summary>
 public class AssetLoader
 {
 	public static GameObject LeftHandBase;

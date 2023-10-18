@@ -10,7 +10,7 @@ internal class WeatherControllerPatches
 	[HarmonyPatch(nameof(WeatherController.Update))]
 	public static void WeatherController_Update(WeatherController __instance)
 	{
-		// TODO: Could make this an optional setting for crazy people
+		// TODO: Make this an optional setting
 		// Meant to lessen sea-sickness
 		__instance._waveSteepness = 0;
 		Shader.SetGlobalFloat("_WaveSteepness", 0);

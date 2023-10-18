@@ -4,6 +4,10 @@ using UnityEngine.SceneManagement;
 
 namespace DredgeVR.VRUI;
 
+/// <summary>
+/// This behaviour is responsible for applying all VR ui fixes on each game scene
+/// Either by directly modifying components or adding fixers to them
+/// </summary>
 internal class VRUIManager : MonoBehaviour
 {
 	public void Awake()
@@ -25,6 +29,7 @@ internal class VRUIManager : MonoBehaviour
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
 			canvas.renderMode = RenderMode.WorldSpace;
+			// TODO: If the dominant hand is changed while ingame, we'd have to reset this on all canvases
 			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 			canvas.scaleFactor = 1f;
 			canvas.planeDistance = 1;

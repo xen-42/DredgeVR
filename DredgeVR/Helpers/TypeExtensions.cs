@@ -4,6 +4,10 @@ using System.Reflection;
 
 namespace DredgeVR.Helpers;
 
+/// <summary>
+/// While the publicizer for the Dredge game libs makes this mostly unnecessary, there are some other resources that I'm too lazy to publicize right now
+/// Taken from Rai
+/// </summary>
 public static class TypeExtensions
 {
 	private const BindingFlags Flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public |

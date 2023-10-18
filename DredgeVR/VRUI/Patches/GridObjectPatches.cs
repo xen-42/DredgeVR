@@ -1,9 +1,12 @@
-﻿using DredgeVR.VRCamera;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace DredgeVR.VRUI.Patches;
 
+/// <summary>
+/// These are the inventory grid spots
+/// Without this patch, they have constant world space rotation which gets messed up if the boat has turned
+/// </summary>
 [HarmonyPatch(typeof(GridObject))]
 public static class GridObjectPatches
 {

@@ -5,6 +5,7 @@ using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
+# if DEBUG
 [HarmonyPatch(typeof(Debug))]
 internal static class DebugLogPatches
 {
@@ -24,3 +25,4 @@ internal static class DebugLogPatches
 	[HarmonyPatch(nameof(Debug.LogException), new Type[] { typeof(Exception) })]
 	public static void Debug_LogException(Exception exception) => WinchCore.Log.Error($"[UnityEngine.Debug.Log] {exception}");
 }
+#endif

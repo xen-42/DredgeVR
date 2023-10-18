@@ -21,8 +21,6 @@ public static class GridManagerPatches
 	[HarmonyPatch(nameof(GridManager.DoHitTestFromCursorProxy))]
 	public static bool GridManager_DoHitTestFromCursorProxy(GridManager __instance, out GridObject gridObjectHit, out GridCell gridCellHit)
 	{
-		WinchCore.Log.Info($"Thing happened! {Environment.StackTrace}");
-
 		gridObjectHit = null;
 		gridCellHit = null;
 

@@ -4,7 +4,7 @@ namespace DredgeVR.VRUI;
 
 /// <summary>
 /// The funds and backplate game objects aren't hidden when it's offscreen
-/// These can still be seen in VR
+/// These can still be seen in VR since there's no "offscreen" anymore
 /// </summary>
 [RequireComponent(typeof(SlidePanel))]
 public class PlayerSlidePanelFixer : MonoBehaviour
@@ -23,7 +23,7 @@ public class PlayerSlidePanelFixer : MonoBehaviour
 		_slidePanel.OnShowStart.AddListener(Show);
 
 		Hide();
-	}
+	} 
 
 	public void OnDestroy()
 	{

@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace DredgeVR.World;
 
+/// <summary>
+/// This behaviour is responsible for fixing physical objects in the game
+/// Mostly by correcting issues with shaders
+/// </summary>
 internal class WorldManager : MonoBehaviour
 {
 	private Shader _litShader = Shader.Find("Shader Graphs/Lit_Shader");
