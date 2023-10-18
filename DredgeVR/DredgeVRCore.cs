@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Tutorial;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using DredgeVR.VRUI;
@@ -36,6 +37,7 @@ namespace DredgeVR
 			gameObject.AddComponent<VRInputModule>();
 			gameObject.AddComponent<VRUIManager>();
 			gameObject.AddComponent<WorldManager>();
+			gameObject.AddComponent<VRTutorialManager>();
 
 			SceneManager.activeSceneChanged += OnActiveSceneChanged;
 			OnActiveSceneChanged(default, SceneManager.GetActiveScene());
