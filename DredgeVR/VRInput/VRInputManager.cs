@@ -97,15 +97,16 @@ public class VRInputManager : MonoBehaviour
 			ReplaceBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
 			ReplaceBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftTrigger); // E
+			ReplaceBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftThumbStickButton); // E
+
 			ReplaceBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftTrigger); // Mouse2
 			ReplaceBinding(GameManager.Instance.Input.Controls.DoAbility, LeftTrigger); // Mouse2
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
 			ReplaceBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
 			ReplaceBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
-			ReplaceBinding(GameManager.Instance.Input.Controls.Confirm, defaultAcceptBinding); // Mouse1
 
+			ReplaceBinding(GameManager.Instance.Input.Controls.Confirm, RightTrigger); // Mouse1
 			ReplaceBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
