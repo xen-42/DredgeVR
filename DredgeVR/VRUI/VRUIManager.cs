@@ -67,7 +67,11 @@ internal class VRUIManager : MonoBehaviour
 		}
 
 		// The slide panel still shows when "off screen"
-		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<PlayerSlidePanelFixer>();
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "Funds", "Backplate" };
+		GameObject.Find("GameCanvases/GameCanvas/DestinationUI/MarketDestinationUI/MarketSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "TitleContainer", "Backplate" };
+
+		// Make the tab button easier to target
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").transform.localScale = Vector3.one * 1.5f;
 
 		// Make it easier to target
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
