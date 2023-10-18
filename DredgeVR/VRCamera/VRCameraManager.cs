@@ -48,14 +48,26 @@ public class VRCameraManager : MonoBehaviour
 		LeftHand.transform.parent = _pivot;
 		RightHand.transform.parent = _pivot;
 
+		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 	}
 
 	public void OnDestroy()
 	{
+		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.TitleSceneStart -= OnGameSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+	}
+
+	private void OnSceneStart(string _)
+	{
+		// Always have a ResetTransform on each scene, then the other events handle positioning it properly if need be
+		ResetTransform = new GameObject("ResetTransform").transform;
+		ResetTransform.position = Vector3.zero;
+		ResetTransform.rotation = Quaternion.identity;
+
+		Delay.FireOnNextUpdate(ResetPosition);
 	}
 
 	private void OnTitleSceneStart()
@@ -64,11 +76,8 @@ public class VRCameraManager : MonoBehaviour
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
 		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
 
-		ResetTransform = new GameObject("ResetTransform").transform;
 		ResetTransform.position = new Vector3(-6.5f, 0.5f, 0);
 		ResetTransform.LookAt(worldPos);
-
-		Delay.FireOnNextUpdate(ResetPosition);
 	}
 
 	private void OnGameSceneStart()
@@ -79,7 +88,6 @@ public class VRCameraManager : MonoBehaviour
 			() =>
 			{
 				// Make the player follow the boat
-				ResetTransform = new GameObject("ResetTransform").transform;
 				ResetTransform.parent = GameManager.Instance.Player.transform;
 				ResetTransform.localPosition = new Vector3(0, 1, -2);
 				ResetTransform.localRotation = Quaternion.identity;
@@ -95,14 +103,14 @@ public class VRCameraManager : MonoBehaviour
 
 		if (ResetTransform != null)
 		{
-			// Don't take on origin pitch rotation because that is turbo motion sickness
-			var forwardOnPlane = ResetTransform.forward.ProjectOntoPlane(Vector3.up);
-			VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
-
 			// In the game scene force a constant ResetTransform y position
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
+				// Don't take on origin pitch rotation because that is turbo motion sickness
+				var forwardOnPlane = ResetTransform.forward.ProjectOntoPlane(Vector3.up);
+				VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+
 				ResetTransform.position = new Vector3(ResetTransform.position.x, 0.66f, ResetTransform.position.z);
 			}
 

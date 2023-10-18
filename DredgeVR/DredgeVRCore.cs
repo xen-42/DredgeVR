@@ -17,9 +17,13 @@ namespace DredgeVR
 	{
 		public static DredgeVRCore Instance { get; private set; }
 
+		/// <summary>
+		/// SceneStart is always invoked before the specific scene start actions, so it can be used for general initialization on each scene
+		/// </summary>
 		public static Action<string> SceneStart;
 		public static Action GameSceneStart;
 		public static Action TitleSceneStart;
+		public static Action IntroCutsceneStart;
 
 		public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -63,6 +67,11 @@ namespace DredgeVR
 			if (arg1.name == "Title")
 			{
 				TitleSceneStart?.Invoke();
+			}
+
+			if (arg1.name == "IntroCutscene")
+			{
+				IntroCutsceneStart?.Invoke();
 			}
 		}
 	}

@@ -1,4 +1,6 @@
-﻿using DredgeVR.VRInput;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
+using DredgeVR.VRInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +17,7 @@ internal class VRUIManager : MonoBehaviour
 		SceneManager.activeSceneChanged += OnActiveSceneChanged;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.IntroCutsceneStart += OnIntroCutsceneStart;
 	}
 
 	public void OnDestroy()
@@ -22,6 +25,7 @@ internal class VRUIManager : MonoBehaviour
 		SceneManager.activeSceneChanged -= OnActiveSceneChanged;
 		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.IntroCutsceneStart -= OnIntroCutsceneStart;
 	}
 
 	private void OnActiveSceneChanged(Scene prev, Scene current)
@@ -75,5 +79,22 @@ internal class VRUIManager : MonoBehaviour
 
 		// Make it easier to target
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
+	}
+
+	private void OnIntroCutsceneStart()
+	{
+		// Reposition Scene1Container, Scene2Container, Scene3Container
+		var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
+
+		cutscene.transform.Find("Camera").gameObject.SetActive(false);
+
+		cutscene.transform.position = VRCameraManager.ResetTransform.position + VRCameraManager.ResetTransform.forward * 40f - VRCameraManager.ResetTransform.up * 10f;
+		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.ResetTransform.rotation.y, 0);
+
+		var scenes = new Transform[] { cutscene.transform.Find("Scene1Container"), cutscene.transform.Find("Scene2Container"), cutscene.transform.Find("Scene3Container") };
+		foreach (var scene in scenes)
+		{
+			scene.transform.localPosition = Vector3.zero;
+		}
 	}
 }
