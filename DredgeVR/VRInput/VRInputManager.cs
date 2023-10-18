@@ -54,7 +54,13 @@ public class VRInputManager : MonoBehaviour
 	public static VRBinding LeftTrigger = new(SteamVR_Actions._default.LeftTrigger, SteamVR_Input_Sources.LeftHand);
 	public static VRBinding RightTrigger = new(SteamVR_Actions._default.RightTrigger, SteamVR_Input_Sources.RightHand);
 
+	public static VRBinding LeftStart = new(SteamVR_Actions._default.LeftStart, SteamVR_Input_Sources.LeftHand);
+	public static VRBinding LeftThumbStickButton = new(SteamVR_Actions._default.LeftThumbStickPress, SteamVR_Input_Sources.LeftHand);
+	public static VRBinding RightThumbStickButton = new(SteamVR_Actions._default.RightThumbStickPress, SteamVR_Input_Sources.RightHand);
+
 	public static Dictionary<VRBinding, bool> State = new();
+
+	public Dictionary<VRBinding, ControlIconData> ControlIcons = new();
 
 	public void Awake()
 	{
@@ -82,23 +88,33 @@ public class VRInputManager : MonoBehaviour
 	{
 		DredgeVRCore.TitleSceneStart -= InitControls;
 
+		var defaultCancelBinding = RightHandB;
+		var defaultAcceptBinding = RightHandA;
+
 		Delay.FireInNUpdates(10, () =>
 		{
-			ReplaceBinding(GameManager.Instance.Input.Controls.Undock, RightHandB); // X
-			ReplaceBinding(GameManager.Instance.Input.Controls.Back, RightHandB); // X
+			ReplaceBinding(GameManager.Instance.Input.Controls.Undock, defaultCancelBinding); // X
+			ReplaceBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
+			ReplaceBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftTrigger); // E
+			ReplaceBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftTrigger); // Mouse2
+			ReplaceBinding(GameManager.Instance.Input.Controls.DoAbility, LeftTrigger); // Mouse2
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.Interact, RightHandA); // F
-			ReplaceBinding(GameManager.Instance.Input.Controls.Reel, RightHandA); // F
-			ReplaceBinding(GameManager.Instance.Input.Controls.SellItem, RightHandA); // F
+			ReplaceBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
+			ReplaceBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
+			ReplaceBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
+			ReplaceBinding(GameManager.Instance.Input.Controls.Confirm, defaultAcceptBinding); // Mouse1
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.DoAbility, LeftHandA); // Mouse2
-			ReplaceBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftHandA); // Mouse2
+			ReplaceBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
+			ReplaceBinding(GameManager.Instance.Input.Controls.RotateCounterClockwise, RightThumbStickButton); // One Axis
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftTrigger); // One Axis
+			ReplaceBinding(GameManager.Instance.Input.Controls.ToggleCargo, LeftHandB); // Tab
+
+			ReplaceBinding(GameManager.Instance.Input.Controls.Pause, LeftHandA); // Escape
+			ReplaceBinding(GameManager.Instance.Input.Controls.Unpause, LeftHandA); // Escape
 		});
 	}
 

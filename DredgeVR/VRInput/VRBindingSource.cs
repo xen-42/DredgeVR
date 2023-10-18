@@ -20,9 +20,9 @@ public class VRBindingSource : BindingSource
 
 	public override InputDeviceClass DeviceClass => InputDeviceClass.Controller;
 
-	public override InputDeviceStyle DeviceStyle => InputDeviceStyle.Vive;
+	public override InputDeviceStyle DeviceStyle => InputDeviceStyle.Oculus;
 
-	public override BindingSourceType BindingSourceType => BindingSourceType.DeviceBindingSource;
+	public override BindingSourceType BindingSourceType => BindingSourceType.UnknownDeviceBindingSource;
 
 	public override bool Equals(BindingSource other)
 	{

@@ -62,6 +62,19 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/LeftStart",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
+      "name": "/actions/default/in/LeftThumbStickPress",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RightThumbStickPress",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     },
@@ -184,7 +197,10 @@
       "/actions/default/in/A Left": "A (Left)",
       "/actions/default/in/B Left": "B (Left)",
       "/actions/default/in/A Right": "A (Right)",
-      "/actions/default/in/B Right": "B (Right)"
+      "/actions/default/in/B Right": "B (Right)",
+      "/actions/default/in/LeftStart": "LeftStart",
+      "/actions/default/in/LeftThumbStickPress": "Left Thumb Stick Press",
+      "/actions/default/in/RightThumbStickPress": "Right Thumb Stick Press"
     }
   ]
 }
