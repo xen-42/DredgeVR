@@ -1,6 +1,5 @@
 ﻿using DredgeVR.VRInput;
 using HarmonyLib;
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Winch.Core;
@@ -49,5 +48,23 @@ public static class GridManagerPatches
 		}
 
 		return false;
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(nameof(GridManager.ObjectPickedUp))]
+	public static void GridManager_ObjectPickedUp(GridManager __instance)
+	{
+		// By default it's 0 and the held item is invisible
+		__instance.heldItemContainer.GetComponent<RectTransform>().sizeDelta = __instance.currentlyHeldObject.GetComponent<RectTransform>().sizeDelta;
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(nameof(GridManager.LateUpdate))]
+	public static void GridManager_LateUpdate(GridManager __instance)
+	{
+		if (__instance.currentlyHeldObject)
+		{
+			__instance.currentlyHeldObject.transform.position = GameManager.Instance.GridManager.CursorProxy.CursorSquare.transform.position;
+		}
 	}
 }

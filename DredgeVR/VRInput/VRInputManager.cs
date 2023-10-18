@@ -74,7 +74,16 @@ public class VRInputManager : MonoBehaviour
 			vrButton.action.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
 		}
 
-		// Todo: figure out better timing for this
+		DredgeVRCore.TitleSceneStart += InitControls;
+	}
+
+	/// <summary>
+	/// Timing on this is so wack
+	/// </summary>
+	private void InitControls()
+	{
+		DredgeVRCore.TitleSceneStart -= InitControls;
+
 		Delay.FireInNUpdates(10, () =>
 		{
 			ReplaceBinding(GameManager.Instance.Input.Controls.Undock, RightHandB); // X
