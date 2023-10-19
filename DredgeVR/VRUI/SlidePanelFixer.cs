@@ -28,13 +28,21 @@ public class SlidePanelFixer : MonoBehaviour
 		_slidePanel.OnHideFinish.AddListener(Hide);
 		_slidePanel.OnShowStart.AddListener(Show);
 
-		Hide();
+		// Catching the initial state of the slide panel, could already be animating to open so catch that too (happens with fish market)
+		if (_slidePanel.isShowing || _slidePanel.isAnimating)
+		{
+			Show();
+		}
+		else
+		{
+			Hide();
+		}
 	} 
 
 	public void OnDestroy()
 	{
-		_slidePanel.OnHideStart.RemoveListener(Hide);
-		_slidePanel.OnShowFinish.RemoveListener(Show);
+		_slidePanel.OnHideFinish.RemoveListener(Hide);
+		_slidePanel.OnShowStart.RemoveListener(Show);
 	}
 
 	private void Hide()
