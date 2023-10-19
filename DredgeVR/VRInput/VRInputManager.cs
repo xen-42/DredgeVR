@@ -2,6 +2,7 @@
 using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using InControl;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -43,6 +44,8 @@ public class VRInputManager : MonoBehaviour
 			return hand.GetHashCode() + action.GetHashCode() * 15;
 		}
 	}
+
+	public static PlayerAction ResetCamera { get; private set; }
 
 	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
@@ -110,13 +113,38 @@ public class VRInputManager : MonoBehaviour
 			ReplaceBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
-			ReplaceBinding(GameManager.Instance.Input.Controls.RotateCounterClockwise, RightThumbStickButton); // One Axis
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.ToggleCargo, LeftHandB); // Tab
 
 			ReplaceBinding(GameManager.Instance.Input.Controls.Pause, LeftHandA); // Escape
 			ReplaceBinding(GameManager.Instance.Input.Controls.Unpause, LeftHandA); // Escape
+
+			CreatePlayerAction("reset-camera", "Reset Camera", RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
 		});
+	}
+
+	private PlayerAction CreatePlayerAction(string id, string name, VRBinding binding, Action onPress)
+	{
+		// TODO: Why doesnt this work
+		try
+		{
+			var playerAction = new PlayerAction(id, GameManager.Instance.Input.Controls);
+			playerAction.AddDefaultBinding(new VRBindingSource(binding));
+			playerAction.ResetBindings();
+
+			var dredgePlayerAction = new DredgePlayerActionPress(name, playerAction);
+			dredgePlayerAction.OnPressComplete += onPress;
+			GameManager.Instance.Input.AddActionListener(new DredgePlayerActionBase[] { dredgePlayerAction }, ActionLayer.PERSISTENT);
+
+			WinchCore.Log.Info($"Created custom player action {id}");
+
+			return playerAction;
+		}
+		catch (Exception e)
+		{
+			WinchCore.Log.Error($"Couldn't create player action {id} : {e}");
+			return null;
+		}
 	}
 
 	private void ReplaceBinding(PlayerAction action, VRBinding replacement)
