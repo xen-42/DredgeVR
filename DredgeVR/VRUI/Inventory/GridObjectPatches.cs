@@ -29,7 +29,7 @@ public static class GridObjectPatches
 		var z = VRCameraManager.ResetTransform.transform.forward.normalized;
 		var y = Quaternion.AngleAxis(__instance.currentRotation, z) * Vector3.up;
 
-		__instance.gridObjectImage.transform.rotation = Quaternion.LookRotation(-z, y);
+		__instance.gridObjectImage.transform.rotation = Quaternion.LookRotation(z, y);
 	}
 
 	[HarmonyPostfix]
