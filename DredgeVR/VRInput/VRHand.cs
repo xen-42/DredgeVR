@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DredgeVR.Helpers;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.ResourceManagement;
 using Valve.VR;
@@ -25,28 +26,26 @@ public class VRHand : MonoBehaviour
 	{
 		// Loading buoys off the title screen
 		// Probably should move this to a bundle but idc
-		DredgeVRCore.TitleSceneStart += AddBuoyGraphics;
+		DredgeVRCore.TitleSceneStart += InitGraphics;
 
-		var handSkeleton = gameObject.AddComponent<SteamVR_Behaviour_Skeleton>();
-		handSkeleton.inputSource = hand;
-		handSkeleton.skeletonRoot = transform;
-		handSkeleton.enabled = true;
-
-		RaycastCamera = gameObject.AddComponent<Camera>();
+		RaycastCamera = new GameObject("RaycastCamera").AddComponent<Camera>();
+		RaycastCamera.transform.parent = transform;
+		RaycastCamera.transform.localPosition = Vector3.zero;
+		RaycastCamera.transform.localRotation = Quaternion.Euler(45f, 0f, 0f);
 		RaycastCamera.nearClipPlane = 0.01f;
 		RaycastCamera.farClipPlane = 1000f;
 		RaycastCamera.enabled = false;
 
 		LaserPointerEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		Component.DestroyImmediate(LaserPointerEnd.GetComponent<SphereCollider>());
-		LaserPointerEnd.transform.parent = transform;
+		LaserPointerEnd.transform.parent = RaycastCamera.transform;
 		LaserPointerEnd.transform.localScale = Vector3.one * 0.025f;
 		LaserPointerEnd.name = "Dot";
 
 		// Tried using a line renderer for this but it did not behave in VR
 		_line = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		Component.DestroyImmediate(_line.GetComponent<Collider>());
-		_line.transform.parent = transform;
+		_line.transform.parent = RaycastCamera.transform;
 		_line.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 		_line.name = "Line";
 
@@ -67,22 +66,16 @@ public class VRHand : MonoBehaviour
 	/// <summary>
 	/// First time the title scene loads we'll steal some buoys and shaders for our hand graphics
 	/// </summary>
-	private void AddBuoyGraphics()
+	private void InitGraphics()
 	{
-		DredgeVRCore.TitleSceneStart -= AddBuoyGraphics;
+		DredgeVRCore.TitleSceneStart -= InitGraphics;
 
+		/*
 		var buoy = GameObject.Instantiate(GameObject.Find("TheMarrows/Islands/GreaterMarrow/Buoys/Buoy/LightBuoy"));
 		buoy.transform.parent = transform;
 		buoy.transform.localPosition = Vector3.zero;
 		buoy.transform.localRotation = Quaternion.identity;
 		buoy.transform.localScale = Vector3.one * 0.1f;
-
-		// Need a fresh material for our laser pointer
-		var material = new Material(buoy.GetComponent<MeshRenderer>().material.shader);
-		_line.GetComponent<MeshRenderer>().material = material;
-		LaserPointerEnd.GetComponent<MeshRenderer>().material = material;
-
-		_graphicsInitialized = true;
 
 		// Need to keep the addressables loaded else we lose our buoys
 		if (!_flagTitleSceneAcquire)
@@ -90,6 +83,20 @@ public class VRHand : MonoBehaviour
 			_flagTitleSceneAcquire = true;
 			DredgeVRCore.Instance.StartCoroutine(KeepTitleSceneAddressablesLoaded());
 		}
+		*/
+
+		// Need a fresh material for our laser pointer
+		var material = new Material(AssetLoader.LitShader);
+
+		var lineMR = _line.GetComponent<MeshRenderer>();
+		lineMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		lineMR.material = material;
+
+		var endMR = LaserPointerEnd.GetComponent<MeshRenderer>();
+		endMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		endMR.material = material;
+
+		_graphicsInitialized = true;
 	}
 
 	private IEnumerator KeepTitleSceneAddressablesLoaded()
@@ -133,7 +140,7 @@ public class VRHand : MonoBehaviour
 			var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance;
 
 			// Only collide with UI
-			var endPosition = transform.position + transform.forward * targetLength;
+			var endPosition = RaycastCamera.transform.position + RaycastCamera.transform.forward * targetLength;
 
 			LaserPointerEnd.transform.position = endPosition;
 

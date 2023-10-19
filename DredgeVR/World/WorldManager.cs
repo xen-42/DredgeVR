@@ -10,8 +10,6 @@ namespace DredgeVR.World;
 /// </summary>
 internal class WorldManager : MonoBehaviour
 {
-	private Shader _litShader = Shader.Find("Shader Graphs/Lit_Shader");
-
 	public void Awake()
 	{
 		DredgeVRCore.SceneStart += OnSceneStart;
@@ -42,7 +40,7 @@ internal class WorldManager : MonoBehaviour
 		// Unfortunately this gets rid of their cool effect and just makes them regular rocks
 		foreach (var ghostRock in GameObject.FindObjectsOfType<GhostRock>())
 		{
-			ghostRock.rockMeshObject.GetComponent<MeshRenderer>().material.shader = _litShader;
+			ghostRock.rockMeshObject.GetComponent<MeshRenderer>().material.shader = AssetLoader.LitShader;
 		}
 
 		// Have to wait a frame for the boat to exist
@@ -57,5 +55,23 @@ internal class WorldManager : MonoBehaviour
 				}
 			}
 		);
+
+		// Replacing the shaders doesn't fix it, they still show in the wrong eyes
+		/*
+		var badShaders = new string[]
+		{
+			"Shader Graphs/Particle_Shader",
+			"Shader Graphs/FloatingParticle_Shader",
+			"Shader Graphs/ShimmerWarp_Shader"
+		};
+
+		foreach (var particles in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
+		{
+			if (badShaders.Contains(particles.material.shader.name))
+			{
+				particles.material.shader = _litShader;
+			}
+		}
+		*/
 	}
 }

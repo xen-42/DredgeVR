@@ -34,10 +34,14 @@ public class VRCameraManager : MonoBehaviour
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
 		// Set up hands
-		LeftHand = new GameObject("LeftHand").AddComponent<VRHand>();
-		LeftHand.hand = SteamVR_Input_Sources.LeftHand;
+		// LeftHand = new GameObject("LeftHand").AddComponent<VRHand>();
 
-		RightHand = new GameObject("RightHand").AddComponent<VRHand>();
+		// RightHand = new GameObject("RightHand").AddComponent<VRHand>();
+
+		LeftHand = GameObject.Instantiate(AssetLoader.LeftHandBase).AddComponent<VRHand>();
+		RightHand = GameObject.Instantiate(AssetLoader.RightHandBase).AddComponent<VRHand>();
+
+		LeftHand.hand = SteamVR_Input_Sources.LeftHand;
 		RightHand.hand = SteamVR_Input_Sources.RightHand;
 
 		// Parent everything to a new "pivot" object
