@@ -65,6 +65,10 @@ namespace Valve.VR
         
         private static SteamVR_Action_Boolean p_default_RemoveMarker;
         
+        private static SteamVR_Action_Pose p_default_LeftHandPose;
+        
+        private static SteamVR_Action_Pose p_default_RightHandPose;
+        
         private static SteamVR_Action_Vibration p_default_Haptic;
         
         private static SteamVR_Action_Vector2 p_platformer_Move;
@@ -273,6 +277,22 @@ namespace Valve.VR
             }
         }
         
+        public static SteamVR_Action_Pose default_LeftHandPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_LeftHandPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
+        public static SteamVR_Action_Pose default_RightHandPose
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_RightHandPose.GetCopy<SteamVR_Action_Pose>();
+            }
+        }
+        
         public static SteamVR_Action_Vibration default_Haptic
         {
             get
@@ -364,6 +384,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
                     SteamVR_Actions.default_RemoveMarker,
+                    SteamVR_Actions.default_LeftHandPose,
+                    SteamVR_Actions.default_RightHandPose,
                     SteamVR_Actions.default_Haptic,
                     SteamVR_Actions.platformer_Move,
                     SteamVR_Actions.platformer_Jump,
@@ -397,6 +419,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
                     SteamVR_Actions.default_RemoveMarker,
+                    SteamVR_Actions.default_LeftHandPose,
+                    SteamVR_Actions.default_RightHandPose,
                     SteamVR_Actions.platformer_Move,
                     SteamVR_Actions.platformer_Jump,
                     SteamVR_Actions.buggy_Steering,
@@ -409,6 +433,8 @@ namespace Valve.VR
             Valve.VR.SteamVR_Input.actionsVibration = new Valve.VR.SteamVR_Action_Vibration[] {
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsPose = new Valve.VR.SteamVR_Action_Pose[] {
+                    SteamVR_Actions.default_LeftHandPose,
+                    SteamVR_Actions.default_RightHandPose,
                     SteamVR_Actions.mixedreality_ExternalCamera};
             Valve.VR.SteamVR_Input.actionsBoolean = new Valve.VR.SteamVR_Action_Boolean[] {
                     SteamVR_Actions.default_Confirm,
@@ -502,6 +528,8 @@ namespace Valve.VR
             SteamVR_Actions.p_default_ZoomMapIn = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/ZoomMapIn")));
             SteamVR_Actions.p_default_ZoomMapOut = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/ZoomMapOut")));
             SteamVR_Actions.p_default_RemoveMarker = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/RemoveMarker")));
+            SteamVR_Actions.p_default_LeftHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/LeftHandPose")));
+            SteamVR_Actions.p_default_RightHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/RightHandPose")));
             SteamVR_Actions.p_default_Haptic = ((SteamVR_Action_Vibration)(SteamVR_Action.Create<SteamVR_Action_Vibration>("/actions/default/out/Haptic")));
             SteamVR_Actions.p_platformer_Move = ((SteamVR_Action_Vector2)(SteamVR_Action.Create<SteamVR_Action_Vector2>("/actions/platformer/in/Move")));
             SteamVR_Actions.p_platformer_Jump = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/platformer/in/Jump")));

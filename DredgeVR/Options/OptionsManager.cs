@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using UnityEngine.XR;
+using Valve.VR;
 
 namespace DredgeVR.Options;
 
@@ -27,13 +29,6 @@ public static class OptionsManager
 			}
 			// Always write the contents so that if there's been an update they'll get the new settings in their config
 			File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options, Formatting.Indented));
-
-			// TODO: Eventually the controller type should just be detected
-			// Vive needs to use the flat ui else the prompts wont all be interactable
-			if (Options.controller == VRInput.VRInputManager.ControllerType.Vive)
-			{
-				Options.useFlatUI = true;
-			}
 		}
 		catch (Exception e)
 		{

@@ -1,5 +1,4 @@
 ﻿using InControl;
-using System;
 using System.IO;
 using Valve.VR;
 
@@ -7,14 +6,14 @@ namespace DredgeVR.VRInput;
 
 public class VRBindingSource : BindingSource
 {
-	public VRInputManager.VRBinding binding;
+	public SteamVR_Action_Boolean action;
 
-	public VRBindingSource(VRInputManager.VRBinding binding)
+	public VRBindingSource(SteamVR_Action_Boolean action)
 	{
-		this.binding = binding;
+		this.action = action;
 	}
 
-	public override string Name => $"{binding.action.GetShortName()} ({Enum.GetName(typeof(SteamVR_Input_Sources), binding.hand)})";
+	public override string Name => $"{action.GetShortName()} - {action.GetLocalizedOrigin(SteamVR_Input_Sources.Any)}";
 
 	public override string DeviceName => "VR";
 
@@ -27,12 +26,12 @@ public class VRBindingSource : BindingSource
 
 	public override bool Equals(BindingSource other)
 	{
-		return other is VRBindingSource otherVR && otherVR.binding.Equals(binding);
+		return other is VRBindingSource otherVR && otherVR.action.Equals(action);
 	}
 
 	public override bool GetState(InputDevice inputDevice)
 	{
-		return VRInputManager.State[binding];
+		return VRInputManager.IsVRActionPressed(action);
 	}
 
 	public override float GetValue(InputDevice inputDevice)

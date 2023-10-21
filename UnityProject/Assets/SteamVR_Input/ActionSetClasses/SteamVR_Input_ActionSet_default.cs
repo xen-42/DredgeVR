@@ -209,6 +209,22 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Pose LeftHandPose
+        {
+            get
+            {
+                return SteamVR_Actions.default_LeftHandPose;
+            }
+        }
+        
+        public virtual SteamVR_Action_Pose RightHandPose
+        {
+            get
+            {
+                return SteamVR_Actions.default_RightHandPose;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration Haptic
         {
             get
