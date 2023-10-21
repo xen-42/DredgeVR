@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using DredgeVR.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using Winch.Core;
 
 namespace DredgeVR.Options;
 
@@ -18,7 +18,7 @@ public static class OptionsManager
 		}
 		catch (Exception e)
 		{
-			WinchCore.Log.Error($"Couldn't load options file: {e}");
+			DredgeVRLogger.Error($"Couldn't load options file: {e}");
 		}
 	}
 }

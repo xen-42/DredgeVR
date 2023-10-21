@@ -42,7 +42,7 @@ public class AssetLoader
 		}
 		else
 		{
-			WinchCore.Log.Error($"Failed to load asset {prefabName}");
+			DredgeVRLogger.Error($"Failed to load asset {prefabName}");
 			return null;
 		}
 	}

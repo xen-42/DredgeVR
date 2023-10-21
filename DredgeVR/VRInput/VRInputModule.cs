@@ -1,4 +1,5 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -72,7 +73,7 @@ internal class VRInputModule : BaseInputModule
 			Data.pointerPress = newPointerPress;
 			Data.rawPointerPress = _currentObject;
 
-			WinchCore.Log.Info("Clicked");
+			DredgeVRLogger.Info("Clicked");
 		}
 
 		if (UIClickAction.GetStateUp(DominantHand))
@@ -91,7 +92,7 @@ internal class VRInputModule : BaseInputModule
 			Data.pointerPress = null;
 			Data.rawPointerPress = null;
 
-			WinchCore.Log.Info("Released");
+			DredgeVRLogger.Info("Released");
 		}
 	}
 }

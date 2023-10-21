@@ -38,19 +38,19 @@ internal class ApplicationManifestHelper
 			var error = OpenVR.Applications.AddApplicationManifest(manifestPath, false);
 			if (error != EVRApplicationError.None)
 			{
-				WinchCore.Log.Error("Failed to set AppManifest " + error);
+				DredgeVRLogger.Error("Failed to set AppManifest " + error);
 			}
 
 			var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
 			var applicationIdentifyErr = OpenVR.Applications.IdentifyApplication((uint)processId, appKey);
 			if (applicationIdentifyErr != EVRApplicationError.None)
 			{
-				WinchCore.Log.Error("Error identifying application: " + applicationIdentifyErr.ToString());
+				DredgeVRLogger.Error("Error identifying application: " + applicationIdentifyErr.ToString());
 			}
 		}
 		catch (Exception exception)
 		{
-			WinchCore.Log.Error("Error updating AppManifest: " + exception);
+			DredgeVRLogger.Error("Error updating AppManifest: " + exception);
 		}
 	}
 

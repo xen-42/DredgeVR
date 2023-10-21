@@ -136,13 +136,13 @@ public class VRInputManager : MonoBehaviour
 			dredgePlayerAction.OnPressComplete += onPress;
 			GameManager.Instance.Input.AddActionListener(new DredgePlayerActionBase[] { dredgePlayerAction }, ActionLayer.PERSISTENT);
 
-			WinchCore.Log.Info($"Created custom player action {id}");
+			DredgeVRLogger.Info($"Created custom player action {id}");
 
 			return playerAction;
 		}
 		catch (Exception e)
 		{
-			WinchCore.Log.Error($"Couldn't create player action {id} : {e}");
+			DredgeVRLogger.Error($"Couldn't create player action {id} : {e}");
 			return null;
 		}
 	}
@@ -155,13 +155,13 @@ public class VRInputManager : MonoBehaviour
 
 	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
-		WinchCore.Log.Info($"Pressed button {fromAction.GetShortName()}");
+		DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
 		State[new VRBinding(fromAction, fromSource)] = true;
 	}
 
 	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
-		WinchCore.Log.Info($"Released button {fromAction.GetShortName()}");
+		DredgeVRLogger.Info($"Released button {fromAction.GetShortName()}");
 		State[new VRBinding(fromAction, fromSource)] = false;
 	}
 

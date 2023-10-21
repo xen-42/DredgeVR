@@ -31,7 +31,7 @@ namespace DredgeVR
 		public void Awake()
 		{
 			Instance = this;
-			WinchCore.Log.Debug($"{nameof(DredgeVRCore)} has loaded!");
+			DredgeVRLogger.Debug($"{nameof(DredgeVRCore)} has loaded!");
 
 			new AssetLoader();
 			OptionsManager.Load();

@@ -33,7 +33,7 @@ internal static class TryCatchPatch
 	{
 		if (__exception != null)
 		{
-			WinchCore.Log.Error(__exception);
+			DredgeVRLogger.Error(__exception);
 		}
 		return __exception;
 	}
