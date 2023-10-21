@@ -12,6 +12,8 @@ internal class WorldManager : MonoBehaviour
 {
 	public void Awake()
 	{
+		QualitySettings.lodBias = 3.8f;
+
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 	}
@@ -23,6 +25,7 @@ internal class WorldManager : MonoBehaviour
 		foreach (var terrain in GameObject.FindObjectsOfType<Terrain>())
 		{
 			terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
+			terrain.treeLODBiasMultiplier = 3.8f; // Magic number
 		}
 
 		// Reflections look super weird in VR - Make sure its off when we load in

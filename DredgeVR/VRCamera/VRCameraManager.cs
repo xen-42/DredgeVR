@@ -105,6 +105,7 @@ public class VRCameraManager : MonoBehaviour
 	public void Update()
 	{
 		_camera.fieldOfView = SteamVR.instance.fieldOfView;
+		_camera.aspect = SteamVR.instance.aspect;
 
 		if (AnchorTransform != null)
 		{
