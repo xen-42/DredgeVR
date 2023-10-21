@@ -62,16 +62,19 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/LeftStart",
-      "type": "boolean",
-      "requirement": "suggested"
-    },
-    {
       "name": "/actions/default/in/LeftThumbStickPress",
       "type": "boolean"
     },
     {
       "name": "/actions/default/in/RightThumbStickPress",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/LeftMenu",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RightMenu",
       "type": "boolean"
     },
     {
@@ -198,9 +201,10 @@
       "/actions/default/in/B Left": "B (Left)",
       "/actions/default/in/A Right": "A (Right)",
       "/actions/default/in/B Right": "B (Right)",
-      "/actions/default/in/LeftStart": "LeftStart",
       "/actions/default/in/LeftThumbStickPress": "Left Thumb Stick Press",
-      "/actions/default/in/RightThumbStickPress": "Right Thumb Stick Press"
+      "/actions/default/in/RightThumbStickPress": "Right Thumb Stick Press",
+      "/actions/default/in/LeftMenu": "Left Menu",
+      "/actions/default/in/RightMenu": "Right Menu"
     }
   ]
 }

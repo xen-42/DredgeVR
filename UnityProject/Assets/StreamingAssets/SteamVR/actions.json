@@ -3,76 +3,113 @@
     {
       "name": "/actions/default/in/SkeletonLeftHand",
       "type": "skeleton",
-      "skeleton": "/skeleton/hand/left"
+      "skeleton": "/skeleton/hand/left",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/SkeletonRightHand",
       "type": "skeleton",
-      "skeleton": "/skeleton/hand/right"
+      "skeleton": "/skeleton/hand/right",
+      "requirement": "mandatory"
     },
     {
-      "name": "/actions/default/in/LeftGrab",
+      "name": "/actions/default/in/Move",
+      "type": "vector2",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/default/in/RadialSelect",
+      "type": "vector2",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/default/in/Confirm",
+      "type": "boolean",
+      "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/default/in/Cancel",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/RightGrab",
+      "name": "/actions/default/in/Accept",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/LeftTrigger",
+      "name": "/actions/default/in/RadialSelectShow",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/RightTrigger",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/default/in/LeftHandPose",
-      "type": "pose"
-    },
-    {
-      "name": "/actions/default/in/RightHandPose",
-      "type": "pose"
-    },
-    {
-      "name": "/actions/default/in/LeftThumbStick",
-      "type": "vector2"
-    },
-    {
-      "name": "/actions/default/in/RightThumbStick",
-      "type": "vector2"
-    },
-    {
-      "name": "/actions/default/in/B Left",
+      "name": "/actions/default/in/DiscardItem",
       "type": "boolean",
       "requirement": "suggested"
     },
     {
-      "name": "/actions/default/in/A Left",
-      "type": "boolean",
-      "requirement": "suggested"
-    },
-    {
-      "name": "/actions/default/in/B Right",
-      "type": "boolean",
-      "requirement": "suggested"
-    },
-    {
-      "name": "/actions/default/in/A Right",
+      "name": "/actions/default/in/DoAbility",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/LeftStart",
+      "name": "/actions/default/in/Interact",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/Reel",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/SellItem",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RotateClockwise",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RotateCounterClockwise",
       "type": "boolean",
-      "requirement": "suggested"
+      "requirement": "optional"
     },
     {
-      "name": "/actions/default/in/LeftThumbStickPress",
+      "name": "/actions/default/in/ToggleCargo",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/Pause",
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/RightThumbStickPress",
+      "name": "/actions/default/in/BuyItem",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/RepairItem",
       "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RepairAll",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/RepairMode",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/ZoomMapIn",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/ZoomMapOut",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/RemoveMarker",
+      "type": "boolean",
+      "requirement": "optional"
     },
     {
       "name": "/actions/default/out/Haptic",
@@ -186,21 +223,28 @@
       "/actions/platformer/in/Jump": "Jump",
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
-      "/actions/default/in/LeftGrab": "Left Grab",
-      "/actions/default/in/RightGrab": "Right Grab",
-      "/actions/default/in/LeftTrigger": "Left Trigger",
-      "/actions/default/in/RightTrigger": "Right Trigger",
-      "/actions/default/in/LeftHandPose": "Left Hand Pose",
-      "/actions/default/in/RightHandPose": "Right Hand Pose",
-      "/actions/default/in/LeftThumbStick": "Left Thumb Stick",
-      "/actions/default/in/RightThumbStick": "Right Thumb Stick",
-      "/actions/default/in/A Left": "A (Left)",
-      "/actions/default/in/B Left": "B (Left)",
-      "/actions/default/in/A Right": "A (Right)",
-      "/actions/default/in/B Right": "B (Right)",
-      "/actions/default/in/LeftStart": "LeftStart",
-      "/actions/default/in/LeftThumbStickPress": "Left Thumb Stick Press",
-      "/actions/default/in/RightThumbStickPress": "Right Thumb Stick Press"
+      "/actions/default/in/Cancel": "Cancel",
+      "/actions/default/in/Accept": "Accept",
+      "/actions/default/in/DiscardItem": "Discard Item",
+      "/actions/default/in/DoAbility": "Do Ability",
+      "/actions/default/in/Interact": "Interact",
+      "/actions/default/in/Reel": "Reel",
+      "/actions/default/in/SellItem": "Sell Item",
+      "/actions/default/in/Confirm": "Confirm",
+      "/actions/default/in/RotateClockwise": "Rotate Clockwise",
+      "/actions/default/in/RotateCounterClockwise": "RotateCounterClockwise",
+      "/actions/default/in/ToggleCargo": "Toggle Cargo",
+      "/actions/default/in/Pause": "Pause",
+      "/actions/default/in/RadialSelect": "Radial Select",
+      "/actions/default/in/RadialSelectShow": "Radial Select Show",
+      "/actions/default/in/Move": "Move",
+      "/actions/default/in/BuyItem": "Buy Item",
+      "/actions/default/in/RepairItem": "Repair Item",
+      "/actions/default/in/RepairAll": "Repair All",
+      "/actions/default/in/RepairMode": "Repair Mode",
+      "/actions/default/in/ZoomMapIn": "Zoom Map In",
+      "/actions/default/in/ZoomMapOut": "Zoom Map Out",
+      "/actions/default/in/RemoveMarker": "RemoveMarker"
     }
   ]
 }

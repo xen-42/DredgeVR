@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DredgeVR.VRInput;
+using Newtonsoft.Json;
 
 namespace DredgeVR.Options;
 
@@ -22,4 +23,7 @@ public class OptionsConfig
 
 	[JsonProperty]
 	public bool useFlatUI;
+
+	[JsonProperty]
+	public VRInputManager.ControllerType controller = VRInputManager.ControllerType.Index;
 }

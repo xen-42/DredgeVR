@@ -3,6 +3,8 @@ using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using InControl;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,13 +60,27 @@ public class VRInputManager : MonoBehaviour
 	public static VRBinding LeftTrigger = new(SteamVR_Actions._default.LeftTrigger, SteamVR_Input_Sources.LeftHand);
 	public static VRBinding RightTrigger = new(SteamVR_Actions._default.RightTrigger, SteamVR_Input_Sources.RightHand);
 
-	public static VRBinding LeftStart = new(SteamVR_Actions._default.LeftStart, SteamVR_Input_Sources.LeftHand);
+	// These are for the Vive controller since it lacks A/B buttons
+	public static VRBinding LeftMenu = new(SteamVR_Actions._default.LeftMenu, SteamVR_Input_Sources.LeftHand);
+	public static VRBinding RightMenu = new(SteamVR_Actions._default.RightMenu, SteamVR_Input_Sources.RightHand);
+	public static VRBinding LeftGrab = new(SteamVR_Actions._default.LeftGrab, SteamVR_Input_Sources.LeftHand);
+	public static VRBinding RightGrab = new(SteamVR_Actions._default.RightGrab, SteamVR_Input_Sources.RightHand);
+
 	public static VRBinding LeftThumbStickButton = new(SteamVR_Actions._default.LeftThumbStickPress, SteamVR_Input_Sources.LeftHand);
 	public static VRBinding RightThumbStickButton = new(SteamVR_Actions._default.RightThumbStickPress, SteamVR_Input_Sources.RightHand);
 
 	public static Dictionary<VRBinding, bool> State = new();
 
 	public Dictionary<VRBinding, ControlIconData> ControlIcons = new();
+
+	[JsonConverter(typeof(StringEnumConverter))]
+	public enum ControllerType
+	{
+		Index,
+		Oculus,
+		Vive
+	}
+	public static ControllerType Controller { get; private set; }
 
 	public void Awake()
 	{
@@ -82,6 +98,9 @@ public class VRInputManager : MonoBehaviour
 			vrButton.action.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
 		}
 
+		// Todo: Detect this
+		Controller = OptionsManager.Options.controller;
+
 		DredgeVRCore.TitleSceneStart += InitControls;
 	}
 
@@ -93,33 +112,66 @@ public class VRInputManager : MonoBehaviour
 		DredgeVRCore.TitleSceneStart -= InitControls;
 
 		// Depending on handedness flip all controls
-		var defaultCancelBinding = OptionsManager.Options.leftHanded ? LeftHandB : RightHandB;
-		var defaultAcceptBinding = OptionsManager.Options.leftHanded ? LeftHandA : RightHandA;
+		VRBinding? cancelBinding, acceptBinding, inventoryBinding, menuBinding, dominantThumbPress, otherThumbPress, dominantTriggerBinding, otherTriggerBinding;
+
+		switch (Controller)
+		{
+			case ControllerType.Vive:
+				// These controls probably have on screen prompts u can click so... won't put them
+				cancelBinding = null;
+				acceptBinding = OptionsManager.Options.leftHanded ? LeftMenu : RightMenu;
+
+				dominantTriggerBinding = OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger;
+				otherTriggerBinding = OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger;
+
+				dominantThumbPress = OptionsManager.Options.leftHanded ? LeftGrab : RightGrab;
+				otherThumbPress = OptionsManager.Options.leftHanded ? RightGrab : LeftGrab;
+
+				// Has on screen prompt
+				inventoryBinding = null;
+				menuBinding = OptionsManager.Options.leftHanded ? RightMenu : LeftMenu;
+
+				break;
+			default:
+				cancelBinding = OptionsManager.Options.leftHanded ? LeftHandB : RightHandB;
+				acceptBinding = OptionsManager.Options.leftHanded ? LeftHandA : RightHandA;
+
+				dominantTriggerBinding = OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger;
+				otherTriggerBinding = OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger;
+
+				dominantThumbPress = OptionsManager.Options.leftHanded ? LeftThumbStickButton : RightThumbStickButton;
+				otherThumbPress = OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton;
+
+				inventoryBinding = OptionsManager.Options.leftHanded ? RightHandB : LeftHandB;
+				menuBinding = OptionsManager.Options.leftHanded ? RightHandA : LeftHandA;
+
+				break;
+		}
 
 		Delay.FireInNUpdates(10, () =>
 		{
-			AddNewBinding(GameManager.Instance.Input.Controls.Undock, defaultCancelBinding); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Undock, cancelBinding); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Back, cancelBinding); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Skip, cancelBinding); // Escape
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // E
+			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, otherThumbPress); // E
 
-			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
-			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, otherTriggerBinding); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, otherTriggerBinding); // Mouse2
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Interact, acceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Reel, acceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, acceptBinding); // F
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
-			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, dominantTriggerBinding); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, dominantTriggerBinding); // Mouse1
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // One Axis
+			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, otherThumbPress); // One Axis
 
-			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, OptionsManager.Options.leftHanded ? RightHandB : LeftHandB); // Tab
+			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, inventoryBinding); // Tab
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Pause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
-			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Pause, menuBinding); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, menuBinding); // Escape
 
 			CreatePlayerAction("reset-camera", "Reset Camera", OptionsManager.Options.leftHanded ? LeftThumbStickButton : RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
 		});
@@ -149,10 +201,14 @@ public class VRInputManager : MonoBehaviour
 		}
 	}
 
-	private void AddNewBinding(PlayerAction action, VRBinding replacement)
+	private void AddNewBinding(PlayerAction action, VRBinding? replacement)
 	{
-		action.AddDefaultBinding(new VRBindingSource(replacement));
-		action.ResetBindings();
+		// Null check
+		if (replacement is VRBinding vrBinding)
+		{
+			action.AddDefaultBinding(new VRBindingSource(vrBinding));
+			action.ResetBindings();
+		}
 	}
 
 	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
