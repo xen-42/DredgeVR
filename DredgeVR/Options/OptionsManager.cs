@@ -16,16 +16,16 @@ public static class OptionsManager
 		try
 		{
 			Options = new();
-			/*
 			if (File.Exists(optionsPath))
 			{
 				JsonConvert.PopulateObject(File.ReadAllText(optionsPath), Options);
+				DredgeVRLogger.Info("Loaded options file");
 			}
 			else
 			{
 				File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options));
+				DredgeVRLogger.Info("Created default options file");
 			}
-			*/
 		}
 		catch (Exception e)
 		{

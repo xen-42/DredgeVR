@@ -6,16 +6,16 @@ namespace DredgeVR.Options;
 public class OptionsConfig
 {
 	[JsonProperty]
-	public bool removeWaves;
+	public bool removeWaves = true;
 
 	[JsonProperty]
-	public bool lockViewToHorizon;
+	public bool lockViewToHorizon = true;
 
 	[JsonProperty]
-	public bool lockCameraYPosition;
+	public bool lockCameraYPosition = true;
 
 	[JsonProperty]
-	public bool lowerTerrainLOD;
+	public bool lowerTerrainLOD = true;
 
 	[JsonProperty]
 	public bool leftHand;
