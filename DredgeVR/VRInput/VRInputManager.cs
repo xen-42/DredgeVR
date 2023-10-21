@@ -96,28 +96,28 @@ public class VRInputManager : MonoBehaviour
 
 		Delay.FireInNUpdates(10, () =>
 		{
-			ReplaceBinding(GameManager.Instance.Input.Controls.Undock, defaultCancelBinding); // X
-			ReplaceBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
-			ReplaceBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Undock, defaultCancelBinding); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftThumbStickButton); // E
+			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftThumbStickButton); // E
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftTrigger); // Mouse2
-			ReplaceBinding(GameManager.Instance.Input.Controls.DoAbility, LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, LeftTrigger); // Mouse2
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
-			ReplaceBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
-			ReplaceBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.Confirm, RightTrigger); // Mouse1
-			ReplaceBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
+			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.ToggleCargo, LeftHandB); // Tab
+			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, LeftHandB); // Tab
 
-			ReplaceBinding(GameManager.Instance.Input.Controls.Pause, LeftHandA); // Escape
-			ReplaceBinding(GameManager.Instance.Input.Controls.Unpause, LeftHandA); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Pause, LeftHandA); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, LeftHandA); // Escape
 
 			CreatePlayerAction("reset-camera", "Reset Camera", RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
 		});
@@ -147,10 +147,8 @@ public class VRInputManager : MonoBehaviour
 		}
 	}
 
-	private void ReplaceBinding(PlayerAction action, VRBinding replacement)
+	private void AddNewBinding(PlayerAction action, VRBinding replacement)
 	{
-		var defaultBindings = action.GetValue<List<BindingSource>>("defaultBindings");
-		defaultBindings.Clear();
 		action.AddDefaultBinding(new VRBindingSource(replacement));
 		action.ResetBindings();
 	}
