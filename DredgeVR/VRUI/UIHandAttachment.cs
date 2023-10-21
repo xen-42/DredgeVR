@@ -20,6 +20,16 @@ public class UIHandAttachment : MonoBehaviour
 		_scale = scale;
 	}
 
+	public void Awake()
+	{
+		// For some control schemes the user might be better off just being able to target the buttons with their cursor
+		if (OptionsManager.Options.useFlatUI)
+		{
+			enabled = false;
+			Component.Destroy(this);
+		}
+	}
+
 	public void Update()
 	{
 		var leftHand = _dominantHand == OptionsManager.Options.leftHanded;

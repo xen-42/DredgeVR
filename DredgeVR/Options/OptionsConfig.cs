@@ -19,4 +19,7 @@ public class OptionsConfig
 
 	[JsonProperty]
 	public bool leftHanded;
+
+	[JsonProperty]
+	public bool useFlatUI;
 }
