@@ -25,12 +25,26 @@ internal class WorldManager : MonoBehaviour
 			terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
 		}
 
+		// Reflections look super weird in VR - Make sure its off when we load in
+		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
+
 		// TODO: Make this a setting
-		// Force lower all LOD
-		foreach (var lodGroup in GameObject.FindObjectsOfType<LODGroup>())
+		// Make all LOD only go up to the second highest
+		foreach (var lod in GameObject.FindObjectsOfType<LODGroup>())
 		{
-			lodGroup.ForceLOD(lodGroup.GetLODs().Count() - 1);
-			lodGroup.enabled = false;
+			var lods = lod.GetLODs();
+			if (lods.Count() > 2)
+			{
+				lods[0] = lods[1];
+			}
+			lod.SetLODs(lods);
+		}
+
+		// TODO: Make this a setting
+		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
+		{
+			var emission = particleSystem.emission;
+			emission.rateOverTimeMultiplier = 0.8f;
 		}
 	}
 
