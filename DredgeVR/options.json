@@ -1,0 +1,9 @@
+{
+    "removeWaves": true,
+    "lockViewToHorizon": true,
+    "lockCameraYPosition": true,
+    "lowerTerrainLOD": true,
+    "limitLOD": true,
+    "particleModifier": 0.8,
+    "leftHand": false
+}

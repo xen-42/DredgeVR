@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
 using DredgeVR.Tutorial;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
@@ -33,6 +34,7 @@ namespace DredgeVR
 			WinchCore.Log.Debug($"{nameof(DredgeVRCore)} has loaded!");
 
 			new AssetLoader();
+			OptionsManager.Load();
 
 			// Dredge uses one camera for all time and between scenes, which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
