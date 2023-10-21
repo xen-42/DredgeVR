@@ -1,7 +1,6 @@
 ﻿using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using UnityEngine;
-using Valve.VR;
 
 namespace DredgeVR.VRUI;
 
@@ -27,6 +26,9 @@ public class UIHandAttachment : MonoBehaviour
 		{
 			enabled = false;
 			Component.Destroy(this);
+
+			// Since it'll be flat double the size
+			transform.localScale = Vector3.one * 2f;
 		}
 	}
 
