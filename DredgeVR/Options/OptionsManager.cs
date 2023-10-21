@@ -23,9 +23,10 @@ public static class OptionsManager
 			}
 			else
 			{
-				File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options, Formatting.Indented));
 				DredgeVRLogger.Info("Created default options file");
 			}
+			// Always write the contents so that if there's been an update they'll get the new settings in their config
+			File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options, Formatting.Indented));
 		}
 		catch (Exception e)
 		{
