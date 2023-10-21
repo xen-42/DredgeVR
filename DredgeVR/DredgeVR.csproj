@@ -22,7 +22,7 @@
 		<None Include="mod_meta.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Include="AssetBundles/*">
+		<None Include="AssetBundles/**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="DredgeVR.csproj.user" />

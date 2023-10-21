@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Valve.VR;
 using Winch.Core;
@@ -22,6 +23,8 @@ public class AssetLoader
 		}
 	}
 	private static Shader _litShader;
+
+	private static readonly Dictionary<string, Texture2D> _icons = new();
 
 	public AssetLoader()
 	{
@@ -50,5 +53,19 @@ public class AssetLoader
 			WinchCore.Log.Error($"Failed to load asset {prefabName}");
 			return null;
 		}
+	}
+
+	public static Texture2D GetTexture(string path)
+	{
+		if (!_icons.ContainsKey(path))
+		{
+			var rawData = File.ReadAllBytes(Path.Combine(DredgeVRCore.ModPath, path));
+			var tex = new Texture2D(2, 2);
+			tex.LoadImage(rawData);
+			tex.name = Path.GetFileName(path);
+			_icons[path] = tex;
+		}
+		return _icons[path];
+
 	}
 }
