@@ -1,6 +1,7 @@
 ﻿using Cinemachine;
 using Cinemachine.Utility;
 using DredgeVR.Helpers;
+using DredgeVR.Options;
 using DredgeVR.VRInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -113,11 +114,16 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				// Don't take on origin pitch rotation because that is turbo motion sickness
-				var forwardOnPlane = AnchorTransform.forward.ProjectOntoPlane(Vector3.up);
-				VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+				if (OptionsManager.Options.lockViewToHorizon)
+				{
+					// Don't take on origin pitch rotation because that is turbo motion sickness
+					var forwardOnPlane = AnchorTransform.forward.ProjectOntoPlane(Vector3.up);
+					VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+				}
 
-				AnchorTransform.position = new Vector3(AnchorTransform.position.x, 0.66f, AnchorTransform.position.z);
+				// Helps when you ram into stuff to not bounce around
+				var anchorY = OptionsManager.Options.lockCameraYPosition ? 0.66f : AnchorTransform.position.y;
+				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
 			}
 
 			VRPlayer.origin.transform.position = AnchorTransform.position;

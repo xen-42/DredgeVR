@@ -1,5 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
+using DredgeVR.Options;
 using System.Linq;
 using UnityEngine;
 
@@ -21,30 +22,20 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnSceneStart(string scene)
 	{
-		// TODO: Make this a setting
 		// Heightmap terrain causes massive lag in VR
 		foreach (var terrain in GameObject.FindObjectsOfType<Terrain>())
 		{
-			terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
+			if (OptionsManager.Options.lowerTerrainLOD)
+			{
+				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
+			}
+
 			terrain.treeLODBiasMultiplier = 3.8f; // Magic number
 		}
 
 		// Reflections look super weird in VR - Make sure its off when we load in
 		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
 
-		// TODO: Make this a setting
-		// Make all LOD only go up to the second highest
-		foreach (var lod in GameObject.FindObjectsOfType<LODGroup>())
-		{
-			var lods = lod.GetLODs();
-			if (lods.Count() > 2)
-			{
-				lods[0] = lods[1];
-			}
-			lod.SetLODs(lods);
-		}
-
-		// TODO: Make this a setting
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{
 			var emission = particleSystem.emission;

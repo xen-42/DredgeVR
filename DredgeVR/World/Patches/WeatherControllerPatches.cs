@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using DredgeVR.Options;
+using HarmonyLib;
 using UnityEngine;
 
 namespace DredgeVR.World.Patches;
@@ -10,10 +11,12 @@ internal class WeatherControllerPatches
 	[HarmonyPatch(nameof(WeatherController.Update))]
 	public static void WeatherController_Update(WeatherController __instance)
 	{
-		// TODO: Make this an optional setting
 		// Meant to lessen sea-sickness
-		__instance._waveSteepness = 0;
-		Shader.SetGlobalFloat("_WaveSteepness", 0);
-		GameManager.Instance.WaveController.Steepness = 0;
+		if (OptionsManager.Options.removeWaves)
+		{
+			__instance._waveSteepness = 0;
+			Shader.SetGlobalFloat("_WaveSteepness", 0);
+			GameManager.Instance.WaveController.Steepness = 0;
+		}
 	}
 }

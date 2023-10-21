@@ -11,10 +11,21 @@ public static class OptionsManager
 
 	public static void Load()
 	{
+		var optionsPath = Path.Combine(DredgeVRCore.ModPath, "options.json");
+
 		try
 		{
 			Options = new();
-			JsonConvert.PopulateObject(File.ReadAllText(Path.Combine(DredgeVRCore.ModPath, "options.json")), Options);
+			/*
+			if (File.Exists(optionsPath))
+			{
+				JsonConvert.PopulateObject(File.ReadAllText(optionsPath), Options);
+			}
+			else
+			{
+				File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options));
+			}
+			*/
 		}
 		catch (Exception e)
 		{
