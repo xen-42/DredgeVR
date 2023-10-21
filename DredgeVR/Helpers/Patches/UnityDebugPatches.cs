@@ -16,11 +16,9 @@ internal static class DebugLogPatches
 	[HarmonyPatch(nameof(Debug.LogWarning), new Type[] { typeof(object) })]
 	public static void Debug_LogWarning(object message) => DredgeVRLogger.Warn($"[UnityEngine.Debug.Log] {message}");
 
-	/*
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(Debug.LogError), new Type[] { typeof(object) })]
 	public static void Debug_LogError(object message) => DredgeVRLogger.Error($"[UnityEngine.Debug.Log] {message}");
-	*/
 
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(Debug.LogException), new Type[] { typeof(Exception) })]

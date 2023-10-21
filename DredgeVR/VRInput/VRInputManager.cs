@@ -47,16 +47,12 @@ public class VRInputManager : MonoBehaviour
 					boolAction.AddOnStateUpListener(VRButtonUpdate_Released, SteamVR_Input_Sources.LeftHand);
 					boolAction.AddOnStateUpListener(VRButtonUpdate_Released, SteamVR_Input_Sources.RightHand);
 
-					DredgeVRLogger.Debug($"Added listener to {action.GetShortName()} on hand");
+					DredgeVRLogger.Debug($"Added listener to {action.GetShortName()}");
 				}
 				catch (Exception e)
 				{
 					DredgeVRLogger.Error($"Could not add listener to action {action.GetShortName()} : {e}");
 				}
-			}
-			else
-			{
-				DredgeVRLogger.Debug($"{action.GetShortName()} was {action.GetType().Name}");
 			}
 		}
 
@@ -137,15 +133,8 @@ public class VRInputManager : MonoBehaviour
 
 	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
-		try
-		{
-			DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
-			_state[fromAction] = true;
-		}
-		catch (Exception e)
-		{
-			DredgeVRLogger.Error("Fuck you" + e);
-		}
+		DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
+		_state[fromAction] = true;
 	}
 
 	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
@@ -188,20 +177,5 @@ public class VRInputManager : MonoBehaviour
 	private void LeftThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
 	{
 		LeftThumbStick = axis;
-	}
-
-	public void Update()
-	{
-		foreach (var action in _state.Keys)
-		{
-			if (action.GetStateDown(SteamVR_Input_Sources.LeftHand) || action.GetStateDown(SteamVR_Input_Sources.RightHand))
-			{
-				_state[action] = true;
-			}
-			else if (action.GetStateUp(SteamVR_Input_Sources.LeftHand) || action.GetStateUp(SteamVR_Input_Sources.RightHand))
-			{
-				_state[action] = false;
-			}
-		}
 	}
 }
