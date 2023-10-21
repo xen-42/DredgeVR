@@ -13,30 +13,25 @@ public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	public static Camera Camera { get; private set; }
+	private static Camera _camera;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
 
-	public static Transform ResetTransform { get; private set; }
+	public static Transform AnchorTransform { get; private set; }
 	private Transform _pivot;
 
 	public void Awake()
 	{
 		Instance = this;
 
-		Camera = GetComponent<Camera>();
+		_camera = GetComponent<Camera>();
 
 		// This thing tries to take over and breaks our tracking
 		GetComponent<CinemachineBrain>().enabled = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
-
-		// Set up hands
-		// LeftHand = new GameObject("LeftHand").AddComponent<VRHand>();
-
-		// RightHand = new GameObject("RightHand").AddComponent<VRHand>();
 
 		LeftHand = GameObject.Instantiate(AssetLoader.LeftHandBase).AddComponent<VRHand>();
 		RightHand = GameObject.Instantiate(AssetLoader.RightHandBase).AddComponent<VRHand>();
@@ -67,11 +62,17 @@ public class VRCameraManager : MonoBehaviour
 	private void OnSceneStart(string _)
 	{
 		// Always have a ResetTransform on each scene, then the other events handle positioning it properly if need be
-		ResetTransform = new GameObject("ResetTransform").transform;
-		ResetTransform.position = Vector3.zero;
-		ResetTransform.rotation = Quaternion.identity;
 
-		Delay.FireOnNextUpdate(ResetPosition);
+		// Can persist between scenes if it wasn't parented to a game object
+		if (AnchorTransform == null)
+		{
+			AnchorTransform = new GameObject(nameof(AnchorTransform)).transform;
+		}
+
+		AnchorTransform.position = Vector3.zero;
+		AnchorTransform.rotation = Quaternion.identity;
+
+		Delay.FireInNUpdates(2, ResetPosition);
 	}
 
 	private void OnTitleSceneStart()
@@ -80,8 +81,8 @@ public class VRCameraManager : MonoBehaviour
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
 		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
 
-		ResetTransform.position = new Vector3(-6.5f, 0.5f, 0);
-		ResetTransform.LookAt(worldPos);
+		AnchorTransform.position = new Vector3(-6.5f, 0.5f, 0);
+		AnchorTransform.LookAt(worldPos);
 	}
 
 	private void OnGameSceneStart()
@@ -92,9 +93,9 @@ public class VRCameraManager : MonoBehaviour
 			() =>
 			{
 				// Make the player follow the boat
-				ResetTransform.parent = GameManager.Instance.Player.transform;
-				ResetTransform.localPosition = new Vector3(0, 1, -2);
-				ResetTransform.localRotation = Quaternion.identity;
+				AnchorTransform.parent = GameManager.Instance.Player.transform;
+				AnchorTransform.localPosition = new Vector3(0, 1, -2);
+				AnchorTransform.localRotation = Quaternion.identity;
 
 				Delay.FireOnNextUpdate(ResetPosition);
 			}
@@ -103,31 +104,31 @@ public class VRCameraManager : MonoBehaviour
 
 	public void Update()
 	{
-		Camera.fieldOfView = SteamVR.instance.fieldOfView;
+		_camera.fieldOfView = SteamVR.instance.fieldOfView;
 
-		if (ResetTransform != null)
+		if (AnchorTransform != null)
 		{
 			// In the game scene force a constant ResetTransform y position
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
 				// Don't take on origin pitch rotation because that is turbo motion sickness
-				var forwardOnPlane = ResetTransform.forward.ProjectOntoPlane(Vector3.up);
+				var forwardOnPlane = AnchorTransform.forward.ProjectOntoPlane(Vector3.up);
 				VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
 
-				ResetTransform.position = new Vector3(ResetTransform.position.x, 0.66f, ResetTransform.position.z);
+				AnchorTransform.position = new Vector3(AnchorTransform.position.x, 0.66f, AnchorTransform.position.z);
 			}
 
-			VRPlayer.origin.transform.position = ResetTransform.position;
+			VRPlayer.origin.transform.position = AnchorTransform.position;
 		}
 	}
 
 	public void ResetPosition()
 	{
-		var rotationAngleY = ResetTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
+		var rotationAngleY = AnchorTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
 		_pivot.Rotate(0, rotationAngleY, 0);
 
-		var distanceDiff = ResetTransform.position - _pivot.position;
+		var distanceDiff = AnchorTransform.position - _pivot.position;
 		_pivot.transform.position += distanceDiff;
 	}
 }

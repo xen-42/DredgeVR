@@ -88,8 +88,8 @@ internal class VRUIManager : MonoBehaviour
 
 		cutscene.transform.Find("Camera").gameObject.SetActive(false);
 
-		cutscene.transform.position = VRCameraManager.ResetTransform.position + VRCameraManager.ResetTransform.forward * 40f - VRCameraManager.ResetTransform.up * 10f;
-		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.ResetTransform.rotation.y, 0);
+		cutscene.transform.position = VRCameraManager.AnchorTransform.position + VRCameraManager.AnchorTransform.forward * 40f - VRCameraManager.AnchorTransform.up * 10f;
+		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.AnchorTransform.rotation.y, 0);
 
 		var scenes = new Transform[] { cutscene.transform.Find("Scene1Container"), cutscene.transform.Find("Scene2Container"), cutscene.transform.Find("Scene3Container") };
 		foreach (var scene in scenes)

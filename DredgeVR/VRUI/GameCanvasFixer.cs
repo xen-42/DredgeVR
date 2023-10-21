@@ -18,7 +18,7 @@ internal class GameCanvasFixer : MonoBehaviour
 
 	public void Update()
 	{
-		var uiParent = VRCameraManager.ResetTransform;
+		var uiParent = VRCameraManager.AnchorTransform;
 
 		if (uiParent != null)
 		{

@@ -26,7 +26,7 @@ public static class GridObjectPatches
 		__instance.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, __instance.CurrentRotation);
 
 		// Without this, they have constant world space rotation which gets messed up if the boat has turned
-		var z = VRCameraManager.ResetTransform.transform.forward.normalized;
+		var z = VRCameraManager.AnchorTransform.transform.forward.normalized;
 		var y = Quaternion.AngleAxis(__instance.currentRotation, z) * Vector3.up;
 
 		__instance.gridObjectImage.transform.rotation = Quaternion.LookRotation(z, y);
