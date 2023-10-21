@@ -7,14 +7,14 @@ namespace DredgeVR.VRInput;
 
 public class VRBindingSource : BindingSource
 {
-	private VRInputManager.VRBinding _binding;
+	public VRInputManager.VRBinding binding;
 
 	public VRBindingSource(VRInputManager.VRBinding binding)
 	{
-		_binding = binding;
+		this.binding = binding;
 	}
 
-	public override string Name => $"{_binding.action.GetShortName()} ({Enum.GetName(typeof(SteamVR_Input_Sources), _binding.hand)})";
+	public override string Name => $"{binding.action.GetShortName()} ({Enum.GetName(typeof(SteamVR_Input_Sources), binding.hand)})";
 
 	public override string DeviceName => "VR";
 
@@ -22,16 +22,17 @@ public class VRBindingSource : BindingSource
 
 	public override InputDeviceStyle DeviceStyle => InputDeviceStyle.Oculus;
 
-	public override BindingSourceType BindingSourceType => BindingSourceType.UnknownDeviceBindingSource;
+	public static BindingSourceType Source = BindingSourceType.UnknownDeviceBindingSource;
+	public override BindingSourceType BindingSourceType => Source;
 
 	public override bool Equals(BindingSource other)
 	{
-		return other is VRBindingSource otherVR && otherVR._binding.Equals(_binding);
+		return other is VRBindingSource otherVR && otherVR.binding.Equals(binding);
 	}
 
 	public override bool GetState(InputDevice inputDevice)
 	{
-		return VRInputManager.State[_binding];
+		return VRInputManager.State[binding];
 	}
 
 	public override float GetValue(InputDevice inputDevice)
