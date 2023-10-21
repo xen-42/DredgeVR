@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Items;
 using System.Linq;
 using UnityEngine;
 
@@ -70,6 +71,9 @@ internal class WorldManager : MonoBehaviour
 				{
 					smokeColumn.gameObject.SetActive(false);
 				}
+
+				// Set up held items
+				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldMap>();
 			}
 		);
 

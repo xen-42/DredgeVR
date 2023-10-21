@@ -1,10 +1,4 @@
-﻿using AeLa.EasyFeedback.APIs;
-using DredgeVR.Helpers;
-using HarmonyLib;
-using InControl;
-using System.Collections.Generic;
-using System.Linq;
-using Winch.Core;
+﻿using HarmonyLib;
 
 namespace DredgeVR.VRInput.Patches;
 

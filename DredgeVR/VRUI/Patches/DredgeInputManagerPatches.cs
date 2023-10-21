@@ -22,7 +22,8 @@ public static class DredgeInputManagerPatches
 	{
 		if (requestedBindingSourceType == VRBindingSource.Source)
 		{
-			var vrAction = ((VRBindingSource)action.Bindings.FirstOrDefault(x => x is VRBindingSource)).binding.action;
+			var vrAction = ((VRBindingSource)action.Bindings?.FirstOrDefault(x => x is VRBindingSource))?.binding.action;
+
 			if (vrAction != null)
 			{
 				var controlIcon = VRControlIcons.GetControlIconData(vrAction);

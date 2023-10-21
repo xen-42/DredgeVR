@@ -3,6 +3,7 @@ using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Valve.VR;
 
 namespace DredgeVR.VRUI;
 
@@ -12,6 +13,8 @@ namespace DredgeVR.VRUI;
 /// </summary>
 internal class VRUIManager : MonoBehaviour
 {
+	private bool _hasInitialized;
+
 	public void Awake()
 	{
 		SceneManager.activeSceneChanged += OnActiveSceneChanged;
@@ -49,12 +52,18 @@ internal class VRUIManager : MonoBehaviour
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
-		// Make the loading screen UI show in front of the player too
-		GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
+		// These canvases are on the Manager scene and will persist the way they are
+		if (!_hasInitialized)
+		{
+			// Make the loading screen UI show in front of the player too
+			GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
 
-		// Make these a bit easier to target
-		GameObject.Find("Canvas/ControlPromptPanel").transform.localScale = Vector3.one * 1.5f;
-		GameObject.Find("Canvas/ControlPromptPanel").transform.localScale = Vector3.one * 1.5f;
+			// Attach right hand button prompts
+			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
+				.Init(SteamVR_Input_Sources.RightHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+
+			_hasInitialized = true;
+		}
 	}
 
 	private void OnGameSceneStart()
@@ -74,11 +83,20 @@ internal class VRUIManager : MonoBehaviour
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "Funds", "Backplate" };
 		GameObject.Find("GameCanvases/GameCanvas/DestinationUI/MarketDestinationUI/MarketSlidePanel").AddComponent<SlidePanelFixer>().targets = new string[] { "TitleContainer", "Backplate" };
 
-		// Make the tab button easier to target
-		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").transform.localScale = Vector3.one * 1.5f;
-
 		// Make it easier to target
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
+
+		// Attach activity UI to hand
+		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
+			.Init(SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+
+		// Attach inventory tab UI to hand
+		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
+			.Init(SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+
+		// Cabin slide panel is wrong
+		var itemScroller = GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/PlayerTabbedPanelContainer/Panels/CabinPanel/Container/ItemScroller/NonSpatialItemGrid").transform;
+		itemScroller.localPosition = new Vector3(itemScroller.localPosition.x, itemScroller.localPosition.y, 0f);
 	}
 
 	private void OnIntroCutsceneStart()

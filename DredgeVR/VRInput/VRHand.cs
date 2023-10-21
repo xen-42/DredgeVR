@@ -70,21 +70,6 @@ public class VRHand : MonoBehaviour
 	{
 		DredgeVRCore.TitleSceneStart -= InitGraphics;
 
-		/*
-		var buoy = GameObject.Instantiate(GameObject.Find("TheMarrows/Islands/GreaterMarrow/Buoys/Buoy/LightBuoy"));
-		buoy.transform.parent = transform;
-		buoy.transform.localPosition = Vector3.zero;
-		buoy.transform.localRotation = Quaternion.identity;
-		buoy.transform.localScale = Vector3.one * 0.1f;
-
-		// Need to keep the addressables loaded else we lose our buoys
-		if (!_flagTitleSceneAcquire)
-		{
-			_flagTitleSceneAcquire = true;
-			DredgeVRCore.Instance.StartCoroutine(KeepTitleSceneAddressablesLoaded());
-		}
-		*/
-
 		// Need a fresh material for our laser pointer
 		var material = new Material(AssetLoader.LitShader);
 
@@ -97,31 +82,6 @@ public class VRHand : MonoBehaviour
 		endMR.material = material;
 
 		_graphicsInitialized = true;
-	}
-
-	private IEnumerator KeepTitleSceneAddressablesLoaded()
-	{
-		var time = 0f;
-		var failed = true;
-		while (failed)
-		{
-			if (time > 10f)
-			{
-				WinchCore.Log.Error($"Couldn't keep title scene addressables loaded, timed out after 10 seconds");
-				yield return null;
-			}
-
-			try
-			{
-				new ResourceManager().Acquire(GameManager.Instance._sceneLoader.titleSceneHandle);
-				failed = false;
-			}
-			catch { }
-
-			time += 0.5f;
-			yield return new WaitForSeconds(0.5f);
-		}
-		yield return null;
 	}
 
 	public void Update()
