@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1114172133
+CRC: 2454439253
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5c580e75a6caf7e7f1dc8f0a9d4f239f
+    Hash: 7981dcf1a04ba290def00488fbe6e8df
   TypeTreeHash:
     serializedVersion: 2
     Hash: 98adf697c6833b5b33b6c58fabd5743d
@@ -61,6 +61,8 @@ SerializeReferenceClassIdentifiers:
 - AssemblyName: UnityEngine.CoreModule
   ClassName: UnityEngine.Events.PersistentCallGroup
 Assets:
+- Assets/SteamVR/Models/Materials/vr_glove_normal.png
+- Assets/SteamVR/InteractionSystem/Poses/fallback_relaxed.asset
 - Assets/SteamVR/Prefabs/vr_glove_right.prefab
 - Assets/SteamVR/Prefabs/vr_glove_left.prefab
 Dependencies: []

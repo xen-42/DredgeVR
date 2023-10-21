@@ -38,14 +38,6 @@ public class AssetLoader
 		var asset = bundle.LoadAsset<T>($"Assets/{prefabName}");
 		if (asset)
 		{
-			if (asset is GameObject go)
-			{
-				foreach (var meshRenderer in go.GetComponentsInChildren<SkinnedMeshRenderer>())
-				{
-					meshRenderer.material.shader = LitShader;
-				}
-			}
-
 			return asset;
 		}
 		else
