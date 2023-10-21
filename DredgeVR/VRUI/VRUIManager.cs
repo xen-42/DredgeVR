@@ -21,6 +21,8 @@ internal class VRUIManager : MonoBehaviour
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart += OnIntroCutsceneStart;
+
+		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
 	}
 
 	public void OnDestroy()
@@ -29,6 +31,16 @@ internal class VRUIManager : MonoBehaviour
 		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart -= OnIntroCutsceneStart;
+
+		VRInputModule.Instance.DominantHandChanged -= OnDominantHandChanged;
+	}
+
+	private void OnDominantHandChanged(SteamVR_Input_Sources _)
+	{
+		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+		{
+			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
+		}
 	}
 
 	private void OnActiveSceneChanged(Scene prev, Scene current)
@@ -36,7 +48,6 @@ internal class VRUIManager : MonoBehaviour
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
 			canvas.renderMode = RenderMode.WorldSpace;
-			// TODO: If the dominant hand is changed while ingame, we'd have to reset this on all canvases
 			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 			canvas.scaleFactor = 1f;
 			canvas.planeDistance = 1;
@@ -60,7 +71,7 @@ internal class VRUIManager : MonoBehaviour
 
 			// Attach right hand button prompts
 			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
-				.Init(SteamVR_Input_Sources.RightHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+				.Init(true, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
 
 			_hasInitialized = true;
 		}
@@ -88,11 +99,11 @@ internal class VRUIManager : MonoBehaviour
 
 		// Attach activity UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
-			.Init(SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
 
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
-			.Init(SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
 
 		// Cabin slide panel is wrong
 		var itemScroller = GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/PlayerTabbedPanelContainer/Panels/CabinPanel/Container/ItemScroller/NonSpatialItemGrid").transform;

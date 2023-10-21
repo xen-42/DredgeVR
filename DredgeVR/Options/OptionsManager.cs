@@ -23,7 +23,7 @@ public static class OptionsManager
 			}
 			else
 			{
-				File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options));
+				File.WriteAllText(optionsPath, JsonConvert.SerializeObject(Options, Formatting.Indented));
 				DredgeVRLogger.Info("Created default options file");
 			}
 		}

@@ -22,7 +22,7 @@ public static class CursorProxyPatches
 		_canvas ??= __instance.GetComponentInParent<Canvas>();
 		var pixelHalfSize = new Vector3(_canvas.pixelRect.size.x, _canvas.pixelRect.size.y, 0f) / 2f;
 
-		if (VRHand.DominantHand?.LaserPointerEnd?.transform?.position is Vector3 laserPointerPos)
+		if (VRInputModule.Instance?.DominantHand?.LaserPointerEnd?.transform?.position is Vector3 laserPointerPos)
 		{
 			__instance.cursorSquare.transform.position = laserPointerPos;
 			var localLaserPosition = __instance.cursorSquare.transform.localPosition;

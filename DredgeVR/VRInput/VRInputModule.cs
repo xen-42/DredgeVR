@@ -1,10 +1,10 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.VRInput;
 
@@ -17,7 +17,8 @@ internal class VRInputModule : BaseInputModule
 
 	// For raycasting
 	public Camera RaycastCamera;
-	public SteamVR_Input_Sources DominantHand { get; private set; }
+	public SteamVR_Input_Sources DominantHandInputSource { get; private set; }
+	public VRHand DominantHand { get; private set; }
 	public Action<SteamVR_Input_Sources> DominantHandChanged;
 
 	public SteamVR_Action_Boolean UIClickAction;
@@ -36,18 +37,19 @@ internal class VRInputModule : BaseInputModule
 	{
 		base.Start();
 
-		SetDominantHand(false);
+		SetDominantHand(OptionsManager.Options.leftHanded);
 
 		Data = new PointerEventData(eventSystem);
 	}		 
 	
 	public void SetDominantHand(bool left)
 	{
-		RaycastCamera = left ? VRCameraManager.LeftHand.RaycastCamera : VRCameraManager.RightHand.RaycastCamera;
-		DominantHand = left ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
+		DominantHand = left ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
+		RaycastCamera = DominantHand.RaycastCamera;
+		DominantHandInputSource = left ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
 		UIClickAction = left ? SteamVR_Actions._default.LeftTrigger : SteamVR_Actions._default.RightTrigger;
 
-		DominantHandChanged?.Invoke(DominantHand);
+		DominantHandChanged?.Invoke(DominantHandInputSource);
 	}
 
 	public override void Process()
@@ -64,7 +66,7 @@ internal class VRInputModule : BaseInputModule
 
 		HandlePointerExitAndEnter(Data, _currentObject);
 
-		if (UIClickAction.GetStateDown(DominantHand))
+		if (UIClickAction.GetStateDown(DominantHandInputSource))
 		{
 			Data.pointerPressRaycast = Data.pointerCurrentRaycast;
 			var newPointerPress = ExecuteEvents.ExecuteHierarchy(_currentObject, Data, ExecuteEvents.pointerDownHandler) 
@@ -76,7 +78,7 @@ internal class VRInputModule : BaseInputModule
 			DredgeVRLogger.Info("Clicked");
 		}
 
-		if (UIClickAction.GetStateUp(DominantHand))
+		if (UIClickAction.GetStateUp(DominantHandInputSource))
 		{
 			ExecuteEvents.Execute(Data.pointerPress, Data, ExecuteEvents.pointerUpHandler);
 

@@ -2,7 +2,6 @@
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Winch.Core;
 
 namespace DredgeVR.VRUI.Patches;
 

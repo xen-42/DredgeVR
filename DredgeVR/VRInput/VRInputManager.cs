@@ -1,5 +1,6 @@
 ﻿using DG.Tweening.Core.Easing;
 using DredgeVR.Helpers;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using InControl;
 using System;
@@ -91,8 +92,9 @@ public class VRInputManager : MonoBehaviour
 	{
 		DredgeVRCore.TitleSceneStart -= InitControls;
 
-		var defaultCancelBinding = RightHandB;
-		var defaultAcceptBinding = RightHandA;
+		// Depending on handedness flip all controls
+		var defaultCancelBinding = OptionsManager.Options.leftHanded ? LeftHandB : RightHandB;
+		var defaultAcceptBinding = OptionsManager.Options.leftHanded ? LeftHandA : RightHandA;
 
 		Delay.FireInNUpdates(10, () =>
 		{
@@ -100,26 +102,26 @@ public class VRInputManager : MonoBehaviour
 			AddNewBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
 			AddNewBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, LeftThumbStickButton); // E
+			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // E
 
-			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, LeftTrigger); // Mouse2
-			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
 
 			AddNewBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
 			AddNewBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
 			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, RightTrigger); // Mouse1
-			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, LeftThumbStickButton); // One Axis
+			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // One Axis
 
-			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, LeftHandB); // Tab
+			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, OptionsManager.Options.leftHanded ? RightHandB : LeftHandB); // Tab
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Pause, LeftHandA); // Escape
-			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, LeftHandA); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Pause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
 
-			CreatePlayerAction("reset-camera", "Reset Camera", RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
+			CreatePlayerAction("reset-camera", "Reset Camera", OptionsManager.Options.leftHanded ? LeftThumbStickButton : RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
 		});
 	}
 

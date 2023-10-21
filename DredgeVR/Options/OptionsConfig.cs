@@ -18,5 +18,5 @@ public class OptionsConfig
 	public bool lowerTerrainLOD = true;
 
 	[JsonProperty]
-	public bool leftHand;
+	public bool leftHanded;
 }

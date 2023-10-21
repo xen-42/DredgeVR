@@ -20,8 +20,6 @@ public class VRHand : MonoBehaviour
 
 	public bool IsDominantHand { get; private set; }
 
-	public static VRHand DominantHand { get; private set; }
-
 	public void Start()
 	{
 		// Loading buoys off the title screen
@@ -54,13 +52,12 @@ public class VRHand : MonoBehaviour
 		_line.SetActive(false);
 
 		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
-		OnDominantHandChanged(VRInputModule.Instance.DominantHand);
+		OnDominantHandChanged(VRInputModule.Instance.DominantHandInputSource);
 	}
 
 	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
 	{
 		IsDominantHand = dominantHand == hand;
-		DominantHand = this;
 	}
 
 	/// <summary>
