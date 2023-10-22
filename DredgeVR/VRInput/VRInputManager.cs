@@ -94,57 +94,34 @@ public class VRInputManager : MonoBehaviour
 
 			AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
 			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
-
-			//CreatePlayerAction("reset-camera", "Reset Camera", OptionsManager.Options.leftHanded ? LeftThumbStickButton : RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
 		});
 	}
-
-	/*
-	private PlayerAction CreatePlayerAction(string id, string name, VRBinding binding, Action onPress)
-	{
-		// TODO: Why doesnt this work
-		try
-		{
-			var playerAction = new PlayerAction(id, GameManager.Instance.Input.Controls);
-			playerAction.AddDefaultBinding(new VRBindingSource(binding));
-			playerAction.ResetBindings();
-
-			var dredgePlayerAction = new DredgePlayerActionPress(name, playerAction);
-			dredgePlayerAction.OnPressComplete += onPress;
-			GameManager.Instance.Input.AddActionListener(new DredgePlayerActionBase[] { dredgePlayerAction }, ActionLayer.PERSISTENT);
-
-			DredgeVRLogger.Info($"Created custom player action {id}");
-
-			return playerAction;
-		}
-		catch (Exception e)
-		{
-			DredgeVRLogger.Error($"Couldn't create player action {id} : {e}");
-			return null;
-		}
-	}
-	*/
 
 	private void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
 		action.AddDefaultBinding(new VRBindingSource(vrAction));
 		action.ResetBindings();
+
+		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
 	}
 
 	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
 		DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
+
 		_state[fromAction] = true;
 	}
 
 	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
 	{
 		DredgeVRLogger.Info($"Released button {fromAction.GetShortName()}");
+
 		_state[fromAction] = false;
 	}
 
 	public static bool IsVRActionPressed(SteamVR_Action_Boolean action)
 	{
+		return action.state;
 		if (Instance._state.TryGetValue(action, out var result))
 		{
 			return result;
