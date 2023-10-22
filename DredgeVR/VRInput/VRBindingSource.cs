@@ -31,7 +31,7 @@ public class VRBindingSource : BindingSource
 
 	public override bool GetState(InputDevice inputDevice)
 	{
-		return VRInputManager.IsVRActionPressed(action);
+		return action.state;
 	}
 
 	public override float GetValue(InputDevice inputDevice)

@@ -106,7 +106,7 @@ public static class VRControlIcons
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_RT.png");
 			}
 		}
-		if (inputSource.Contains("Joystick"))
+		if (inputSource.Contains("Thumb Stick"))
 		{
 			if (hand.Contains("Left"))
 			{

@@ -18,8 +18,6 @@ public class VRInputManager : MonoBehaviour
 	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
-	private Dictionary<SteamVR_Action_Boolean, bool> _state = new();
-
 	public void Awake()
 	{
 		Instance = this;
@@ -27,34 +25,10 @@ public class VRInputManager : MonoBehaviour
 		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, LeftHandUpdate);
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
-		SteamVR_Actions._default.Move.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.Any);
-		SteamVR_Actions._default.RadialSelect.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.Any);
+		SteamVR_Actions._default.Move.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.Any);
+		SteamVR_Actions._default.RadialSelect.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.Any);
 
 		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
-
-		foreach (var action in SteamVR_Actions._default.allActions)
-		{
-			if (action is SteamVR_Action_Boolean boolAction)
-			{
-				try
-				{
-					_state.Add(boolAction, false);
-
-					// Have to listen on both hands, doing Any doesn't work
-					boolAction.AddOnStateDownListener(VRButtonUpdate_Pressed, SteamVR_Input_Sources.LeftHand);
-					boolAction.AddOnStateDownListener(VRButtonUpdate_Pressed, SteamVR_Input_Sources.RightHand);
-
-					boolAction.AddOnStateUpListener(VRButtonUpdate_Released, SteamVR_Input_Sources.LeftHand);
-					boolAction.AddOnStateUpListener(VRButtonUpdate_Released, SteamVR_Input_Sources.RightHand);
-
-					DredgeVRLogger.Debug($"Added listener to {action.GetShortName()}");
-				}
-				catch (Exception e)
-				{
-					DredgeVRLogger.Error($"Could not add listener to action {action.GetShortName()} : {e}");
-				}
-			}
-		}
 
 		DredgeVRCore.TitleSceneStart += InitControls;
 	}
@@ -103,30 +77,6 @@ public class VRInputManager : MonoBehaviour
 		action.ResetBindings();
 
 		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
-	}
-
-	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-	{
-		DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
-
-		_state[fromAction] = true;
-	}
-
-	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-	{
-		DredgeVRLogger.Info($"Released button {fromAction.GetShortName()}");
-
-		_state[fromAction] = false;
-	}
-
-	public static bool IsVRActionPressed(SteamVR_Action_Boolean action)
-	{
-		return action.state;
-		if (Instance._state.TryGetValue(action, out var result))
-		{
-			return result;
-		}
-		return false;
 	}
 
 	private void LeftHandUpdate(SteamVR_Action_Pose fromAction, SteamVR_Input_Sources fromSource)
