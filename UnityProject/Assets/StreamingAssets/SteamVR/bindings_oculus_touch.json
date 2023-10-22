@@ -1,47 +1,34 @@
 {
+  "app_key": "application.generated.unity.dredgevr.exe",
   "bindings": {
     "/actions/buggy": {
       "chords": [],
       "poses": [],
       "haptics": [],
+      "sources": [],
+      "skeleton": []
+    },
+    "/actions/default": {
+      "chords": [],
+      "poses": [
+        {
+          "output": "/actions/default/in/lefthandpose",
+          "path": "/user/hand/left/pose/raw"
+        },
+        {
+          "output": "/actions/default/in/righthandpose",
+          "path": "/user/hand/right/pose/raw"
+        }
+      ],
+      "haptics": [],
       "sources": [
         {
           "path": "/user/hand/left/input/trigger",
-          "mode": "trigger",
+          "mode": "button",
           "parameters": {},
           "inputs": {
-            "pull": {
-              "output": "/actions/buggy/in/throttle"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/trigger",
-          "mode": "trigger",
-          "parameters": {},
-          "inputs": {
-            "pull": {
-              "output": "/actions/buggy/in/throttle"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/left/input/joystick",
-          "mode": "joystick",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/buggy/in/steering"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/joystick",
-          "mode": "joystick",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/buggy/in/steering"
+            "click": {
+              "output": "/actions/default/in/discarditem"
             }
           }
         },
@@ -51,17 +38,7 @@
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/brake"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/x",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/buggy/in/brake"
+              "output": "/actions/default/in/pause"
             }
           }
         },
@@ -71,17 +48,17 @@
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/reset"
+              "output": "/actions/default/in/togglecargo"
             }
           }
         },
         {
-          "path": "/user/hand/right/input/y",
+          "path": "/user/hand/right/input/trigger",
           "mode": "button",
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/reset"
+              "output": "/actions/default/in/confirm"
             }
           }
         },
@@ -91,7 +68,7 @@
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/brake"
+              "output": "/actions/default/in/interact"
             }
           }
         },
@@ -101,35 +78,27 @@
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/reset"
+              "output": "/actions/default/in/cancel"
             }
           }
-        }
-      ],
-      "skeleton": []
-    },
-    "/actions/default": {
-      "chords": [],
-      "poses": [],
-      "haptics": [],
-      "sources": [],
-      "skeleton": []
-    },
-    "/actions/platformer": {
-      "chords": [],
-      "poses": [],
-      "haptics": [],
-      "sources": [
+        },
         {
           "path": "/user/hand/left/input/joystick",
           "mode": "joystick",
           "parameters": {},
           "inputs": {
-            "click": {
-              "output": "/actions/platformer/in/jump"
-            },
             "position": {
-              "output": "/actions/platformer/in/move"
+              "output": "/actions/default/in/move"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/joystick",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/rotateclockwise"
             }
           }
         },
@@ -138,19 +107,92 @@
           "mode": "joystick",
           "parameters": {},
           "inputs": {
-            "click": {
-              "output": "/actions/platformer/in/jump"
-            },
             "position": {
-              "output": "/actions/platformer/in/move"
+              "output": "/actions/default/in/radialselect"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/joystick",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/rotatecounterclockwise"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/trigger",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/doability"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/a",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/reel"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/a",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/sellitem"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/a",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/buyitem"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/a",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/accept"
             }
           }
         }
       ],
+      "skeleton": [
+        {
+          "output": "/actions/default/in/skeletonlefthand",
+          "path": "/user/hand/left/input/skeleton/left"
+        },
+        {
+          "output": "/actions/default/in/skeletonrighthand",
+          "path": "/user/hand/right/input/skeleton/right"
+        }
+      ]
+    },
+    "/actions/platformer": {
+      "chords": [],
+      "poses": [],
+      "haptics": [],
+      "sources": [],
       "skeleton": []
     }
   },
   "controller_type": "oculus_touch",
   "description": "",
-  "name": "oculus_touch"
+  "name": "Dredge VR configuration for Oculus Touch Controller"
 }

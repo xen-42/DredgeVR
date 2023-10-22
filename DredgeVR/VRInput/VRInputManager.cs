@@ -1,86 +1,34 @@
-﻿using DG.Tweening.Core.Easing;
-using DredgeVR.Helpers;
-using DredgeVR.Options;
+﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using InControl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.VRInput;
 
 public class VRInputManager : MonoBehaviour
 {
-	public struct VRBinding
-	{
-		public SteamVR_Action_Boolean action;
-		public SteamVR_Input_Sources hand;
-
-		public bool state;
-
-		public VRBinding(SteamVR_Action_Boolean action, SteamVR_Input_Sources hand)
-		{
-			this.action = action;
-			this.hand = hand;
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj is VRBinding otherVRBinding)
-			{
-				return otherVRBinding.action == action && otherVRBinding.hand == hand;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		public override int GetHashCode()
-		{
-			return hand.GetHashCode() + action.GetHashCode() * 15;
-		}
-	}
+	public static VRInputManager Instance { get; private set; }
 
 	public static PlayerAction ResetCamera { get; private set; }
 
 	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
-	public static VRBinding LeftHandA = new(SteamVR_Actions._default.A_Left, SteamVR_Input_Sources.LeftHand);
-	public static VRBinding LeftHandB = new(SteamVR_Actions._default.B_Left, SteamVR_Input_Sources.LeftHand);
-	public static VRBinding RightHandA = new(SteamVR_Actions._default.A_Right, SteamVR_Input_Sources.RightHand);
-	public static VRBinding RightHandB = new(SteamVR_Actions._default.B_Right, SteamVR_Input_Sources.RightHand);
-	public static VRBinding LeftTrigger = new(SteamVR_Actions._default.LeftTrigger, SteamVR_Input_Sources.LeftHand);
-	public static VRBinding RightTrigger = new(SteamVR_Actions._default.RightTrigger, SteamVR_Input_Sources.RightHand);
-
-	public static VRBinding LeftStart = new(SteamVR_Actions._default.LeftStart, SteamVR_Input_Sources.LeftHand);
-	public static VRBinding LeftThumbStickButton = new(SteamVR_Actions._default.LeftThumbStickPress, SteamVR_Input_Sources.LeftHand);
-	public static VRBinding RightThumbStickButton = new(SteamVR_Actions._default.RightThumbStickPress, SteamVR_Input_Sources.RightHand);
-
-	public static Dictionary<VRBinding, bool> State = new();
-
-	public Dictionary<VRBinding, ControlIconData> ControlIcons = new();
-
 	public void Awake()
 	{
-		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, LeftHandUpdate);
-		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.Any, RightHandUpdate);
+		Instance = this;
 
-		SteamVR_Actions._default.RightThumbStick.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.RightHand);
-		SteamVR_Actions._default.LeftThumbStick.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.LeftHand);
+		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, LeftHandUpdate);
+		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
-		foreach (var vrButton in typeof(VRInputManager).GetFields(BindingFlags.Public | BindingFlags.Static).Where(x => x.FieldType == typeof(VRBinding)).Select(x => (VRBinding)x.GetValue(null)))
-		{
-			State.Add(vrButton, false);
+		SteamVR_Actions._default.Move.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.Any);
+		SteamVR_Actions._default.RadialSelect.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.Any);
 
-			vrButton.action.AddOnStateDownListener(VRButtonUpdate_Pressed, vrButton.hand);
-			vrButton.action.AddOnStateUpListener(VRButtonUpdate_Released, vrButton.hand);
-		}
+		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
 
 		DredgeVRCore.TitleSceneStart += InitControls;
 	}
@@ -92,79 +40,43 @@ public class VRInputManager : MonoBehaviour
 	{
 		DredgeVRCore.TitleSceneStart -= InitControls;
 
-		// Depending on handedness flip all controls
-		var defaultCancelBinding = OptionsManager.Options.leftHanded ? LeftHandB : RightHandB;
-		var defaultAcceptBinding = OptionsManager.Options.leftHanded ? LeftHandA : RightHandA;
+		var cancel = SteamVR_Actions._default.Cancel;
 
 		Delay.FireInNUpdates(10, () =>
 		{
-			AddNewBinding(GameManager.Instance.Input.Controls.Undock, defaultCancelBinding); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Back, defaultCancelBinding); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Skip, defaultCancelBinding); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Undock, cancel); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Back, cancel); // X
+			AddNewBinding(GameManager.Instance.Input.Controls.Skip, cancel); // Escape
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // E
+			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, SteamVR_Actions._default.RadialSelectShow); // E
 
-			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
-			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, OptionsManager.Options.leftHanded ? RightTrigger : LeftTrigger); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, SteamVR_Actions._default.DiscardItem); // Mouse2
+			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, SteamVR_Actions._default.DoAbility); // Mouse2
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Interact, defaultAcceptBinding); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.Reel, defaultAcceptBinding); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, defaultAcceptBinding); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Interact, SteamVR_Actions._default.Interact); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.Reel, SteamVR_Actions._default.Reel); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, SteamVR_Actions._default.SellItem); // F
+			AddNewBinding(GameManager.Instance.Input.Controls.BuyItem, SteamVR_Actions._default.BuyItem); // F
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
-			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, OptionsManager.Options.leftHanded ? LeftTrigger : RightTrigger); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, SteamVR_Actions._default.Confirm); // Mouse1
+			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, SteamVR_Actions._default.Confirm); // Mouse1
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, OptionsManager.Options.leftHanded ? RightThumbStickButton : LeftThumbStickButton); // One Axis
+			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, SteamVR_Actions._default.RotateClockwise); // One Axis
+			AddNewBinding(GameManager.Instance.Input.Controls.RotateCounterClockwise, SteamVR_Actions._default.RotateCounterClockwise); // One Axis
 
-			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, OptionsManager.Options.leftHanded ? RightHandB : LeftHandB); // Tab
+			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, SteamVR_Actions._default.ToggleCargo); // Tab
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Pause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
-			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, OptionsManager.Options.leftHanded ? RightHandA : LeftHandA); // Escape
-
-			CreatePlayerAction("reset-camera", "Reset Camera", OptionsManager.Options.leftHanded ? LeftThumbStickButton : RightThumbStickButton, VRCameraManager.Instance.ResetPosition);
+			AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
+			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
 		});
 	}
 
-	private PlayerAction CreatePlayerAction(string id, string name, VRBinding binding, Action onPress)
+	private void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
-		// TODO: Why doesnt this work
-		try
-		{
-			var playerAction = new PlayerAction(id, GameManager.Instance.Input.Controls);
-			playerAction.AddDefaultBinding(new VRBindingSource(binding));
-			playerAction.ResetBindings();
-
-			var dredgePlayerAction = new DredgePlayerActionPress(name, playerAction);
-			dredgePlayerAction.OnPressComplete += onPress;
-			GameManager.Instance.Input.AddActionListener(new DredgePlayerActionBase[] { dredgePlayerAction }, ActionLayer.PERSISTENT);
-
-			DredgeVRLogger.Info($"Created custom player action {id}");
-
-			return playerAction;
-		}
-		catch (Exception e)
-		{
-			DredgeVRLogger.Error($"Couldn't create player action {id} : {e}");
-			return null;
-		}
-	}
-
-	private void AddNewBinding(PlayerAction action, VRBinding replacement)
-	{
-		action.AddDefaultBinding(new VRBindingSource(replacement));
+		action.AddDefaultBinding(new VRBindingSource(vrAction));
 		action.ResetBindings();
-	}
 
-	private void VRButtonUpdate_Pressed(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-	{
-		DredgeVRLogger.Info($"Pressed button {fromAction.GetShortName()}");
-		State[new VRBinding(fromAction, fromSource)] = true;
-	}
-
-	private void VRButtonUpdate_Released(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource)
-	{
-		DredgeVRLogger.Info($"Released button {fromAction.GetShortName()}");
-		State[new VRBinding(fromAction, fromSource)] = false;
+		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
 	}
 
 	private void LeftHandUpdate(SteamVR_Action_Pose fromAction, SteamVR_Input_Sources fromSource)
@@ -187,8 +99,8 @@ public class VRInputManager : MonoBehaviour
 	private void RightThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
 	{
 		RightThumbStick = axis;
-	}	  	
-	
+	}
+
 	private void LeftThumbStickUpdate(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta)
 	{
 		LeftThumbStick = axis;

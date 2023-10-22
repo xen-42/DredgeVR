@@ -22,7 +22,7 @@ public static class DredgeInputManagerPatches
 	{
 		if (requestedBindingSourceType == VRBindingSource.Source)
 		{
-			var vrAction = ((VRBindingSource)action.Bindings?.FirstOrDefault(x => x is VRBindingSource))?.binding.action;
+			var vrAction = ((VRBindingSource)action.Bindings?.FirstOrDefault(x => x is VRBindingSource))?.action;
 
 			if (vrAction != null)
 			{

@@ -1,7 +1,7 @@
 {
    "action_manifest_version" : 0,
    "alias_info" : {},
-   "app_key" : "application.generated.unity.dredgevrsetup2.exe",
+   "app_key" : "application.generated.unity.dredgevr.exe",
    "bindings" : {
       "/actions/buggy" : {
          "chords" : [],
@@ -119,7 +119,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/lefttrigger"
+                     "output" : "/actions/default/in/discarditem"
                   }
                },
                "mode" : "button",
@@ -128,7 +128,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/righttrigger"
+                     "output" : "/actions/default/in/confirm"
                   }
                },
                "mode" : "button",
@@ -137,7 +137,7 @@
             {
                "inputs" : {
                   "position" : {
-                     "output" : "/actions/default/in/rightthumbstick"
+                     "output" : "/actions/default/in/radialselect"
                   }
                },
                "mode" : "joystick",
@@ -146,7 +146,7 @@
             {
                "inputs" : {
                   "position" : {
-                     "output" : "/actions/default/in/leftthumbstick"
+                     "output" : "/actions/default/in/move"
                   }
                },
                "mode" : "joystick",
@@ -155,25 +155,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/leftgrab"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/rightgrab"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/grip"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/b right"
+                     "output" : "/actions/default/in/cancel"
                   }
                },
                "mode" : "button",
@@ -182,7 +164,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/a right"
+                     "output" : "/actions/default/in/interact"
                   }
                },
                "mode" : "button",
@@ -191,7 +173,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/b left"
+                     "output" : "/actions/default/in/togglecargo"
                   }
                },
                "mode" : "button",
@@ -200,7 +182,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/a left"
+                     "output" : "/actions/default/in/pause"
                   }
                },
                "mode" : "button",
@@ -209,16 +191,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/leftstart"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/system"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/leftthumbstickpress"
+                     "output" : "/actions/default/in/radialselectshow"
                   }
                },
                "mode" : "button",
@@ -227,11 +200,65 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/rightthumbstickpress"
+                     "output" : "/actions/default/in/rotatecounterclockwise"
                   }
                },
                "mode" : "button",
                "path" : "/user/hand/right/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/doability"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/reel"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/sellitem"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/rotateclockwise"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/buyitem"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/accept"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
             }
          ]
       },
@@ -284,7 +311,7 @@
    "controller_type" : "knuckles",
    "description" : "",
    "interaction_profile" : "",
-   "name" : "Saved Dredge VR Setup 2 [Testing] configuration for Index Controller",
+   "name" : "Saved Dredge VR [Testing] configuration for Index Controller",
    "options" : {},
    "simulated_actions" : []
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Valve.VR;
@@ -49,13 +50,21 @@ public class AssetLoader
 
 	public static Texture2D GetTexture(string path)
 	{
-		if (!_icons.ContainsKey(path))
+		try
 		{
-			var rawData = File.ReadAllBytes(Path.Combine(DredgeVRCore.ModPath, path));
-			var tex = new Texture2D(2, 2);
-			tex.LoadImage(rawData);
-			tex.name = Path.GetFileName(path);
-			_icons[path] = tex;
+			if (!_icons.ContainsKey(path))
+			{
+				var rawData = File.ReadAllBytes(Path.Combine(DredgeVRCore.ModPath, path));
+				var tex = new Texture2D(2, 2);
+				tex.LoadImage(rawData);
+				tex.name = Path.GetFileName(path);
+				_icons[path] = tex;
+			}
+		}
+		catch (Exception e)
+		{
+			DredgeVRLogger.Error($"Could not load texture at {path} : {e}");
+			_icons[path] = null;
 		}
 		return _icons[path];
 

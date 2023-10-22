@@ -1,27 +1,64 @@
 {
+  "app_key": "application.generated.unity.dredgevr.exe",
   "bindings": {
     "/actions/buggy": {
       "chords": [],
       "poses": [],
       "haptics": [],
+      "sources": [],
+      "skeleton": []
+    },
+    "/actions/default": {
+      "chords": [],
+      "poses": [
+        {
+          "output": "/actions/default/in/lefthandpose",
+          "path": "/user/hand/left/pose/raw"
+        },
+        {
+          "output": "/actions/default/in/righthandpose",
+          "path": "/user/hand/right/pose/raw"
+        }
+      ],
+      "haptics": [],
       "sources": [
         {
-          "path": "/user/hand/left/input/trigger",
-          "mode": "trigger",
+          "path": "/user/hand/left/input/grip",
+          "mode": "button",
           "parameters": {},
           "inputs": {
-            "pull": {
-              "output": "/actions/buggy/in/throttle"
+            "click": {
+              "output": "/actions/default/in/rotateclockwise"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/grip",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/rotatecounterclockwise"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/trigger",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/doability"
             }
           }
         },
         {
           "path": "/user/hand/right/input/trigger",
-          "mode": "trigger",
+          "mode": "button",
           "parameters": {},
           "inputs": {
-            "pull": {
-              "output": "/actions/buggy/in/throttle"
+            "click": {
+              "output": "/actions/default/in/confirm"
             }
           }
         },
@@ -30,11 +67,8 @@
           "mode": "trackpad",
           "parameters": {},
           "inputs": {
-            "click": {
-              "output": "/actions/buggy/in/brake"
-            },
             "position": {
-              "output": "/actions/buggy/in/steering"
+              "output": "/actions/default/in/move"
             }
           }
         },
@@ -43,21 +77,8 @@
           "mode": "trackpad",
           "parameters": {},
           "inputs": {
-            "click": {
-              "output": "/actions/buggy/in/brake"
-            },
             "position": {
-              "output": "/actions/buggy/in/steering"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/left/input/application_menu",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/buggy/in/reset"
+              "output": "/actions/default/in/radialselect"
             }
           }
         },
@@ -67,70 +88,101 @@
           "parameters": {},
           "inputs": {
             "click": {
-              "output": "/actions/buggy/in/reset"
+              "output": "/actions/default/in/accept"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/reel"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/interact"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/sellitem"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/right/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/buyitem"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/application_menu",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/pause"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/trigger",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/discarditem"
+            }
+          }
+        },
+        {
+          "path": "/user/hand/left/input/grip",
+          "mode": "button",
+          "parameters": {},
+          "inputs": {
+            "click": {
+              "output": "/actions/default/in/radialselectshow"
             }
           }
         }
       ],
-      "skeleton": []
-    },
-    "/actions/default": {
-      "chords": [],
-      "poses": [],
-      "haptics": [],
-      "sources": [],
-      "skeleton": []
+      "skeleton": [
+        {
+          "output": "/actions/default/in/skeletonlefthand",
+          "path": "/user/hand/left/input/skeleton/left"
+        },
+        {
+          "output": "/actions/default/in/skeletonrighthand",
+          "path": "/user/hand/right/input/skeleton/right"
+        }
+      ]
     },
     "/actions/platformer": {
       "chords": [],
       "poses": [],
       "haptics": [],
-      "sources": [
-        {
-          "path": "/user/hand/left/input/trackpad",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/platformer/in/jump"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/trackpad",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/platformer/in/jump"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/left/input/trackpad",
-          "mode": "trackpad",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/platformer/in/move"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/trackpad",
-          "mode": "trackpad",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/platformer/in/move"
-            }
-          }
-        }
-      ],
+      "sources": [],
       "skeleton": []
     }
   },
   "controller_type": "vive_controller",
   "description": "",
-  "name": "vive_controller"
+  "name": "Dredge VR configuration for Vive Controller"
 }

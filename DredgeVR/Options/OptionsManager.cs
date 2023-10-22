@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using UnityEngine.XR;
+using Valve.VR;
 
 namespace DredgeVR.Options;
 

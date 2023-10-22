@@ -1,11 +1,10 @@
 ﻿using HarmonyLib;
 using System;
 using UnityEngine;
-using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
-# if DEBUG
+#if DEBUG
 [HarmonyPatch(typeof(Debug))]
 internal static class DebugLogPatches
 {

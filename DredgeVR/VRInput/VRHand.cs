@@ -13,7 +13,6 @@ public class VRHand : MonoBehaviour
 	private GameObject _line;
 	public GameObject LaserPointerEnd { get; private set; }
 	private bool _graphicsInitialized;
-	private static bool _flagTitleSceneAcquire;
 
 	public float defaultLength = 5.0f;
 	public SteamVR_Input_Sources hand;

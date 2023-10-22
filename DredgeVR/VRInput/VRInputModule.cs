@@ -47,7 +47,7 @@ internal class VRInputModule : BaseInputModule
 		DominantHand = left ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 		RaycastCamera = DominantHand.RaycastCamera;
 		DominantHandInputSource = left ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
-		UIClickAction = left ? SteamVR_Actions._default.LeftTrigger : SteamVR_Actions._default.RightTrigger;
+		UIClickAction = SteamVR_Actions._default.Confirm;
 
 		DominantHandChanged?.Invoke(DominantHandInputSource);
 	}
