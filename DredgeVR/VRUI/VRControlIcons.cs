@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using Valve.VR;
 
 namespace DredgeVR.VRUI;
@@ -11,6 +12,11 @@ public static class VRControlIcons
 
 	public static ControlIconData GetControlIconData(SteamVR_Action_Boolean action)
 	{
+		if (LocalizationSettings.AvailableLocales.GetLocale("en") == null)
+		{
+			return null;
+		}
+
 		var controllerType = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_ControllerType);
 		var inputSource = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
 		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);

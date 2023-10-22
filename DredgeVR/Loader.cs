@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using Unity.XR.OpenVR;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using UnityEngine.XR.Management;
 using Valve.VR;
 
@@ -14,6 +15,9 @@ namespace DredgeVR
 	{
 		public static void Initialize()
 		{
+			// Else some stuff breaks
+			LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.GetLocale("en");
+
 			SetUpXr();
 
 			var gameObject = new GameObject(nameof(DredgeVRCore));
