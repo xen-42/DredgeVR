@@ -1,7 +1,11 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
+using FluffyUnderware.DevTools.Extensions;
+using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -65,7 +69,7 @@ internal class VRUIManager : MonoBehaviour
 			splashScreen.t17Video.targetTexture = (RenderTexture)videoImage.texture;
 		}
 		// If we do it on the splash screen we break unity explorer
-		else
+		else if (scene != "IntroCutscene")
 		{
 			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 			{
@@ -140,18 +144,25 @@ internal class VRUIManager : MonoBehaviour
 
 	private void OnIntroCutsceneStart()
 	{
-		// Reposition Scene1Container, Scene2Container, Scene3Container
-		var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
-
-		cutscene.transform.Find("Camera").gameObject.SetActive(false);
-
-		cutscene.transform.position = VRCameraManager.AnchorTransform.position + VRCameraManager.AnchorTransform.forward * 40f - VRCameraManager.AnchorTransform.up * 10f;
-		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.AnchorTransform.rotation.y, 0);
-
-		var scenes = new Transform[] { cutscene.transform.Find("Scene1Container"), cutscene.transform.Find("Scene2Container"), cutscene.transform.Find("Scene3Container") };
-		foreach (var scene in scenes)
+		try
 		{
-			scene.transform.localPosition = Vector3.zero;
+			var cutsceneRenderer = new GameObject("CutsceneRenderTexture").gameObject.AddComponent<RawImage>();
+			cutsceneRenderer.texture = new RenderTexture(1920, 1080, 1);
+			var cutsceneRendererCanvas = cutsceneRenderer.gameObject.AddComponent<Canvas>();
+			cutsceneRendererCanvas.scaleFactor = 5f;
+			MakeCanvasWorldSpace(cutsceneRendererCanvas);
+			cutsceneRenderer.transform.position = new Vector3(0, 1, 2);
+			cutsceneRenderer.transform.localScale = Vector3.one * 0.02f;
+
+			var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
+			cutscene.transform.position = new Vector3(0, 0, -5000);
+			var camera = cutscene.transform.Find("Camera").gameObject.AddComponent<Camera>();
+
+			camera.targetTexture = (RenderTexture)cutsceneRenderer.texture;
+		}
+		catch (Exception e)
+		{
+			DredgeVRLogger.Error($"Couldn't set up intro cutscene ui: {e}");
 		}
 	}
 }
