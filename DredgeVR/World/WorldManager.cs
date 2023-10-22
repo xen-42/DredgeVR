@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
+using System.Linq;
 using UnityEngine;
 
 namespace DredgeVR.World;
@@ -17,6 +18,14 @@ internal class WorldManager : MonoBehaviour
 	public void Awake()
 	{
 		QualitySettings.lodBias = LOD_BIAS;
+
+		if (OptionsManager.Options.decreaseLOD)
+		{
+			QualitySettings.maximumLODLevel = 1;
+		}
+
+		QualitySettings.shadows = ShadowQuality.Disable;
+		QualitySettings.vSyncCount = 2;
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
@@ -46,8 +55,24 @@ internal class WorldManager : MonoBehaviour
 
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{
-			var emission = particleSystem.emission;
-			emission.rateOverTimeMultiplier = 0.8f;
+			if (OptionsManager.Options.disableExtraParticleEffects)
+			{
+				particleSystem.gameObject.SetActive(particleSystem.gameObject.GetComponentInParent<HarvestableParticles>() != null);
+			}
+			else
+			{
+				var emission = particleSystem.emission;
+				emission.rateOverTimeMultiplier = 0.5f;
+			}
+		}
+
+		if (OptionsManager.Options.removeTrees)
+		{
+			foreach (var tree in GameObject.FindObjectsOfType<GameObject>().Where(x => x.name == "Trees"))
+			{
+				tree.SetActive(false);
+			}
+			GameObject.Find("TheMarrows/Islands/LittleMarrow/Details").SetActive(false);
 		}
 	}
 
@@ -58,6 +83,14 @@ internal class WorldManager : MonoBehaviour
 		foreach (var ghostRock in GameObject.FindObjectsOfType<GhostRock>())
 		{
 			ghostRock.rockMeshObject.GetComponent<MeshRenderer>().material.shader = AssetLoader.LitShader;
+		}
+
+		if (OptionsManager.Options.disableDistantParticleEffects)
+		{
+			foreach (var harvestable in GameObject.FindObjectsOfType<HarvestableParticles>(true))
+			{
+				harvestable.gameObject.AddComponent<LODChildCuller>();
+			}
 		}
 
 		// Have to wait a frame for the boat to exist
