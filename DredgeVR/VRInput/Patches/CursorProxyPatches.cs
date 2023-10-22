@@ -9,6 +9,16 @@ public static class CursorProxyPatches
 {
 	private static Canvas _canvas;
 
+	static CursorProxyPatches()
+	{
+		DredgeVRCore.SceneStart += OnSceneStart;
+	}
+
+	private static void OnSceneStart(string _)
+	{
+		_canvas = null;
+	}
+
 	/// <summary>
 	/// Cursor proxy position is used for navigating grid inventory menus
 	/// </summary>
@@ -20,17 +30,12 @@ public static class CursorProxyPatches
 	public static void CursorProxy_Update(CursorProxy __instance)
 	{
 		_canvas ??= __instance.GetComponentInParent<Canvas>();
-		var pixelHalfSize = new Vector3(_canvas.pixelRect.size.x, _canvas.pixelRect.size.y, 0f) / 2f;
-
 		if (VRInputModule.Instance?.DominantHand?.LaserPointerEnd?.transform?.position is Vector3 laserPointerPos)
 		{
+			var pixelHalfSize = new Vector3(_canvas.pixelRect.size.x, _canvas.pixelRect.size.y, 0f) / 2f;
 			__instance.cursorSquare.transform.position = laserPointerPos;
 			var localLaserPosition = __instance.cursorSquare.transform.localPosition;
 			__instance.cursorPos = localLaserPosition + pixelHalfSize;
 		}
-
-		// If we were to try and implement XBox controller support, we'd still need to convert it's cursor pos into the new VR screen space
-		var localPosition = __instance.cursorPos - pixelHalfSize;
-		__instance.cursorSquare.transform.position = __instance.transform.TransformPoint(localPosition);
 	}
 }
