@@ -111,6 +111,11 @@ public class VRCameraManager : MonoBehaviour
 
 		if (AnchorTransform != null)
 		{
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				ResetPosition();
+			}
+
 			// In the game scene force a constant ResetTransform y position
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")

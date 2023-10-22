@@ -1,6 +1,8 @@
 ﻿using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Valve.VR;
 
 namespace DredgeVR.VRUI;
@@ -43,13 +45,24 @@ internal class VRUIManager : MonoBehaviour
 
 	private void OnSceneStart(string scene)
 	{
+		// On new save files theres a prompt they need to press here
+		if (scene == "Startup")
+		{
+			GameObject.FindObjectsOfType<Canvas>().FirstOrDefault(x => x.name == "Canvas" && x.gameObject.scene.name == "Startup").gameObject.AddComponent<GameCanvasFixer>();
+		}
+
 		if (scene == "Splash")
 		{
-			var splashScreen = GameObject.FindObjectOfType<SplashController>().gameObject;
+			var splashScreen = GameObject.FindObjectOfType<SplashController>();
 			MakeCanvasWorldSpace(splashScreen.GetComponent<Canvas>());
-			splashScreen.AddComponent<GameCanvasFixer>();
+			splashScreen.gameObject.AddComponent<GameCanvasFixer>();
 
-			// TODO: Figure out why the Team17 logo doesn't get put into worldspace
+			// Fixes it displaying directly on your far clip plane
+			var videoImage = splashScreen.gameObject.AddComponent<RawImage>();
+			videoImage.texture = new RenderTexture(1920, 1080, 1);
+			splashScreen.t17Video.aspectRatio = UnityEngine.Video.VideoAspectRatio.FitVertically;
+			splashScreen.t17Video.renderMode = UnityEngine.Video.VideoRenderMode.RenderTexture;
+			splashScreen.t17Video.targetTexture = (RenderTexture)videoImage.texture;
 		}
 		// If we do it on the splash screen we break unity explorer
 		else
