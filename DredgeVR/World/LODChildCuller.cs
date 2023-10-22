@@ -8,6 +8,9 @@ public class LODChildCuller : MonoBehaviour
 
 	public void Update()
 	{
+		if (GameManager.Instance?.Player == null)
+			return;
+
 		var shouldHide = (GameManager.Instance.Player.transform.position - transform.position).sqrMagnitude > 1000;
 		if (shouldHide != _hidden)
 		{

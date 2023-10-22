@@ -22,6 +22,8 @@ public class VRCameraManager : MonoBehaviour
 	public static Transform AnchorTransform { get; private set; }
 	private Transform _pivot, _root;
 
+	private float _gameAnchorYPosition = 0.8f;
+
 	public void Awake()
 	{
 		Instance = this;
@@ -98,7 +100,7 @@ public class VRCameraManager : MonoBehaviour
 			{
 				// Make the player follow the boat
 				AnchorTransform.parent = GameManager.Instance.Player.transform;
-				AnchorTransform.localPosition = new Vector3(0, 1, -1);
+				AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
 				AnchorTransform.localRotation = Quaternion.identity;
 
 				Delay.FireOnNextUpdate(ResetPosition);
@@ -126,11 +128,11 @@ public class VRCameraManager : MonoBehaviour
 				{
 					// Don't take on origin pitch rotation because that is turbo motion sickness
 					var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
-					AnchorTransform.transform.rotation = Quaternion.FromToRotation(Vector3.forward, forwardOnPlane);
+					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
 				}
 
 				// Helps when you ram into stuff to not bounce around
-				var anchorY = OptionsManager.Options.lockCameraYPosition ? 0.66f : AnchorTransform.position.y;
+				var anchorY = OptionsManager.Options.lockCameraYPosition ? _gameAnchorYPosition : AnchorTransform.position.y;
 				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
 			}
 
