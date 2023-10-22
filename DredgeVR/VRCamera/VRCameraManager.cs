@@ -20,7 +20,7 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand RightHand { get; private set; }
 
 	public static Transform AnchorTransform { get; private set; }
-	private Transform _pivot;
+	private Transform _pivot, _root;
 
 	public void Awake()
 	{
@@ -41,7 +41,9 @@ public class VRCameraManager : MonoBehaviour
 		RightHand.hand = SteamVR_Input_Sources.RightHand;
 
 		// Parent everything to a new "pivot" object
+		_root = new GameObject("PlayerRoot").transform;
 		_pivot = new GameObject("VRCameraPivot").transform;
+		_pivot.parent = _root;
 		VRPlayer.origin = _pivot;
 
 		transform.parent = _pivot;
@@ -96,7 +98,7 @@ public class VRCameraManager : MonoBehaviour
 			{
 				// Make the player follow the boat
 				AnchorTransform.parent = GameManager.Instance.Player.transform;
-				AnchorTransform.localPosition = new Vector3(0, 1, -2);
+				AnchorTransform.localPosition = new Vector3(0, 1, -1);
 				AnchorTransform.localRotation = Quaternion.identity;
 
 				Delay.FireOnNextUpdate(ResetPosition);
@@ -120,11 +122,11 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (OptionsManager.Options.lockViewToHorizon)
+				if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
 				{
 					// Don't take on origin pitch rotation because that is turbo motion sickness
-					var forwardOnPlane = AnchorTransform.forward.ProjectOntoPlane(Vector3.up);
-					VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+					var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
+					AnchorTransform.transform.rotation = Quaternion.FromToRotation(Vector3.forward, forwardOnPlane);
 				}
 
 				// Helps when you ram into stuff to not bounce around
@@ -132,7 +134,8 @@ public class VRCameraManager : MonoBehaviour
 				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
 			}
 
-			VRPlayer.origin.transform.position = AnchorTransform.position;
+			_root.transform.position = AnchorTransform.position;
+			_root.transform.rotation = AnchorTransform.rotation;
 		}
 	}
 
@@ -140,11 +143,11 @@ public class VRCameraManager : MonoBehaviour
 	{
 		if (AnchorTransform != null)
 		{
-			var rotationAngleY = AnchorTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
-			_pivot.Rotate(0, rotationAngleY, 0);
+			var rotationAngleY = VRPlayer.transform.rotation.eulerAngles.y - AnchorTransform.rotation.eulerAngles.y;
+			_pivot.Rotate(0, -rotationAngleY, 0);
 
-			var distanceDiff = AnchorTransform.position - _pivot.position;
-			_pivot.transform.position += distanceDiff;
+			var distanceDiff = VRPlayer.transform.position - AnchorTransform.position;
+			_pivot.position -= new Vector3(distanceDiff.x, 0f, distanceDiff.z);
 		}
 	}
 }
