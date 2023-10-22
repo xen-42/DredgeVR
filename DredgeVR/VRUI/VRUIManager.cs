@@ -1,8 +1,6 @@
-﻿using DredgeVR.Helpers;
-using DredgeVR.VRCamera;
+﻿using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Valve.VR;
 
 namespace DredgeVR.VRUI;
@@ -17,7 +15,7 @@ internal class VRUIManager : MonoBehaviour
 
 	public void Awake()
 	{
-		SceneManager.activeSceneChanged += OnActiveSceneChanged;
+		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart += OnIntroCutsceneStart;
@@ -27,7 +25,7 @@ internal class VRUIManager : MonoBehaviour
 
 	public void OnDestroy()
 	{
-		SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart -= OnIntroCutsceneStart;
@@ -43,15 +41,32 @@ internal class VRUIManager : MonoBehaviour
 		}
 	}
 
-	private void OnActiveSceneChanged(Scene prev, Scene current)
+	private void OnSceneStart(string scene)
 	{
-		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+		if (scene == "Splash")
 		{
-			canvas.renderMode = RenderMode.WorldSpace;
-			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
-			canvas.scaleFactor = 1f;
-			canvas.planeDistance = 1;
+			var splashScreen = GameObject.FindObjectOfType<SplashController>().gameObject;
+			MakeCanvasWorldSpace(splashScreen.GetComponent<Canvas>());
+			splashScreen.AddComponent<GameCanvasFixer>();
+
+			// TODO: Figure out why the Team17 logo doesn't get put into worldspace
 		}
+		// If we do it on the splash screen we break unity explorer
+		else
+		{
+			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+			{
+				MakeCanvasWorldSpace(canvas);
+			}
+		}
+	}
+
+	private void MakeCanvasWorldSpace(Canvas canvas)
+	{
+		canvas.renderMode = RenderMode.WorldSpace;
+		canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
+		canvas.scaleFactor = 1f;
+		canvas.planeDistance = 1;
 	}
 
 	private void OnTitleSceneStart()

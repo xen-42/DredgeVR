@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
 using HarmonyLib;
 using System;
 using System.IO;
@@ -17,6 +18,8 @@ namespace DredgeVR
 		{
 			// Else some stuff breaks
 			LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.GetLocale("en");
+
+			OptionsManager.Load();
 
 			SetUpXr();
 
@@ -66,7 +69,7 @@ namespace DredgeVR
 													steamAppId: 1562430);
 
 			// Improves frames by about 10ms
-			SteamVR_Settings.instance.lockPhysicsUpdateRateToRenderFrequency = false;
+			SteamVR_Settings.instance.lockPhysicsUpdateRateToRenderFrequency = OptionsManager.Options.lockPhysicsUpdateRateToRenderFrequency;
 		}
 	}
 }

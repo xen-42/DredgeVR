@@ -62,7 +62,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnSceneStart(string _)
 	{
-		// Always have a ResetTransform on each scene, then the other events handle positioning it properly if need be
+		// Always have a AnchorTransform on each scene, then the other events handle positioning it properly if need be
 
 		// Can persist between scenes if it wasn't parented to a game object
 		if (AnchorTransform == null)
@@ -73,6 +73,7 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.position = Vector3.zero;
 		AnchorTransform.rotation = Quaternion.identity;
 
+		// Weird timing on this
 		Delay.FireInNUpdates(2, ResetPosition);
 	}
 
@@ -132,10 +133,13 @@ public class VRCameraManager : MonoBehaviour
 
 	public void ResetPosition()
 	{
-		var rotationAngleY = AnchorTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
-		_pivot.Rotate(0, rotationAngleY, 0);
+		if (AnchorTransform != null)
+		{
+			var rotationAngleY = AnchorTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
+			_pivot.Rotate(0, rotationAngleY, 0);
 
-		var distanceDiff = AnchorTransform.position - _pivot.position;
-		_pivot.transform.position += distanceDiff;
+			var distanceDiff = AnchorTransform.position - _pivot.position;
+			_pivot.transform.position += distanceDiff;
+		}
 	}
 }

@@ -40,4 +40,10 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool useFlatUI;
+
+	/// <summary>
+	/// Improves frames for me
+	/// </summary>
+	[JsonProperty]
+	public bool lockPhysicsUpdateRateToRenderFrequency = true;
 }

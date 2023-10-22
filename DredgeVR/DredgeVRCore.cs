@@ -1,5 +1,4 @@
 ﻿using DredgeVR.Helpers;
-using DredgeVR.Options;
 using DredgeVR.Tutorial;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
@@ -10,7 +9,6 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Winch.Core;
 
 namespace DredgeVR
 {
@@ -34,7 +32,6 @@ namespace DredgeVR
 			DredgeVRLogger.Debug($"{nameof(DredgeVRCore)} has loaded!");
 
 			new AssetLoader();
-			OptionsManager.Load();
 
 			// Dredge uses one camera for all time and between scenes, which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
@@ -45,8 +42,11 @@ namespace DredgeVR
 			gameObject.AddComponent<WorldManager>();
 			gameObject.AddComponent<VRTutorialManager>();
 
-			SceneManager.activeSceneChanged += OnActiveSceneChanged;
-			OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+			Delay.FireOnNextUpdate(() =>
+			{
+				SceneManager.activeSceneChanged += OnActiveSceneChanged;
+				OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+			});
 		}
 
 		public void OnDestroy()
@@ -56,24 +56,24 @@ namespace DredgeVR
 
 		private void OnActiveSceneChanged(Scene arg0, Scene arg1)
 		{
+			DredgeVRLogger.Debug($"Loading into scene {arg1.name}");
+
 			// Stop all the coroutines set in Delay
 			StopAllCoroutines();
 
 			SceneStart?.Invoke(arg1.name);
 
-			if (arg1.name == "Game")
+			switch (arg1.name)
 			{
-				GameSceneStart?.Invoke();
-			}
-
-			if (arg1.name == "Title")
-			{
-				TitleSceneStart?.Invoke();
-			}
-
-			if (arg1.name == "IntroCutscene")
-			{
-				IntroCutsceneStart?.Invoke();
+				case "Game":
+					GameSceneStart?.Invoke();
+					break;
+				case "Title":
+					TitleSceneStart?.Invoke();
+					break;
+				case "IntroCutscene":
+					IntroCutsceneStart?.Invoke();
+					break;
 			}
 		}
 	}

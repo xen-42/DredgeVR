@@ -1,7 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
-using System.Linq;
 using UnityEngine;
 
 namespace DredgeVR.World;
@@ -12,12 +11,21 @@ namespace DredgeVR.World;
 /// </summary>
 internal class WorldManager : MonoBehaviour
 {
+	// Magic number found online, without this LOD is inconsistent between eyes
+	public const float LOD_BIAS = 3.8f;
+
 	public void Awake()
 	{
-		QualitySettings.lodBias = 3.8f;
+		QualitySettings.lodBias = LOD_BIAS;
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+	}
+
+	public void OnDestroy()
+	{
+		DredgeVRCore.SceneStart -= OnSceneStart;
+		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
 	}
 
 	private void OnSceneStart(string scene)
@@ -30,7 +38,7 @@ internal class WorldManager : MonoBehaviour
 				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
 			}
 
-			terrain.treeLODBiasMultiplier = 3.8f; // Magic number
+			terrain.treeLODBiasMultiplier = LOD_BIAS;
 		}
 
 		// Reflections look super weird in VR - Make sure its off when we load in
