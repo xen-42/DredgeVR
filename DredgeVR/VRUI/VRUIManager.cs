@@ -136,10 +136,6 @@ internal class VRUIManager : MonoBehaviour
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
 			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
-
-		// Cabin slide panel is wrong
-		var itemScroller = GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/PlayerTabbedPanelContainer/Panels/CabinPanel/Container/ItemScroller/NonSpatialItemGrid").transform;
-		itemScroller.localPosition = new Vector3(itemScroller.localPosition.x, itemScroller.localPosition.y, 0f);
 	}
 
 	private void OnIntroCutsceneStart()

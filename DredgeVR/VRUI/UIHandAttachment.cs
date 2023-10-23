@@ -12,7 +12,6 @@ public class UIHandAttachment : MonoBehaviour
 	public bool _leftHand;
 
 	public bool smoothPosition = true;
-	private bool _wasMovingLastFrame = false;
 
 	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
