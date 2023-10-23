@@ -1,4 +1,5 @@
-﻿using DredgeVR.Helpers;
+﻿using Cinemachine;
+using DredgeVR.Helpers;
 using DredgeVR.Tutorial;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
@@ -33,8 +34,12 @@ namespace DredgeVR
 
 			new AssetLoader();
 
-			// Dredge uses one camera for all time and between scenes, which is nice
+			// This thing tries to take over and breaks our tracking
+			Camera.main.GetComponent<CinemachineBrain>().enabled = false;
+
+			// Dredge uses one camera for all time which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
+			Camera.main.useOcclusionCulling = true;
 
 			gameObject.AddComponent<VRInputManager>();
 			gameObject.AddComponent<VRInputModule>();

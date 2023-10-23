@@ -30,9 +30,6 @@ public class VRCameraManager : MonoBehaviour
 
 		_camera = GetComponent<Camera>();
 
-		// This thing tries to take over and breaks our tracking
-		GetComponent<CinemachineBrain>().enabled = false;
-
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
