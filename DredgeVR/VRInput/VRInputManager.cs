@@ -9,17 +9,11 @@ namespace DredgeVR.VRInput;
 
 public class VRInputManager : MonoBehaviour
 {
-	public static VRInputManager Instance { get; private set; }
-
-	public static PlayerAction ResetCamera { get; private set; }
-
 	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
 	public void Awake()
 	{
-		Instance = this;
-
 		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, LeftHandUpdate);
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
@@ -28,13 +22,20 @@ public class VRInputManager : MonoBehaviour
 
 		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
 
-		Delay.RunWhen(() => GameManager.Instance?.Input?.Controls != null, InitControls);
+		InitControls();
+
+		// Sometimes the controls just don't work
+		DredgeVRCore.TitleSceneStart += GameManager.Instance.Input.ResetAllBindings;
+		DredgeVRCore.GameSceneStart += GameManager.Instance.Input.ResetAllBindings;
 	}
 
-	/// <summary>
-	/// Timing on this is so wack
-	/// </summary>
-	private void InitControls()
+	public void OnDestroy()
+	{
+		DredgeVRCore.TitleSceneStart -= GameManager.Instance.Input.ResetAllBindings;
+		DredgeVRCore.GameSceneStart -= GameManager.Instance.Input.ResetAllBindings;
+	}
+
+	public static void InitControls()
 	{
 		var cancel = SteamVR_Actions._default.Cancel;
 
@@ -64,10 +65,11 @@ public class VRInputManager : MonoBehaviour
 		AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
 	}
 
-	private void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
+	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
-		action.AddDefaultBinding(new VRBindingSource(vrAction));
-		action.ResetBindings();
+		var vrBindingSource = new VRBindingSource(vrAction);
+		action.AddDefaultBinding(vrBindingSource);
+		action.AddBinding(vrBindingSource);
 
 		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
 	}

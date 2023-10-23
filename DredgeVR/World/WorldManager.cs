@@ -105,7 +105,8 @@ internal class WorldManager : MonoBehaviour
 				}
 
 				// Set up held items
-				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldMap>();
+				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldMap>().SetOffset(-200, 400);
+				GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldMap>().SetOffset(-250, 250);
 			}
 		);
 

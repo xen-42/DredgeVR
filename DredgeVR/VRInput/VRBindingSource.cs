@@ -1,4 +1,5 @@
-﻿using InControl;
+﻿using DredgeVR.Helpers;
+using InControl;
 using System.IO;
 using Valve.VR;
 
@@ -7,6 +8,14 @@ namespace DredgeVR.VRInput;
 public class VRBindingSource : BindingSource
 {
 	public SteamVR_Action_Boolean action;
+
+	public string GetButtonName()
+	{
+		var button = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
+		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+
+		return $"{button} ({hand})";
+	}
 
 	public VRBindingSource(SteamVR_Action_Boolean action)
 	{

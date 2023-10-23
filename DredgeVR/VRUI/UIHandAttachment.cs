@@ -9,14 +9,22 @@ public class UIHandAttachment : MonoBehaviour
 	public Vector3 _euler = new(45, 0, 0);
 	public Vector3 _offset = new(0.2f, 0, 0);
 	public float _scale = 1f;
-	public bool _dominantHand;
+	public bool _leftHand;
 
-	public void Init(bool dominantHand, Vector3 euler, Vector3 offset, float scale)
+	public bool smoothPosition = true;
+	private bool _wasMovingLastFrame = false;
+
+	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
-		_dominantHand = dominantHand;
+		_leftHand = !rightHand;
 		_euler = euler;
 		_offset = offset;
 		_scale = scale;
+
+		if (!OptionsManager.Options.useFlatUI)
+		{
+			transform.localScale = new Vector3(_leftHand ? -_scale : _scale, _scale, _scale);
+		}
 	}
 
 	public void Awake()
@@ -34,11 +42,27 @@ public class UIHandAttachment : MonoBehaviour
 
 	public void Update()
 	{
-		var leftHand = _dominantHand == OptionsManager.Options.leftHanded;
+		var handGO = _leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 
-		var handGO = leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
-		transform.position = handGO.transform.TransformPoint(new Vector3(_offset.x * (leftHand ? -1 : 1), _offset.y, _offset.z));
-		transform.rotation = handGO.transform.rotation * Quaternion.Euler(_euler);
-		transform.localScale = new Vector3(leftHand ? -_scale : _scale, _scale, _scale);
+		var targetPosition = handGO.transform.TransformPoint(new Vector3(_offset.x * (_leftHand ? -1 : 1), _offset.y, _offset.z));
+		var targetRotation = handGO.transform.rotation * Quaternion.Euler(_euler);
+
+		// Smoothly move to position/rotation to jitter less
+		var t = Time.unscaledDeltaTime * 15f;
+
+		if (smoothPosition)
+		{
+			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
+		}
+		else
+		{
+			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+			// Snap angle
+			if (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
+			}
+		}
 	}
 }
