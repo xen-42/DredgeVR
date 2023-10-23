@@ -122,6 +122,11 @@
       "requirement": "mandatory"
     },
     {
+      "name": "/actions/default/in/RecenterCamera",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -214,7 +219,8 @@
       "/actions/default/in/ZoomMapOut": "Zoom Map Out",
       "/actions/default/in/RemoveMarker": "RemoveMarker",
       "/actions/default/in/LeftHandPose": "Left Hand Pose",
-      "/actions/default/in/RightHandPose": "Right Hand Pose"
+      "/actions/default/in/RightHandPose": "Right Hand Pose",
+      "/actions/default/in/RecenterCamera": "Recenter Camera"
     }
   ]
 }

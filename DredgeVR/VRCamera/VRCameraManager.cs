@@ -75,7 +75,7 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.rotation = Quaternion.identity;
 
 		// Weird timing on this
-		Delay.FireInNUpdates(2, ResetPosition);
+		Delay.FireInNUpdates(2, RecenterCamera);
 	}
 
 	private void OnTitleSceneStart()
@@ -100,7 +100,7 @@ public class VRCameraManager : MonoBehaviour
 				AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
 				AnchorTransform.localRotation = Quaternion.identity;
 
-				Delay.FireOnNextUpdate(ResetPosition);
+				Delay.FireOnNextUpdate(RecenterCamera);
 			}
 		);
 	}
@@ -114,7 +114,7 @@ public class VRCameraManager : MonoBehaviour
 		{
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
-				ResetPosition();
+				RecenterCamera();
 			}
 
 			// In the game scene force a constant ResetTransform y position
@@ -138,7 +138,7 @@ public class VRCameraManager : MonoBehaviour
 		}
 	}
 
-	public void ResetPosition()
+	public void RecenterCamera()
 	{
 		if (AnchorTransform != null)
 		{

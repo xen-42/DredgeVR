@@ -63,6 +63,8 @@ public class VRInputManager : MonoBehaviour
 
 		AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
 		AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
+
+		new CustomControl(SteamVR_Actions._default.RecenterCamera, VRCameraManager.Instance.RecenterCamera);
 	}
 
 	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
