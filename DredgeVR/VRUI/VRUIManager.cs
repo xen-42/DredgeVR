@@ -76,6 +76,15 @@ internal class VRUIManager : MonoBehaviour
 				MakeCanvasWorldSpace(canvas);
 			}
 		}
+
+		// Some UI has 0 z size - messes up text
+		foreach (var rectTransform in Resources.FindObjectsOfTypeAll(typeof(RectTransform)).Cast<RectTransform>())
+		{
+			if (rectTransform.localScale.z == 0)
+			{
+				rectTransform.localScale = new Vector3(rectTransform.localScale.x, rectTransform.localScale.y, 1);
+			}
+		}
 	}
 
 	private void MakeCanvasWorldSpace(Canvas canvas)
