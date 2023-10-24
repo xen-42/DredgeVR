@@ -1,11 +1,9 @@
 ﻿using DredgeVR.VRUI;
 using UnityEngine;
-using Valve.VR;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 namespace DredgeVR.Items;
 
-public class HeldMap : MonoBehaviour
+public class HeldUI : MonoBehaviour
 {
 	private Vector2 _offset;
 	private Transform _container;
