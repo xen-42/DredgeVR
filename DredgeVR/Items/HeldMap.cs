@@ -9,7 +9,7 @@ public class HeldMap : MonoBehaviour
 	public void Awake()
 	{
 		var uiHand = gameObject.AddComponent<UIHandAttachment>();
-		uiHand.Init(false, new Vector3(0, 90, 45), new Vector3(-0.05f, -0.15f, 0.15f), 0.5f);
+		uiHand.Init(false, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
 		uiHand.smoothPosition = false;
 	}
 

@@ -103,7 +103,7 @@ internal class VRUIManager : MonoBehaviour
 
 			// Attach right hand button prompts
 			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
-				.Init(true, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+				.Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
 
 			_hasInitialized = true;
 		}
@@ -131,11 +131,11 @@ internal class VRUIManager : MonoBehaviour
 
 		// Attach activity UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
 
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
 	}
 
 	private void OnIntroCutsceneStart()
