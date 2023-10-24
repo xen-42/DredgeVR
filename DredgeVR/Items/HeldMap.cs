@@ -1,4 +1,6 @@
-﻿using DredgeVR.VRUI;
+﻿using DredgeVR.VRCamera;
+using DredgeVR.VRInput;
+using DredgeVR.VRUI;
 using UnityEngine;
 
 namespace DredgeVR.Items;
@@ -11,7 +13,8 @@ public class HeldUI : MonoBehaviour
 	public void Awake()
 	{
 		var uiHand = gameObject.AddComponent<UIHandAttachment>();
-		uiHand.Init(false, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
+		// Hold in off hand
+		uiHand.Init(VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
 		uiHand.smoothPosition = false;
 		_container = transform.Find("Container").transform;
 		_container.localRotation = Quaternion.Euler(0, 45, 0);
@@ -29,7 +32,7 @@ public class HeldUI : MonoBehaviour
 
 	public void OnEnable()
 	{
-		transform.Find("Container/Scrim").gameObject.SetActive(false);
+		transform.Find("Container/Scrim")?.gameObject.SetActive(false);
 		transform.Find("Container/Title")?.gameObject?.SetActive(false);
 	}
 }
