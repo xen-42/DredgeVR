@@ -1,4 +1,6 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
+using DredgeVR.VRInput;
 using HarmonyLib;
 using UnityEngine;
 
@@ -14,12 +16,14 @@ public static class BoatActionsDestinationUIPatches
 	[HarmonyPatch(nameof(BoatActionsDestinationUI.LateUpdate))]
 	public static bool BoatActionsDestinationUI_LateUpdate(BoatActionsDestinationUI __instance)
 	{
-		/*
-		// Same as DestinationButtonPatches, but slightly smaller
-		__instance.transform.position = __instance.destination.transform.position;
-		__instance.transform.localScale = Vector3.one * 5;
-		DirectionHelper.LookAtPlayerInPlane(__instance.transform, true);
-		*/
+		if (OptionsManager.Options.useFlatUI)
+		{
+			// Same as DestinationButtonPatches, but slightly smaller
+			__instance.transform.position = __instance.destination.transform.position;
+			__instance.transform.localScale = Vector3.one * 5;
+			DirectionHelper.LookAtPlayerInPlane(__instance.transform, true);
+		}
+
 		return false;
 	}
 
@@ -30,8 +34,9 @@ public static class BoatActionsDestinationUIPatches
 	{
 		if (__instance.gameObject.GetComponent<UIHandAttachment>() == null)
 		{
+			// Goes on the off hand so the cursor can always target it
 			__instance.gameObject.AddComponent<UIHandAttachment>()
-				.Init(false, new Vector3(0, 90, 45), new Vector3(0.05f, 0.1f, 0), 1f);
+				.Init(VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.05f, 0.1f, 0), 1f);
 		}
 	}
 }

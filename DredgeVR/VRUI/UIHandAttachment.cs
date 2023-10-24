@@ -1,4 +1,5 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Options;
+using DredgeVR.VRCamera;
 using UnityEngine;
 
 namespace DredgeVR.VRUI;
@@ -22,9 +23,24 @@ public class UIHandAttachment : MonoBehaviour
 
 	public void Awake()
 	{
+		// For some control schemes the user might be better off just being able to target the buttons with their cursor
+		if (OptionsManager.Options.useFlatUI)
+		{
+			enabled = false;
+			Component.Destroy(this);
+
+			// Since it'll be flat double the size
+			transform.localScale = Vector3.one * 2f;
+		}
+
 		// TODO: Fix canvas layers
 
 		// TODO: Allow targeting by touching with hand
+	}
+
+	public void Start()
+	{
+		transform.localScale = Vector3.one * _scale;
 	}
 
 	public void Update()
