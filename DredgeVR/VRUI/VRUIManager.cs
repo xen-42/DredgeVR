@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Items;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using FluffyUnderware.DevTools.Extensions;
@@ -145,6 +146,12 @@ internal class VRUIManager : MonoBehaviour
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
 			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
+
+		// Remove scrims
+		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
+
+		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
+		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
 	}
 
 	private void OnIntroCutsceneStart()
