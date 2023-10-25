@@ -16,9 +16,6 @@ namespace DredgeVR
 	{
 		public static void Initialize()
 		{
-			// Else some stuff breaks
-			LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.GetLocale("en");
-
 			OptionsManager.Load();
 
 			SetUpXr();

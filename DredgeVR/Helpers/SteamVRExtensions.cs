@@ -4,20 +4,18 @@ namespace DredgeVR.Helpers;
 
 public static class SteamVRExtensions
 {
-	// TODO: Don't depend on locale
-
 	public static string GetDeviceName(this SteamVR_Action_Boolean action)
 	{
-		return action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_ControllerType);
+		return SteamVR.instance.GetStringProperty(ETrackedDeviceProperty.Prop_ControllerType_String, action.trackedDeviceIndex);
 	}
 
 	public static string GetButtonName(this SteamVR_Action_Boolean action)
 	{
-		return action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
+		return action.GetRenderModelComponentName(action.activeDevice);
 	}
 
 	public static string GetHandName(this SteamVR_Action_Boolean action)
 	{
-		return action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+		return action.activeDevice == SteamVR_Input_Sources.LeftHand ? "left" : "right";
 	}
 }
