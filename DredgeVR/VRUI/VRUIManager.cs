@@ -94,6 +94,14 @@ internal class VRUIManager : MonoBehaviour
 		canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 		canvas.scaleFactor = 1f;
 		canvas.planeDistance = 1;
+		var canvasScaler = canvas.gameObject.GetComponent<CanvasScaler>();
+		if (canvasScaler != null)
+		{
+			Destroy(canvasScaler);
+			// Canvas scaler already scaled it before it was world space unfortunately
+			canvas.transform.localScale = Vector3.one;
+			// Also repositions stuff
+		}
 	}
 
 	private void OnTitleSceneStart()

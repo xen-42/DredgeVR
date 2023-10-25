@@ -65,4 +65,19 @@ public static class GridManagerPatches
 			__instance.currentlyHeldObject.transform.position = GameManager.Instance.GridManager.CursorProxy.CursorSquare.transform.position;
 		}
 	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(nameof(GridManager.ScaledCellSize), MethodType.Getter)]
+	public static bool GridManager_ScaledCellSize_Get(GridManager __instance, ref float __result)
+	{
+		if (__instance.canvasScaler == null)
+		{
+			__result = 0.06f;
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 }
