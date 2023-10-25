@@ -17,9 +17,9 @@ public static class VRControlIcons
 			return null;
 		}
 
-		var controllerType = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_ControllerType);
-		var inputSource = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
-		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+		var controllerType = action.GetDeviceName();
+		var inputSource = action.GetButtonName();
+		var hand = action.GetHandName();
 
 		ControlIconData data;
 

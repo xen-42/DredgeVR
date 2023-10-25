@@ -11,8 +11,8 @@ public class VRBindingSource : BindingSource
 
 	public string GetButtonName()
 	{
-		var button = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
-		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+		var button = action.GetButtonName();
+		var hand = action.GetHandName();
 
 		return $"{button} ({hand})";
 	}
