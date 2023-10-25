@@ -10,14 +10,17 @@ public class HeldUI : MonoBehaviour
 	private Vector2 _offset;
 	private Transform _container;
 
+	private bool _inRightHand;
+
 	public void Awake()
 	{
 		var uiHand = gameObject.AddComponent<UIHandAttachment>();
 		// Hold in off hand
-		uiHand.Init(VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
+		_inRightHand = VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand;
+		uiHand.Init(_inRightHand, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
 		uiHand.smoothPosition = false;
 		_container = transform.Find("Container").transform;
-		_container.localRotation = Quaternion.Euler(0, 45, 0);
+		_container.localRotation = Quaternion.Euler(0, _inRightHand ? -45 : 45, 0);
 	}
 
 	public void SetOffset(int offsetX, int offsetY)
@@ -27,7 +30,7 @@ public class HeldUI : MonoBehaviour
 
 	public void Update()
 	{
-		_container.localPosition = _container.localRotation * new Vector3(_offset.x, _offset.y, 0f);
+		_container.localPosition = _container.localRotation * new Vector3(_inRightHand ? -_offset.x : _offset.x, _offset.y, 0f);
 	}
 
 	public void OnEnable()

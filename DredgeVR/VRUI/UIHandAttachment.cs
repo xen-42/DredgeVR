@@ -1,4 +1,5 @@
-﻿using DredgeVR.Options;
+﻿using DG.Tweening;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class UIHandAttachment : MonoBehaviour
 	public bool _leftHand;
 
 	public bool smoothPosition = true;
+
+	private RectTransform _rectTransform;
 
 	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
@@ -33,6 +36,13 @@ public class UIHandAttachment : MonoBehaviour
 			transform.localScale = Vector3.one * 2f;
 		}
 
+		// For left handed switch the pivot over to be more consistent
+		_rectTransform = gameObject.GetComponent<RectTransform>();
+		if (_leftHand)
+		{
+			_rectTransform.pivot = new Vector2(1 - _rectTransform.pivot.x, _rectTransform.pivot.y);
+		}
+
 		// TODO: Fix canvas layers
 
 		// TODO: Allow targeting by touching with hand
@@ -47,10 +57,7 @@ public class UIHandAttachment : MonoBehaviour
 	{
 		var handGO = _leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 
-		// Don't take into account the middle of the UI because it's very inconsistent
-		// var centerOffset = transform.lossyScale.x * new Vector3(_rectTransform.rect.center.x, _rectTransform.rect.center.y, 0f);
-		var mirroredOffset = new Vector3(_offset.x, _offset.y, _offset.z);
-		var rotatedOffset = Quaternion.Euler(_euler) * (mirroredOffset);
+		var rotatedOffset = Quaternion.Euler(_euler) * _offset;
 
 		var targetPosition = handGO.transform.TransformPoint(rotatedOffset);
 		var targetRotation = handGO.transform.rotation * Quaternion.Euler(_euler);

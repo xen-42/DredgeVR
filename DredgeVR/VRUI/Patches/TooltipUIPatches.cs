@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Items;
+using DredgeVR.Options;
 using HarmonyLib;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ internal class TooltipUIPatches
 		tooltipHeldRoot.localPosition = Vector3.zero;
 		tooltipHeldRoot.localRotation = Quaternion.identity;
 		__instance.containerRect.parent = tooltipHeldRoot;
-		tooltipHeldRoot.gameObject.AddComponent<HeldUI>().SetOffset(100, 300);
+		tooltipHeldRoot.gameObject.AddComponent<HeldUI>().SetOffset(OptionsManager.Options.leftHanded ? 400 : 100, 300);
 	}
 
 	[HarmonyPrefix]
