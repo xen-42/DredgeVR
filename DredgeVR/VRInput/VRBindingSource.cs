@@ -1,5 +1,4 @@
-﻿using DredgeVR.Helpers;
-using InControl;
+﻿using InControl;
 using System.IO;
 using Valve.VR;
 
