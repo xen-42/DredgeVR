@@ -61,6 +61,12 @@ internal class WorldManager : MonoBehaviour
 
 		// Reflections look super weird in VR - Make sure its off when we load in
 		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
+		// Replace shader reflection texture
+		Shader.SetGlobalTexture(Shader.PropertyToID("_PlanarReflectionTexture"), new Texture2D(2, 2));
+
+		var waterMat = GameObject.FindObjectOfType<ReflectionSettingResponder>().waterMat;
+		waterMat.DisableKeyword("_REFLECTIONS");
+		waterMat.SetFloat("_ReflectionStrength", 0f);
 
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{

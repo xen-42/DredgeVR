@@ -3,6 +3,7 @@ using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
 using Valve.VR;
@@ -35,11 +36,17 @@ public class VRCameraManager : MonoBehaviour
 		_camera1.transform.parent = transform;
 		_camera1.transform.localPosition = Vector3.zero;
 		_camera1.transform.localRotation = Quaternion.identity;
+		_camera1.gameObject.AddComponent<InvertCamera>();
 
 		_camera2 = cameras[1];
 		_camera2.transform.parent = transform;
 		_camera2.transform.localPosition = Vector3.zero;
 		_camera2.transform.localRotation = Quaternion.identity;
+		_camera2.gameObject.AddComponent<InvertCamera>();
+
+		// Fixes weirdly mirrored bloom
+		_camera1.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+		_camera2.GetUniversalAdditionalCameraData().renderPostProcessing = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -120,19 +127,21 @@ public class VRCameraManager : MonoBehaviour
 
 	public void Update()
 	{
-		GL.invertCulling = true;
-
 		_camera1.aspect = SteamVR.instance.aspect;
 		_camera1.fieldOfView = SteamVR.instance.fieldOfView;
 		_camera1.stereoTargetEye = StereoTargetEyeMask.Left;
-		_camera1.projectionMatrix = _camera1.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left) * Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_camera1.projectionMatrix = _camera1.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left);
 		_camera1.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(0);
 
 		_camera2.aspect = SteamVR.instance.aspect;
 		_camera2.fieldOfView = SteamVR.instance.fieldOfView;
 		_camera2.stereoTargetEye = StereoTargetEyeMask.Right;
-		_camera2.projectionMatrix = _camera2.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right) * Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_camera2.projectionMatrix = _camera2.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
 		_camera2.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
+
+		GL.invertCulling = true;
+		_camera2.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_camera1.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 
 		if (AnchorTransform != null)
 		{
@@ -171,6 +180,19 @@ public class VRCameraManager : MonoBehaviour
 
 			var distanceDiff = VRPlayer.transform.position - AnchorTransform.position;
 			_pivot.position -= new Vector3(distanceDiff.x, 0f, distanceDiff.z);
+		}
+	}
+
+	public class InvertCamera : MonoBehaviour
+	{
+		public void OnPreCull()
+		{
+			//GL.invertCulling = true;
+		}
+
+		public void OnPostRender()
+		{
+			//GL.invertCulling = false;
 		}
 	}
 }
