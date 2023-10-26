@@ -36,11 +36,13 @@ namespace DredgeVR
 			new AssetLoader();
 
 			// This thing tries to take over and breaks our tracking
-			Camera.main.GetComponent<CinemachineBrain>().enabled = false;
+			Component.DestroyImmediate(Camera.main.GetComponent<CinemachineBrain>());
 
 			// Dredge uses one camera for all time which is nice
-			Camera.main.gameObject.AddComponent<VRCameraManager>();
-			Camera.main.useOcclusionCulling = true;
+			var head = new GameObject("Head");
+			Camera.main.gameObject.transform.parent = head.transform;
+			GameObject.Instantiate(Camera.main.gameObject, head.transform);
+			head.AddComponent<VRCameraManager>();
 
 			gameObject.AddComponent<VRInputManager>();
 			gameObject.AddComponent<VRInputModule>();

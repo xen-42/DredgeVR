@@ -1,20 +1,19 @@
-﻿using Cinemachine;
-using Cinemachine.Utility;
+﻿using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR;
 using Valve.VR;
 
 namespace DredgeVR.VRCamera;
 
-[RequireComponent(typeof(Camera))]
 public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private static Camera _camera;
+	private static Camera _camera1, _camera2;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -24,11 +23,23 @@ public class VRCameraManager : MonoBehaviour
 
 	private float _gameAnchorYPosition = 0.8f;
 
+	private XRDisplaySubsystem _displaySubsystem;
+
 	public void Awake()
 	{
 		Instance = this;
 
-		_camera = GetComponent<Camera>();
+		var cameras = GetComponentsInChildren<Camera>();
+
+		_camera1 = cameras[0];
+		_camera1.transform.parent = transform;
+		_camera1.transform.localPosition = Vector3.zero;
+		_camera1.transform.localRotation = Quaternion.identity;
+
+		_camera2 = cameras[1];
+		_camera2.transform.parent = transform;
+		_camera2.transform.localPosition = Vector3.zero;
+		_camera2.transform.localRotation = Quaternion.identity;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -52,6 +63,8 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+
+		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 	}
 
 	public void OnDestroy()
@@ -107,8 +120,19 @@ public class VRCameraManager : MonoBehaviour
 
 	public void Update()
 	{
-		_camera.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera.aspect = SteamVR.instance.aspect;
+		GL.invertCulling = true;
+
+		_camera1.aspect = SteamVR.instance.aspect;
+		_camera1.fieldOfView = SteamVR.instance.fieldOfView;
+		_camera1.stereoTargetEye = StereoTargetEyeMask.Left;
+		_camera1.projectionMatrix = _camera1.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left) * Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_camera1.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(0);
+
+		_camera2.aspect = SteamVR.instance.aspect;
+		_camera2.fieldOfView = SteamVR.instance.fieldOfView;
+		_camera2.stereoTargetEye = StereoTargetEyeMask.Right;
+		_camera2.projectionMatrix = _camera2.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right) * Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_camera2.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
 
 		if (AnchorTransform != null)
 		{

@@ -31,7 +31,7 @@ internal class WorldManager : MonoBehaviour
 
 		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
 		// Shadows do not work in OpenVR with URP
-		urp.SetValue("m_MainLightShadowsSupported", false);
+		// urp.SetValue("m_MainLightShadowsSupported", false);
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
