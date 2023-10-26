@@ -3,6 +3,8 @@ using DredgeVR.Items;
 using DredgeVR.Options;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace DredgeVR.World;
 
@@ -24,8 +26,11 @@ internal class WorldManager : MonoBehaviour
 			QualitySettings.maximumLODLevel = 1;
 		}
 
-		QualitySettings.shadows = ShadowQuality.Disable;
 		QualitySettings.vSyncCount = 2;
+
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// Shadows do not work in OpenVR with URP
+		urp.SetValue("m_MainLightShadowsSupported", false);
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
@@ -107,25 +112,20 @@ internal class WorldManager : MonoBehaviour
 				// Set up held items
 				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 				GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+
+				// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
+				// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
+				foreach (var particle in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
+				{
+					if (particle.renderMode != ParticleSystemRenderMode.Mesh)
+					{
+						particle.mesh = AssetLoader.PrimitiveCylinder;
+						particle.renderMode = ParticleSystemRenderMode.Mesh;
+						particle.alignment = ParticleSystemRenderSpace.Local;
+					}
+				}
 			}
 		);
 
-		// Replacing the shaders doesn't fix it, they still show in the wrong eyes
-		/*
-		var badShaders = new string[]
-		{
-			"Shader Graphs/Particle_Shader",
-			"Shader Graphs/FloatingParticle_Shader",
-			"Shader Graphs/ShimmerWarp_Shader"
-		};
-
-		foreach (var particles in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
-		{
-			if (badShaders.Contains(particles.material.shader.name))
-			{
-				particles.material.shader = _litShader;
-			}
-		}
-		*/
 	}
 }
