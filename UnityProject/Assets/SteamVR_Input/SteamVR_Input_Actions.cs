@@ -69,6 +69,8 @@ namespace Valve.VR
         
         private static SteamVR_Action_Pose p_default_RightHandPose;
         
+        private static SteamVR_Action_Boolean p_default_RecenterCamera;
+        
         private static SteamVR_Action_Vibration p_default_Haptic;
         
         public static SteamVR_Action_Skeleton default_SkeletonLeftHand
@@ -279,6 +281,14 @@ namespace Valve.VR
             }
         }
         
+        public static SteamVR_Action_Boolean default_RecenterCamera
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_RecenterCamera.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
         public static SteamVR_Action_Vibration default_Haptic
         {
             get
@@ -316,6 +326,7 @@ namespace Valve.VR
                     SteamVR_Actions.default_RemoveMarker,
                     SteamVR_Actions.default_LeftHandPose,
                     SteamVR_Actions.default_RightHandPose,
+                    SteamVR_Actions.default_RecenterCamera,
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsIn = new Valve.VR.ISteamVR_Action_In[] {
                     SteamVR_Actions.default_SkeletonLeftHand,
@@ -343,7 +354,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ZoomMapOut,
                     SteamVR_Actions.default_RemoveMarker,
                     SteamVR_Actions.default_LeftHandPose,
-                    SteamVR_Actions.default_RightHandPose};
+                    SteamVR_Actions.default_RightHandPose,
+                    SteamVR_Actions.default_RecenterCamera};
             Valve.VR.SteamVR_Input.actionsOut = new Valve.VR.ISteamVR_Action_Out[] {
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsVibration = new Valve.VR.SteamVR_Action_Vibration[] {
@@ -371,7 +383,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_RepairMode,
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
-                    SteamVR_Actions.default_RemoveMarker};
+                    SteamVR_Actions.default_RemoveMarker,
+                    SteamVR_Actions.default_RecenterCamera};
             Valve.VR.SteamVR_Input.actionsSingle = new Valve.VR.SteamVR_Action_Single[0];
             Valve.VR.SteamVR_Input.actionsVector2 = new Valve.VR.SteamVR_Action_Vector2[] {
                     SteamVR_Actions.default_Move,
@@ -402,7 +415,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_RepairMode,
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
-                    SteamVR_Actions.default_RemoveMarker};
+                    SteamVR_Actions.default_RemoveMarker,
+                    SteamVR_Actions.default_RecenterCamera};
         }
         
         private static void PreInitActions()
@@ -433,6 +447,7 @@ namespace Valve.VR
             SteamVR_Actions.p_default_RemoveMarker = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/RemoveMarker")));
             SteamVR_Actions.p_default_LeftHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/LeftHandPose")));
             SteamVR_Actions.p_default_RightHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/RightHandPose")));
+            SteamVR_Actions.p_default_RecenterCamera = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/RecenterCamera")));
             SteamVR_Actions.p_default_Haptic = ((SteamVR_Action_Vibration)(SteamVR_Action.Create<SteamVR_Action_Vibration>("/actions/default/out/Haptic")));
         }
     }

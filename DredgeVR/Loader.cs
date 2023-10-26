@@ -1,10 +1,12 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
 using HarmonyLib;
 using System;
 using System.IO;
 using System.Reflection;
 using Unity.XR.OpenVR;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using UnityEngine.XR.Management;
 using Valve.VR;
 
@@ -14,6 +16,8 @@ namespace DredgeVR
 	{
 		public static void Initialize()
 		{
+			OptionsManager.Load();
+
 			SetUpXr();
 
 			var gameObject = new GameObject(nameof(DredgeVRCore));
@@ -62,7 +66,7 @@ namespace DredgeVR
 													steamAppId: 1562430);
 
 			// Improves frames by about 10ms
-			SteamVR_Settings.instance.lockPhysicsUpdateRateToRenderFrequency = false;
+			SteamVR_Settings.instance.lockPhysicsUpdateRateToRenderFrequency = OptionsManager.Options.lockPhysicsUpdateRateToRenderFrequency;
 		}
 	}
 }

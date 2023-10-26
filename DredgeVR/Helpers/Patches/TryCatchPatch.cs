@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
@@ -13,7 +12,7 @@ namespace DredgeVR.Helpers;
 /// 
 /// This patching will decrease performance, so do not include it in release builds
 /// </summary>
-# if DEBUG
+#if DEBUG
 [HarmonyPatch]
 internal static class TryCatchPatch
 {
@@ -22,6 +21,7 @@ internal static class TryCatchPatch
 	{
 		return Assembly.GetExecutingAssembly()
 			.GetTypes()
+			// Doesn't even work on patches anyway
 			.Where(x => x.GetCustomAttribute(typeof(HarmonyPatch)) == null && !x.IsAbstract)
 			.SelectMany(AccessTools.GetDeclaredMethods)
 			.Where(x => !x.IsGenericMethod)

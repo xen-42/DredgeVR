@@ -16,7 +16,7 @@ public static class DestinationButtonPatches
 	{
 		// Originally these buttons place themself to be at the screen point location corresponding to their real world destination location
 		// We'll just leave them at the destination
-		__instance.transform.position = __instance.destination.transform.position;
+		__instance.transform.position = __instance.destination.transform.position + Vector3.up;
 		__instance.transform.localScale = Vector3.one * 10;
 		DirectionHelper.LookAtPlayerInPlane(__instance.transform, true);
 		return false;

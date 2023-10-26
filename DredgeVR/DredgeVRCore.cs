@@ -1,5 +1,5 @@
-﻿using DredgeVR.Helpers;
-using DredgeVR.Options;
+﻿using Cinemachine;
+using DredgeVR.Helpers;
 using DredgeVR.Tutorial;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
@@ -10,7 +10,6 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Winch.Core;
 
 namespace DredgeVR
 {
@@ -25,6 +24,7 @@ namespace DredgeVR
 		public static Action GameSceneStart;
 		public static Action TitleSceneStart;
 		public static Action IntroCutsceneStart;
+		public static Action PlayerSpawned;
 
 		public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -34,10 +34,13 @@ namespace DredgeVR
 			DredgeVRLogger.Debug($"{nameof(DredgeVRCore)} has loaded!");
 
 			new AssetLoader();
-			OptionsManager.Load();
 
-			// Dredge uses one camera for all time and between scenes, which is nice
+			// This thing tries to take over and breaks our tracking
+			Camera.main.GetComponent<CinemachineBrain>().enabled = false;
+
+			// Dredge uses one camera for all time which is nice
 			Camera.main.gameObject.AddComponent<VRCameraManager>();
+			Camera.main.useOcclusionCulling = true;
 
 			gameObject.AddComponent<VRInputManager>();
 			gameObject.AddComponent<VRInputModule>();
@@ -45,8 +48,11 @@ namespace DredgeVR
 			gameObject.AddComponent<WorldManager>();
 			gameObject.AddComponent<VRTutorialManager>();
 
-			SceneManager.activeSceneChanged += OnActiveSceneChanged;
-			OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+			Delay.FireOnNextUpdate(() =>
+			{
+				SceneManager.activeSceneChanged += OnActiveSceneChanged;
+				OnActiveSceneChanged(default, SceneManager.GetActiveScene());
+			});
 		}
 
 		public void OnDestroy()
@@ -56,24 +62,25 @@ namespace DredgeVR
 
 		private void OnActiveSceneChanged(Scene arg0, Scene arg1)
 		{
+			DredgeVRLogger.Debug($"Loading into scene {arg1.name}");
+
 			// Stop all the coroutines set in Delay
 			StopAllCoroutines();
 
 			SceneStart?.Invoke(arg1.name);
 
-			if (arg1.name == "Game")
+			switch (arg1.name)
 			{
-				GameSceneStart?.Invoke();
-			}
-
-			if (arg1.name == "Title")
-			{
-				TitleSceneStart?.Invoke();
-			}
-
-			if (arg1.name == "IntroCutscene")
-			{
-				IntroCutsceneStart?.Invoke();
+				case "Game":
+					GameSceneStart?.Invoke();
+					Delay.RunWhen(() => GameManager.Instance.Player != null, () => PlayerSpawned?.Invoke());
+					break;
+				case "Title":
+					TitleSceneStart?.Invoke();
+					break;
+				case "IntroCutscene":
+					IntroCutsceneStart?.Invoke();
+					break;
 			}
 		}
 	}

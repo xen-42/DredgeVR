@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using Valve.VR;
 
 namespace DredgeVR.VRUI;
@@ -11,17 +12,22 @@ public static class VRControlIcons
 
 	public static ControlIconData GetControlIconData(SteamVR_Action_Boolean action)
 	{
-		var controllerType = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_ControllerType);
-		var inputSource = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
-		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+		if (LocalizationSettings.AvailableLocales.GetLocale("en") == null)
+		{
+			return null;
+		}
+
+		var controllerType = action.GetDeviceName();
+		var inputSource = action.GetButtonName();
+		var hand = action.GetHandName();
 
 		ControlIconData data;
 
-		if (controllerType.Contains("Index"))
+		if (controllerType.Contains("knuckles"))
 		{
 			data = GetIndexControlIconData(inputSource, hand);
 		}
-		else if (controllerType.Contains("Vive"))
+		else if (controllerType.Contains("vive"))
 		{
 			data = GetViveControlIconData(inputSource, hand);
 		}
@@ -48,28 +54,28 @@ public static class VRControlIcons
 
 	private static ControlIconData GetViveControlIconData(string inputSource, string hand)
 	{
-		if (inputSource.Contains("Menu"))
+		if (inputSource.Contains("menu"))
 		{
 			return CreateData("AssetBundles/VR Icons/Vive/Vive_Menu.png");
 		}
-		if (inputSource.Contains("Trigger"))
+		if (inputSource.Contains("trigger"))
 		{
-			if (hand.Contains("Left"))
+			if (hand.Contains("left"))
 			{
 				return CreateData("AssetBundles/VR Icons/Vive/Vive_LT.png");
 			}
-			if (hand.Contains("Right"))
+			if (hand.Contains("right"))
 			{
 				return CreateData("AssetBundles/VR Icons/Vive/Vive_RT.png");
 			}
 		}
-		if (inputSource.Contains("Grip"))
+		if (inputSource.Contains("grip"))
 		{
-			if (hand.Contains("Left"))
+			if (hand.Contains("left"))
 			{
 				return CreateData("AssetBundles/VR Icons/Vive/Vive_Grip_Left.png");
 			}
-			if (hand.Contains("Right"))
+			if (hand.Contains("right"))
 			{
 				return CreateData("AssetBundles/VR Icons/Vive/Vive_Grip_Right.png");
 			}
@@ -79,40 +85,40 @@ public static class VRControlIcons
 
 	private static ControlIconData GetOculusControlIconData(string inputSource, string hand)
 	{
-		if (inputSource.Contains("A Button"))
+		if (inputSource.Contains("button_a"))
 		{
 			return CreateData("AssetBundles/VR Icons/Oculus/Oculus_A.png");
 		}
-		if (inputSource.Contains("B Button"))
+		if (inputSource.Contains("button_b"))
 		{
 			return CreateData("AssetBundles/VR Icons/Oculus/Oculus_B.png");
 		}
-		if (inputSource.Contains("X Button"))
+		if (inputSource.Contains("button_x"))
 		{
 			return CreateData("AssetBundles/VR Icons/Oculus/Oculus_X.png");
 		}
-		if (inputSource.Contains("Y Button"))
+		if (inputSource.Contains("button_y"))
 		{
 			return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Y.png");
 		}
-		if (inputSource.Contains("Trigger"))
+		if (inputSource.Contains("trigger"))
 		{
-			if (hand.Contains("Left"))
+			if (hand.Contains("left"))
 			{
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_LT.png");
 			}
-			if (hand.Contains("Right"))
+			if (hand.Contains("right"))
 			{
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_RT.png");
 			}
 		}
-		if (inputSource.Contains("Thumb Stick"))
+		if (inputSource.Contains("thumbstick"))
 		{
-			if (hand.Contains("Left"))
+			if (hand.Contains("left"))
 			{
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Left_Stick.png");
 			}
-			if (hand.Contains("Right"))
+			if (hand.Contains("right"))
 			{
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Right_Stick.png");
 			}

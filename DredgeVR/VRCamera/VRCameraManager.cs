@@ -20,16 +20,15 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand RightHand { get; private set; }
 
 	public static Transform AnchorTransform { get; private set; }
-	private Transform _pivot;
+	private Transform _pivot, _root;
+
+	private float _gameAnchorYPosition = 0.8f;
 
 	public void Awake()
 	{
 		Instance = this;
 
 		_camera = GetComponent<Camera>();
-
-		// This thing tries to take over and breaks our tracking
-		GetComponent<CinemachineBrain>().enabled = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -41,7 +40,9 @@ public class VRCameraManager : MonoBehaviour
 		RightHand.hand = SteamVR_Input_Sources.RightHand;
 
 		// Parent everything to a new "pivot" object
+		_root = new GameObject("PlayerRoot").transform;
 		_pivot = new GameObject("VRCameraPivot").transform;
+		_pivot.parent = _root;
 		VRPlayer.origin = _pivot;
 
 		transform.parent = _pivot;
@@ -62,7 +63,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnSceneStart(string _)
 	{
-		// Always have a ResetTransform on each scene, then the other events handle positioning it properly if need be
+		// Always have a AnchorTransform on each scene, then the other events handle positioning it properly if need be
 
 		// Can persist between scenes if it wasn't parented to a game object
 		if (AnchorTransform == null)
@@ -73,7 +74,8 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.position = Vector3.zero;
 		AnchorTransform.rotation = Quaternion.identity;
 
-		Delay.FireInNUpdates(2, ResetPosition);
+		// Weird timing on this
+		Delay.FireInNUpdates(2, RecenterCamera);
 	}
 
 	private void OnTitleSceneStart()
@@ -95,10 +97,10 @@ public class VRCameraManager : MonoBehaviour
 			{
 				// Make the player follow the boat
 				AnchorTransform.parent = GameManager.Instance.Player.transform;
-				AnchorTransform.localPosition = new Vector3(0, 1, -2);
+				AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
 				AnchorTransform.localRotation = Quaternion.identity;
 
-				Delay.FireOnNextUpdate(ResetPosition);
+				Delay.FireOnNextUpdate(RecenterCamera);
 			}
 		);
 	}
@@ -110,32 +112,41 @@ public class VRCameraManager : MonoBehaviour
 
 		if (AnchorTransform != null)
 		{
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				RecenterCamera();
+			}
+
 			// In the game scene force a constant ResetTransform y position
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (OptionsManager.Options.lockViewToHorizon)
+				if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
 				{
 					// Don't take on origin pitch rotation because that is turbo motion sickness
-					var forwardOnPlane = AnchorTransform.forward.ProjectOntoPlane(Vector3.up);
-					VRPlayer.origin.transform.rotation = Quaternion.FromToRotation(Vector3.back, forwardOnPlane);
+					var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
+					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
 				}
 
 				// Helps when you ram into stuff to not bounce around
-				var anchorY = OptionsManager.Options.lockCameraYPosition ? 0.66f : AnchorTransform.position.y;
+				var anchorY = OptionsManager.Options.lockCameraYPosition ? _gameAnchorYPosition : AnchorTransform.position.y;
 				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
 			}
 
-			VRPlayer.origin.transform.position = AnchorTransform.position;
+			_root.transform.position = AnchorTransform.position;
+			_root.transform.rotation = AnchorTransform.rotation;
 		}
 	}
 
-	public void ResetPosition()
+	public void RecenterCamera()
 	{
-		var rotationAngleY = AnchorTransform.rotation.eulerAngles.y - VRPlayer.transform.rotation.eulerAngles.y;
-		_pivot.Rotate(0, rotationAngleY, 0);
+		if (AnchorTransform != null)
+		{
+			var rotationAngleY = VRPlayer.transform.rotation.eulerAngles.y - AnchorTransform.rotation.eulerAngles.y;
+			_pivot.Rotate(0, -rotationAngleY, 0);
 
-		var distanceDiff = AnchorTransform.position - _pivot.position;
-		_pivot.transform.position += distanceDiff;
+			var distanceDiff = VRPlayer.transform.position - AnchorTransform.position;
+			_pivot.position -= new Vector3(distanceDiff.x, 0f, distanceDiff.z);
+		}
 	}
 }

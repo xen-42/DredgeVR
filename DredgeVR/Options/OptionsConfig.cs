@@ -24,13 +24,7 @@ public class OptionsConfig
 	public bool lockCameraYPosition = true;
 
 	/// <summary>
-	/// Keep this on unless you have a beast of a PC, not sure why but the terrain LOD just obliterates my frames.
-	/// </summary>
-	[JsonProperty]
-	public bool lowerTerrainLOD = true;
-
-	/// <summary>
-	/// True to use left hand for pointer, false for right. Also mirrors controls.
+	/// True to use left hand for pointer, false for right.
 	/// </summary>
 	[JsonProperty]
 	public bool leftHanded;
@@ -40,4 +34,40 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool useFlatUI;
+
+	/// <summary>
+	/// Improves frames for me
+	/// </summary>
+	[JsonProperty]
+	public bool lockPhysicsUpdateRateToRenderFrequency = true;
+
+	/// <summary>
+	/// Keep this on unless you have a beast of a PC, not sure why but the terrain LOD just obliterates my frames.
+	/// </summary>
+	[JsonProperty]
+	public bool lowerTerrainLOD = true; 
+
+	/// <summary>
+	/// Disables particles that aren't essential to gameplay. Improves performance
+	/// </summary>
+	[JsonProperty]
+	public bool disableExtraParticleEffects = false;
+
+	/// <summary>
+	/// Disables particles effects over 100m away. Improves performance
+	/// </summary>
+	[JsonProperty]
+	public bool disableDistantParticleEffects = true;
+
+	/// <summary>
+	/// Not ideal for now because it makes some rocks literally invisible, but helps with performance.
+	/// </summary>
+	[JsonProperty]
+	public bool decreaseLOD = false;
+
+	/// <summary>
+	/// Improves perforemance
+	/// </summary>
+	[JsonProperty]
+	public bool removeTrees = false;
 }

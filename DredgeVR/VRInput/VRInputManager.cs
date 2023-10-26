@@ -1,8 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using InControl;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Valve.VR;
@@ -11,17 +9,11 @@ namespace DredgeVR.VRInput;
 
 public class VRInputManager : MonoBehaviour
 {
-	public static VRInputManager Instance { get; private set; }
-
-	public static PlayerAction ResetCamera { get; private set; }
-
 	public static Vector2 LeftThumbStick { get; private set; }
 	public static Vector2 RightThumbStick { get; private set; }
 
 	public void Awake()
 	{
-		Instance = this;
-
 		SteamVR_Actions._default.LeftHandPose.AddOnUpdateListener(SteamVR_Input_Sources.LeftHand, LeftHandUpdate);
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
@@ -30,51 +22,56 @@ public class VRInputManager : MonoBehaviour
 
 		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
 
-		DredgeVRCore.TitleSceneStart += InitControls;
+		InitControls();
+
+		// Sometimes the controls just don't work
+		DredgeVRCore.TitleSceneStart += GameManager.Instance.Input.ResetAllBindings;
+		DredgeVRCore.GameSceneStart += GameManager.Instance.Input.ResetAllBindings;
 	}
 
-	/// <summary>
-	/// Timing on this is so wack
-	/// </summary>
-	private void InitControls()
+	public void OnDestroy()
 	{
-		DredgeVRCore.TitleSceneStart -= InitControls;
+		DredgeVRCore.TitleSceneStart -= GameManager.Instance.Input.ResetAllBindings;
+		DredgeVRCore.GameSceneStart -= GameManager.Instance.Input.ResetAllBindings;
+	}
 
+	public static void InitControls()
+	{
 		var cancel = SteamVR_Actions._default.Cancel;
 
-		Delay.FireInNUpdates(10, () =>
-		{
-			AddNewBinding(GameManager.Instance.Input.Controls.Undock, cancel); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Back, cancel); // X
-			AddNewBinding(GameManager.Instance.Input.Controls.Skip, cancel); // Escape
+		AddNewBinding(GameManager.Instance.Input.Controls.Undock, cancel); // X
+		AddNewBinding(GameManager.Instance.Input.Controls.Back, cancel); // X
+		AddNewBinding(GameManager.Instance.Input.Controls.Skip, cancel); // Escape
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, SteamVR_Actions._default.RadialSelectShow); // E
+		AddNewBinding(GameManager.Instance.Input.Controls.RadialSelectShow, SteamVR_Actions._default.RadialSelectShow); // E
 
-			AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, SteamVR_Actions._default.DiscardItem); // Mouse2
-			AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, SteamVR_Actions._default.DoAbility); // Mouse2
+		AddNewBinding(GameManager.Instance.Input.Controls.DiscardItem, SteamVR_Actions._default.DiscardItem); // Mouse2
+		AddNewBinding(GameManager.Instance.Input.Controls.DoAbility, SteamVR_Actions._default.DoAbility); // Mouse2
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Interact, SteamVR_Actions._default.Interact); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.Reel, SteamVR_Actions._default.Reel); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.SellItem, SteamVR_Actions._default.SellItem); // F
-			AddNewBinding(GameManager.Instance.Input.Controls.BuyItem, SteamVR_Actions._default.BuyItem); // F
+		AddNewBinding(GameManager.Instance.Input.Controls.Interact, SteamVR_Actions._default.Interact); // F
+		AddNewBinding(GameManager.Instance.Input.Controls.Reel, SteamVR_Actions._default.Reel); // F
+		AddNewBinding(GameManager.Instance.Input.Controls.SellItem, SteamVR_Actions._default.SellItem); // F
+		AddNewBinding(GameManager.Instance.Input.Controls.BuyItem, SteamVR_Actions._default.BuyItem); // F
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Confirm, SteamVR_Actions._default.Confirm); // Mouse1
-			AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, SteamVR_Actions._default.Confirm); // Mouse1
+		AddNewBinding(GameManager.Instance.Input.Controls.Confirm, SteamVR_Actions._default.Confirm); // Mouse1
+		AddNewBinding(GameManager.Instance.Input.Controls.PickUpPlace, SteamVR_Actions._default.Confirm); // Mouse1
 
-			AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, SteamVR_Actions._default.RotateClockwise); // One Axis
-			AddNewBinding(GameManager.Instance.Input.Controls.RotateCounterClockwise, SteamVR_Actions._default.RotateCounterClockwise); // One Axis
+		AddNewBinding(GameManager.Instance.Input.Controls.RotateClockwise, SteamVR_Actions._default.RotateClockwise); // One Axis
+		AddNewBinding(GameManager.Instance.Input.Controls.RotateCounterClockwise, SteamVR_Actions._default.RotateCounterClockwise); // One Axis
 
-			AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, SteamVR_Actions._default.ToggleCargo); // Tab
+		AddNewBinding(GameManager.Instance.Input.Controls.ToggleCargo, SteamVR_Actions._default.ToggleCargo); // Tab
 
-			AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
-			AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
-		});
+		AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
+		AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
+
+		new CustomControl(SteamVR_Actions._default.RecenterCamera, VRCameraManager.Instance.RecenterCamera);
 	}
 
-	private void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
+	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
-		action.AddDefaultBinding(new VRBindingSource(vrAction));
-		action.ResetBindings();
+		var vrBindingSource = new VRBindingSource(vrAction);
+		action.AddDefaultBinding(vrBindingSource);
+		action.AddBinding(vrBindingSource);
 
 		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
 	}

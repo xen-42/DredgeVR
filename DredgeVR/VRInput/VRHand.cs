@@ -1,9 +1,6 @@
 ﻿using DredgeVR.Helpers;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.ResourceManagement;
 using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.VRInput;
 
@@ -21,10 +18,6 @@ public class VRHand : MonoBehaviour
 
 	public void Start()
 	{
-		// Loading buoys off the title screen
-		// Probably should move this to a bundle but idc
-		DredgeVRCore.TitleSceneStart += InitGraphics;
-
 		RaycastCamera = new GameObject("RaycastCamera").AddComponent<Camera>();
 		RaycastCamera.transform.parent = transform;
 		RaycastCamera.transform.localPosition = Vector3.zero;
@@ -52,6 +45,8 @@ public class VRHand : MonoBehaviour
 
 		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
 		OnDominantHandChanged(VRInputModule.Instance.DominantHandInputSource);
+
+		InitGraphics();
 	}
 
 	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
@@ -59,23 +54,18 @@ public class VRHand : MonoBehaviour
 		IsDominantHand = dominantHand == hand;
 	}
 
-	/// <summary>
-	/// First time the title scene loads we'll steal some buoys and shaders for our hand graphics
-	/// </summary>
 	private void InitGraphics()
 	{
-		DredgeVRCore.TitleSceneStart -= InitGraphics;
-
 		// Need a fresh material for our laser pointer
 		var material = new Material(AssetLoader.LitShader);
 
 		var lineMR = _line.GetComponent<MeshRenderer>();
 		lineMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-		lineMR.material = material;
+		lineMR.sharedMaterial = material;
 
 		var endMR = LaserPointerEnd.GetComponent<MeshRenderer>();
 		endMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-		endMR.material = material;
+		endMR.sharedMaterial = material;
 
 		_graphicsInitialized = true;
 	}

@@ -8,6 +8,15 @@ public class VRBindingSource : BindingSource
 {
 	public SteamVR_Action_Boolean action;
 
+	public string GetButtonName()
+	{
+		// Keep these localized because they will appear in text strings
+		var button = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_InputSource);
+		var hand = action.GetLocalizedOriginPart(SteamVR_Input_Sources.Any, EVRInputStringBits.VRInputString_Hand);
+
+		return $"{button} ({hand})";
+	}
+
 	public VRBindingSource(SteamVR_Action_Boolean action)
 	{
 		this.action = action;

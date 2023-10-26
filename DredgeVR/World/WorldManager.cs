@@ -3,6 +3,9 @@ using DredgeVR.Items;
 using DredgeVR.Options;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using static UnityEngine.ParticleSystem;
 
 namespace DredgeVR.World;
 
@@ -12,12 +15,35 @@ namespace DredgeVR.World;
 /// </summary>
 internal class WorldManager : MonoBehaviour
 {
+	// Magic number found online, without this LOD is inconsistent between eyes
+	public const float LOD_BIAS = 3.8f;
+
 	public void Awake()
 	{
-		QualitySettings.lodBias = 3.8f;
+		QualitySettings.lodBias = LOD_BIAS;
+
+		if (OptionsManager.Options.decreaseLOD)
+		{
+			QualitySettings.maximumLODLevel = 1;
+		}
+
+		QualitySettings.vSyncCount = 2;
+
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// Shadows do not work in OpenVR with URP
+		urp.SetValue("m_MainLightShadowsSupported", false);
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
+	}
+
+	public void OnDestroy()
+	{
+		DredgeVRCore.SceneStart -= OnSceneStart;
+		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
+
 	}
 
 	private void OnSceneStart(string scene)
@@ -30,7 +56,7 @@ internal class WorldManager : MonoBehaviour
 				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
 			}
 
-			terrain.treeLODBiasMultiplier = 3.8f; // Magic number
+			terrain.treeLODBiasMultiplier = LOD_BIAS;
 		}
 
 		// Reflections look super weird in VR - Make sure its off when we load in
@@ -38,8 +64,24 @@ internal class WorldManager : MonoBehaviour
 
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{
-			var emission = particleSystem.emission;
-			emission.rateOverTimeMultiplier = 0.8f;
+			if (OptionsManager.Options.disableExtraParticleEffects)
+			{
+				particleSystem.gameObject.SetActive(particleSystem.gameObject.GetComponentInParent<HarvestableParticles>() != null);
+			}
+			else
+			{
+				var emission = particleSystem.emission;
+				emission.rateOverTimeMultiplier = 0.5f;
+			}
+		}
+
+		if (OptionsManager.Options.removeTrees)
+		{
+			foreach (var tree in GameObject.FindObjectsOfType<GameObject>().Where(x => x.name == "Trees"))
+			{
+				tree.SetActive(false);
+			}
+			GameObject.Find("TheMarrows/Islands/LittleMarrow/Details").SetActive(false);
 		}
 	}
 
@@ -52,38 +94,69 @@ internal class WorldManager : MonoBehaviour
 			ghostRock.rockMeshObject.GetComponent<MeshRenderer>().material.shader = AssetLoader.LitShader;
 		}
 
-		// Have to wait a frame for the boat to exist
-		Delay.RunWhen(
-			() => GameManager.Instance.Player != null,
-			() =>
-			{
-				// Smoke columns use line renderers which don't work in VR
-				foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
-				{
-					smokeColumn.gameObject.SetActive(false);
-				}
-
-				// Set up held items
-				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldMap>();
-			}
-		);
-
-		// Replacing the shaders doesn't fix it, they still show in the wrong eyes
-		/*
-		var badShaders = new string[]
+		if (OptionsManager.Options.disableDistantParticleEffects)
 		{
-			"Shader Graphs/Particle_Shader",
-			"Shader Graphs/FloatingParticle_Shader",
-			"Shader Graphs/ShimmerWarp_Shader"
-		};
-
-		foreach (var particles in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
-		{
-			if (badShaders.Contains(particles.material.shader.name))
+			foreach (var harvestable in GameObject.FindObjectsOfType<HarvestableParticles>(true))
 			{
-				particles.material.shader = _litShader;
+				harvestable.gameObject.AddComponent<LODChildCuller>();
 			}
 		}
-		*/
+	}
+
+	public void OnPlayerSpawned()
+	{
+		// Smoke columns use line renderers which don't work in VR
+		foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
+		{
+			smokeColumn.gameObject.SetActive(false);
+		}
+
+		// Set up held items
+		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
+		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+
+		FixAllParticles();
+	}
+
+	private void FixAllParticles()
+	{
+		// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
+		// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
+
+		// TODO: Orient the rain so the particles follow their velocity
+		var rain = GameObject.Find("FollowPlayer/Rain");
+		FixParticles(rain.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, false);
+
+		var rainDrops = GameObject.Find("FollowPlayer/Rain/SubEmitter_RainSplashes");
+		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveQuad, true);
+
+		foreach (var inspectionPOI in GameObject.FindObjectsOfType<InspectPOI>())
+		{
+			FixParticles(inspectionPOI.GetComponentInChildren<ParticleSystemRenderer>(), AssetLoader.DoubleSidedQuad, true);
+		}
+
+		foreach (var harvestableParticles in GameObject.FindObjectsOfType<HarvestableParticles>())
+		{
+			var beams = harvestableParticles.transform.Find("Beam")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			var embers = harvestableParticles.transform.Find("Embers")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			foreach (var particle in beams.Concat(embers))
+			{
+				FixParticles(particle, AssetLoader.DoubleSidedQuad, true);
+			}
+		}
+	}
+
+	private void FixParticles(ParticleSystemRenderer renderer, Mesh mesh, bool lookAtPlayer)
+	{
+		if (renderer != null)
+		{
+			renderer.renderMode = ParticleSystemRenderMode.Mesh;
+			if (lookAtPlayer)
+			{
+				renderer.gameObject.AddComponent<LookAtPlayer>();
+			}
+			renderer.mesh = mesh;
+			renderer.alignment = ParticleSystemRenderSpace.Local;
+		}
 	}
 }

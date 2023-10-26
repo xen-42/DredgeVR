@@ -19,6 +19,7 @@ internal class VRInputModule : BaseInputModule
 	public Camera RaycastCamera;
 	public SteamVR_Input_Sources DominantHandInputSource { get; private set; }
 	public VRHand DominantHand { get; private set; }
+	public VRHand OffHand { get; private set; }
 	public Action<SteamVR_Input_Sources> DominantHandChanged;
 
 	public SteamVR_Action_Boolean UIClickAction;
@@ -49,6 +50,8 @@ internal class VRInputModule : BaseInputModule
 		DominantHandInputSource = left ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
 		UIClickAction = SteamVR_Actions._default.Confirm;
 
+		OffHand = left ? VRCameraManager.RightHand : VRCameraManager.LeftHand;
+
 		DominantHandChanged?.Invoke(DominantHandInputSource);
 	}
 
@@ -66,7 +69,7 @@ internal class VRInputModule : BaseInputModule
 
 		HandlePointerExitAndEnter(Data, _currentObject);
 
-		if (UIClickAction.GetStateDown(DominantHandInputSource))
+		if (UIClickAction.GetStateDown(SteamVR_Input_Sources.Any))
 		{
 			Data.pointerPressRaycast = Data.pointerCurrentRaycast;
 			var newPointerPress = ExecuteEvents.ExecuteHierarchy(_currentObject, Data, ExecuteEvents.pointerDownHandler) 
@@ -78,7 +81,7 @@ internal class VRInputModule : BaseInputModule
 			DredgeVRLogger.Info("Clicked");
 		}
 
-		if (UIClickAction.GetStateUp(DominantHandInputSource))
+		if (UIClickAction.GetStateUp(SteamVR_Input_Sources.Any))
 		{
 			ExecuteEvents.Execute(Data.pointerPress, Data, ExecuteEvents.pointerUpHandler);
 

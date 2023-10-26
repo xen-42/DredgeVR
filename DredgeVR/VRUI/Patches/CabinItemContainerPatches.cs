@@ -7,6 +7,16 @@ namespace DredgeVR.VRUI.Patches;
 [HarmonyPatch(typeof(CabinItemContainer))]
 public static class CabinItemContainerPatches
 {
+	[HarmonyPostfix]
+	[HarmonyPatch(nameof(CabinItemContainer.OnEnable))]
+	public static void CabinItemContainer_OnEnable(CabinItemContainer __instance)
+	{
+		var itemScroller = __instance.itemEntryContainer;
+		var nonSpatialItemGrid = __instance.itemEntryContainer.Find("NonSpatialItemGrid");
+		itemScroller.localPosition = Vector3.down * 80;
+		nonSpatialItemGrid.localPosition = Vector3.zero;
+	}
+
 	[HarmonyPrefix]
 	[HarmonyPatch(nameof(CabinItemContainer.OnEntrySelected))]
 	public static bool CabinItemContainer_OnEntrySelected(CabinItemContainer __instance, NonSpatialGridEntryUI entryUI)

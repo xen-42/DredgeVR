@@ -1,8 +1,13 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Items;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
+using FluffyUnderware.DevTools.Extensions;
+using System;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 using Valve.VR;
 
 namespace DredgeVR.VRUI;
@@ -17,7 +22,7 @@ internal class VRUIManager : MonoBehaviour
 
 	public void Awake()
 	{
-		SceneManager.activeSceneChanged += OnActiveSceneChanged;
+		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart += OnIntroCutsceneStart;
@@ -27,7 +32,7 @@ internal class VRUIManager : MonoBehaviour
 
 	public void OnDestroy()
 	{
-		SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
 		DredgeVRCore.IntroCutsceneStart -= OnIntroCutsceneStart;
@@ -43,14 +48,59 @@ internal class VRUIManager : MonoBehaviour
 		}
 	}
 
-	private void OnActiveSceneChanged(Scene prev, Scene current)
+	private void OnSceneStart(string scene)
 	{
-		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+		// On new save files theres a prompt they need to press here
+		if (scene == "Startup")
 		{
-			canvas.renderMode = RenderMode.WorldSpace;
-			canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
-			canvas.scaleFactor = 1f;
-			canvas.planeDistance = 1;
+			GameObject.FindObjectsOfType<Canvas>().FirstOrDefault(x => x.name == "Canvas" && x.gameObject.scene.name == "Startup").gameObject.AddComponent<GameCanvasFixer>();
+		}
+
+		if (scene == "Splash")
+		{
+			var splashScreen = GameObject.FindObjectOfType<SplashController>();
+			MakeCanvasWorldSpace(splashScreen.GetComponent<Canvas>());
+			splashScreen.gameObject.AddComponent<GameCanvasFixer>();
+
+			// Fixes it displaying directly on your far clip plane
+			var videoImage = splashScreen.gameObject.AddComponent<RawImage>();
+			videoImage.texture = new RenderTexture(1920, 1080, 1);
+			splashScreen.t17Video.aspectRatio = UnityEngine.Video.VideoAspectRatio.FitVertically;
+			splashScreen.t17Video.renderMode = UnityEngine.Video.VideoRenderMode.RenderTexture;
+			splashScreen.t17Video.targetTexture = (RenderTexture)videoImage.texture;
+		}
+		// If we do it on the splash screen we break unity explorer
+		else if (scene != "IntroCutscene")
+		{
+			foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
+			{
+				MakeCanvasWorldSpace(canvas);
+			}
+		}
+
+		// Some UI has 0 z size - messes up text
+		foreach (var rectTransform in Resources.FindObjectsOfTypeAll(typeof(RectTransform)).Cast<RectTransform>())
+		{
+			if (rectTransform.localScale.z == 0)
+			{
+				rectTransform.localScale = new Vector3(rectTransform.localScale.x, rectTransform.localScale.y, 1);
+			}
+		}
+	}
+
+	private void MakeCanvasWorldSpace(Canvas canvas)
+	{
+		canvas.renderMode = RenderMode.WorldSpace;
+		canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
+		canvas.scaleFactor = 1f;
+		canvas.planeDistance = 1;
+		var canvasScaler = canvas.gameObject.GetComponent<CanvasScaler>();
+		if (canvasScaler != null)
+		{
+			Destroy(canvasScaler);
+			// Canvas scaler already scaled it before it was world space unfortunately
+			canvas.transform.localScale = Vector3.one;
+			// Also repositions stuff
 		}
 	}
 
@@ -71,7 +121,7 @@ internal class VRUIManager : MonoBehaviour
 
 			// Attach right hand button prompts
 			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
-				.Init(true, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+				.Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
 
 			_hasInitialized = true;
 		}
@@ -99,31 +149,40 @@ internal class VRUIManager : MonoBehaviour
 
 		// Attach activity UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
 
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.2f, -0.2f), 1f);
+			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
 
-		// Cabin slide panel is wrong
-		var itemScroller = GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/PlayerTabbedPanelContainer/Panels/CabinPanel/Container/ItemScroller/NonSpatialItemGrid").transform;
-		itemScroller.localPosition = new Vector3(itemScroller.localPosition.x, itemScroller.localPosition.y, 0f);
+		// Remove scrims
+		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
+
+		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
+		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
 	}
 
 	private void OnIntroCutsceneStart()
 	{
-		// Reposition Scene1Container, Scene2Container, Scene3Container
-		var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
-
-		cutscene.transform.Find("Camera").gameObject.SetActive(false);
-
-		cutscene.transform.position = VRCameraManager.AnchorTransform.position + VRCameraManager.AnchorTransform.forward * 40f - VRCameraManager.AnchorTransform.up * 10f;
-		cutscene.transform.rotation = Quaternion.Euler(0, VRCameraManager.AnchorTransform.rotation.y, 0);
-
-		var scenes = new Transform[] { cutscene.transform.Find("Scene1Container"), cutscene.transform.Find("Scene2Container"), cutscene.transform.Find("Scene3Container") };
-		foreach (var scene in scenes)
+		try
 		{
-			scene.transform.localPosition = Vector3.zero;
+			var cutsceneRenderer = new GameObject("CutsceneRenderTexture").gameObject.AddComponent<RawImage>();
+			cutsceneRenderer.texture = new RenderTexture(1920, 1080, 1);
+			var cutsceneRendererCanvas = cutsceneRenderer.gameObject.AddComponent<Canvas>();
+			cutsceneRendererCanvas.scaleFactor = 5f;
+			MakeCanvasWorldSpace(cutsceneRendererCanvas);
+			cutsceneRenderer.transform.position = new Vector3(0, 1, 2);
+			cutsceneRenderer.transform.localScale = Vector3.one * 0.02f;
+
+			var cutscene = GameObject.FindObjectOfType<IntroIllustratedCutscene>();
+			cutscene.transform.position = new Vector3(0, 0, -5000);
+			var camera = cutscene.transform.Find("Camera").gameObject.AddComponent<Camera>();
+
+			camera.targetTexture = (RenderTexture)cutsceneRenderer.texture;
+		}
+		catch (Exception e)
+		{
+			DredgeVRLogger.Error($"Couldn't set up intro cutscene ui: {e}");
 		}
 	}
 }

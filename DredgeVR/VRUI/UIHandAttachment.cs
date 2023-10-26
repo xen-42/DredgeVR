@@ -1,4 +1,5 @@
-﻿using DredgeVR.Options;
+﻿using DG.Tweening;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using UnityEngine;
 
@@ -9,11 +10,15 @@ public class UIHandAttachment : MonoBehaviour
 	public Vector3 _euler = new(45, 0, 0);
 	public Vector3 _offset = new(0.2f, 0, 0);
 	public float _scale = 1f;
-	public bool _dominantHand;
+	public bool _leftHand;
 
-	public void Init(bool dominantHand, Vector3 euler, Vector3 offset, float scale)
+	public bool smoothPosition = true;
+
+	private RectTransform _rectTransform;
+
+	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
-		_dominantHand = dominantHand;
+		_leftHand = !rightHand;
 		_euler = euler;
 		_offset = offset;
 		_scale = scale;
@@ -30,15 +35,54 @@ public class UIHandAttachment : MonoBehaviour
 			// Since it'll be flat double the size
 			transform.localScale = Vector3.one * 2f;
 		}
+
+		// For left handed switch the pivot over to be more consistent
+		_rectTransform = gameObject.GetComponent<RectTransform>();
+		if (_leftHand)
+		{
+			_rectTransform.pivot = new Vector2(1 - _rectTransform.pivot.x, _rectTransform.pivot.y);
+		}
+
+		// TODO: Fix canvas layers
+
+		// TODO: Allow targeting by touching with hand
+	}
+
+	public void Start()
+	{
+		transform.localScale = Vector3.one * _scale;
 	}
 
 	public void Update()
 	{
-		var leftHand = _dominantHand == OptionsManager.Options.leftHanded;
+		var handGO = _leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 
-		var handGO = leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
-		transform.position = handGO.transform.TransformPoint(new Vector3(_offset.x * (leftHand ? -1 : 1), _offset.y, _offset.z));
-		transform.rotation = handGO.transform.rotation * Quaternion.Euler(_euler);
-		transform.localScale = new Vector3(leftHand ? -_scale : _scale, _scale, _scale);
+		var rotatedOffset = Quaternion.Euler(_euler) * _offset;
+
+		var targetPosition = handGO.transform.TransformPoint(rotatedOffset);
+		var targetRotation = handGO.transform.rotation * Quaternion.Euler(_euler);
+		// For the left hand we have to rotate it 180 degrees around the Y axis
+		if (_leftHand)
+		{
+			targetRotation *= Quaternion.Euler(0, 180f, 0);
+		}
+
+		// Smoothly move to position/rotation to jitter less
+		var t = Time.unscaledDeltaTime * 15f;
+
+		if (smoothPosition)
+		{
+			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
+		}
+		else																								   
+		{
+			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+			// Snap angle
+			if (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
+			{
+				transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
+			}
+		}
 	}
 }
