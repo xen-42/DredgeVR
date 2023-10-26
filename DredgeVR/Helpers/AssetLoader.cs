@@ -26,6 +26,7 @@ public class AssetLoader
 	private static Shader _litShader;
 
 	public static Mesh PrimitiveQuad { get; private set; }
+	public static Mesh DoubleSidedQuad { get; private set; }
 	public static Mesh PrimitiveCylinder { get; private set; }
 
 	private static readonly Dictionary<string, Texture2D> _icons = new();
@@ -39,6 +40,8 @@ public class AssetLoader
 		var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
 		PrimitiveQuad = quad.GetComponent<MeshFilter>().mesh;
 		GameObject.Destroy(quad);
+
+		DoubleSidedQuad = GeometryHelper.MakeMeshDoubleFaced(PrimitiveQuad);
 
 		var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		PrimitiveCylinder = cylinder.GetComponent<MeshFilter>().mesh;

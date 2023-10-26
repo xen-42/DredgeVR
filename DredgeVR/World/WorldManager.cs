@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using static UnityEngine.ParticleSystem;
 
 namespace DredgeVR.World;
 
@@ -34,12 +35,15 @@ internal class WorldManager : MonoBehaviour
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 	}
 
 	public void OnDestroy()
 	{
 		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
+
 	}
 
 	private void OnSceneStart(string scene)
@@ -97,35 +101,62 @@ internal class WorldManager : MonoBehaviour
 				harvestable.gameObject.AddComponent<LODChildCuller>();
 			}
 		}
+	}
 
-		// Have to wait a frame for the boat to exist
-		Delay.RunWhen(
-			() => GameManager.Instance.Player != null,
-			() =>
+	public void OnPlayerSpawned()
+	{
+		// Smoke columns use line renderers which don't work in VR
+		foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
+		{
+			smokeColumn.gameObject.SetActive(false);
+		}
+
+		// Set up held items
+		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
+		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+
+		FixAllParticles();
+	}
+
+	private void FixAllParticles()
+	{
+		// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
+		// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
+
+		// TODO: Orient the rain so the particles follow their velocity
+		var rain = GameObject.Find("FollowPlayer/Rain");
+		FixParticles(rain.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, false);
+
+		var rainDrops = GameObject.Find("FollowPlayer/Rain/SubEmitter_RainSplashes");
+		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveQuad, true);
+
+		foreach (var inspectionPOI in GameObject.FindObjectsOfType<InspectPOI>())
+		{
+			FixParticles(inspectionPOI.GetComponentInChildren<ParticleSystemRenderer>(), AssetLoader.DoubleSidedQuad, true);
+		}
+
+		foreach (var harvestableParticles in GameObject.FindObjectsOfType<HarvestableParticles>())
+		{
+			var beams = harvestableParticles.transform.Find("Beam")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			var embers = harvestableParticles.transform.Find("Embers")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			foreach (var particle in beams.Concat(embers))
 			{
-				// Smoke columns use line renderers which don't work in VR
-				foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
-				{
-					smokeColumn.gameObject.SetActive(false);
-				}
-
-				// Set up held items
-				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
-				GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
-
-				// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
-				// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
-				foreach (var particle in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
-				{
-					if (particle.renderMode != ParticleSystemRenderMode.Mesh)
-					{
-						particle.mesh = AssetLoader.PrimitiveCylinder;
-						particle.renderMode = ParticleSystemRenderMode.Mesh;
-						particle.alignment = ParticleSystemRenderSpace.Local;
-					}
-				}
+				FixParticles(particle, AssetLoader.DoubleSidedQuad, true);
 			}
-		);
+		}
+	}
 
+	private void FixParticles(ParticleSystemRenderer renderer, Mesh mesh, bool lookAtPlayer)
+	{
+		if (renderer != null)
+		{
+			renderer.renderMode = ParticleSystemRenderMode.Mesh;
+			if (lookAtPlayer)
+			{
+				renderer.gameObject.AddComponent<LookAtPlayer>();
+			}
+			renderer.mesh = mesh;
+			renderer.alignment = ParticleSystemRenderSpace.Local;
+		}
 	}
 }

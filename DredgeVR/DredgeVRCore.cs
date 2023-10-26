@@ -24,6 +24,7 @@ namespace DredgeVR
 		public static Action GameSceneStart;
 		public static Action TitleSceneStart;
 		public static Action IntroCutsceneStart;
+		public static Action PlayerSpawned;
 
 		public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -72,6 +73,7 @@ namespace DredgeVR
 			{
 				case "Game":
 					GameSceneStart?.Invoke();
+					Delay.RunWhen(() => GameManager.Instance.Player != null, () => PlayerSpawned?.Invoke());
 					break;
 				case "Title":
 					TitleSceneStart?.Invoke();
