@@ -12,8 +12,8 @@ namespace DredgeVR.Helpers;
 /// </summary>
 public class AssetLoader
 {
-	public static GameObject LeftHandBase;
-	public static GameObject RightHandBase;
+	public static GameObject LeftHandBase { get; private set; }
+	public static GameObject RightHandBase { get; private set; }
 
 	public static Shader LitShader
 	{
@@ -25,6 +25,10 @@ public class AssetLoader
 	}
 	private static Shader _litShader;
 
+	public static Mesh PrimitiveQuad { get; private set; }
+	public static Mesh DoubleSidedQuad { get; private set; }
+	public static Mesh PrimitiveCylinder { get; private set; }
+
 	private static readonly Dictionary<string, Texture2D> _icons = new();
 
 	public AssetLoader()
@@ -32,6 +36,16 @@ public class AssetLoader
 		var bundle = AssetBundle.LoadFromFile(Path.Combine(DredgeVRCore.ModPath, "AssetBundles/dredgevr"));
 		LeftHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_left.prefab");
 		RightHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_right.prefab");
+
+		var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+		PrimitiveQuad = quad.GetComponent<MeshFilter>().mesh;
+		GameObject.Destroy(quad);
+
+		DoubleSidedQuad = GeometryHelper.MakeMeshDoubleFaced(PrimitiveQuad);
+
+		var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+		PrimitiveCylinder = cylinder.GetComponent<MeshFilter>().mesh;
+		GameObject.Destroy(cylinder);
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object

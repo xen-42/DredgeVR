@@ -3,6 +3,9 @@ using DredgeVR.Items;
 using DredgeVR.Options;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using static UnityEngine.ParticleSystem;
 
 namespace DredgeVR.World;
 
@@ -24,17 +27,23 @@ internal class WorldManager : MonoBehaviour
 			QualitySettings.maximumLODLevel = 1;
 		}
 
-		QualitySettings.shadows = ShadowQuality.Disable;
 		QualitySettings.vSyncCount = 2;
+
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// Shadows do not work in OpenVR with URP
+		urp.SetValue("m_MainLightShadowsSupported", false);
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 	}
 
 	public void OnDestroy()
 	{
 		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
+
 	}
 
 	private void OnSceneStart(string scene)
@@ -92,40 +101,62 @@ internal class WorldManager : MonoBehaviour
 				harvestable.gameObject.AddComponent<LODChildCuller>();
 			}
 		}
+	}
 
-		// Have to wait a frame for the boat to exist
-		Delay.RunWhen(
-			() => GameManager.Instance.Player != null,
-			() =>
-			{
-				// Smoke columns use line renderers which don't work in VR
-				foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
-				{
-					smokeColumn.gameObject.SetActive(false);
-				}
-
-				// Set up held items
-				GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
-				GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
-			}
-		);
-
-		// Replacing the shaders doesn't fix it, they still show in the wrong eyes
-		/*
-		var badShaders = new string[]
+	public void OnPlayerSpawned()
+	{
+		// Smoke columns use line renderers which don't work in VR
+		foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
 		{
-			"Shader Graphs/Particle_Shader",
-			"Shader Graphs/FloatingParticle_Shader",
-			"Shader Graphs/ShimmerWarp_Shader"
-		};
+			smokeColumn.gameObject.SetActive(false);
+		}
 
-		foreach (var particles in GameObject.FindObjectsOfType<ParticleSystemRenderer>())
+		// Set up held items
+		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
+		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+
+		FixAllParticles();
+	}
+
+	private void FixAllParticles()
+	{
+		// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
+		// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
+
+		// TODO: Orient the rain so the particles follow their velocity
+		var rain = GameObject.Find("FollowPlayer/Rain");
+		FixParticles(rain.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, false);
+
+		var rainDrops = GameObject.Find("FollowPlayer/Rain/SubEmitter_RainSplashes");
+		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveQuad, true);
+
+		foreach (var inspectionPOI in GameObject.FindObjectsOfType<InspectPOI>())
 		{
-			if (badShaders.Contains(particles.material.shader.name))
+			FixParticles(inspectionPOI.GetComponentInChildren<ParticleSystemRenderer>(), AssetLoader.DoubleSidedQuad, true);
+		}
+
+		foreach (var harvestableParticles in GameObject.FindObjectsOfType<HarvestableParticles>())
+		{
+			var beams = harvestableParticles.transform.Find("Beam")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			var embers = harvestableParticles.transform.Find("Embers")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
+			foreach (var particle in beams.Concat(embers))
 			{
-				particles.material.shader = _litShader;
+				FixParticles(particle, AssetLoader.DoubleSidedQuad, true);
 			}
 		}
-		*/
+	}
+
+	private void FixParticles(ParticleSystemRenderer renderer, Mesh mesh, bool lookAtPlayer)
+	{
+		if (renderer != null)
+		{
+			renderer.renderMode = ParticleSystemRenderMode.Mesh;
+			if (lookAtPlayer)
+			{
+				renderer.gameObject.AddComponent<LookAtPlayer>();
+			}
+			renderer.mesh = mesh;
+			renderer.alignment = ParticleSystemRenderSpace.Local;
+		}
 	}
 }
