@@ -3,6 +3,8 @@ using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using DredgeVR.VRUI;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Valve.VR;
@@ -48,6 +50,10 @@ public class VRCameraManager : MonoBehaviour
 		transform.parent = _pivot;
 		LeftHand.transform.parent = _pivot;
 		RightHand.transform.parent = _pivot;
+
+		var sceneLoadFade = new GameObject(nameof(SceneLoadFade), new Type[] { typeof(SceneLoadFade) });
+		sceneLoadFade.transform.parent = transform;
+		sceneLoadFade.transform.localPosition = Vector3.zero;	
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
