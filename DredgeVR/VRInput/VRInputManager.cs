@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using InControl;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Valve.VR;
@@ -34,6 +35,8 @@ public class VRInputManager : MonoBehaviour
 		DredgeVRCore.TitleSceneStart -= GameManager.Instance.Input.ResetAllBindings;
 		DredgeVRCore.GameSceneStart -= GameManager.Instance.Input.ResetAllBindings;
 	}
+
+	public static readonly Dictionary<PlayerAction, VRBindingSource> PlayerActionBindings = new();
 
 	public static void InitControls()
 	{
@@ -70,6 +73,7 @@ public class VRInputManager : MonoBehaviour
 	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
 		var vrBindingSource = new VRBindingSource(vrAction);
+		PlayerActionBindings[action] = vrBindingSource;
 		action.AddDefaultBinding(vrBindingSource);
 		action.AddBinding(vrBindingSource);
 

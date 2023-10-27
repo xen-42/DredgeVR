@@ -20,6 +20,10 @@ internal class VRUIManager : MonoBehaviour
 {
 	private bool _hasInitialized;
 
+	// So that if two things request to hide the UI we wait for both to stop before showing them
+	private static int _hideUIRequests;
+	public static Action<bool> HeldUIHidden;
+
 	public void Awake()
 	{
 		DredgeVRCore.SceneStart += OnSceneStart;
@@ -50,6 +54,9 @@ internal class VRUIManager : MonoBehaviour
 
 	private void OnSceneStart(string scene)
 	{
+		// Probably safest to reset this between scenes
+		_hideUIRequests = 0;
+
 		// On new save files theres a prompt they need to press here
 		if (scene == "Startup")
 		{
@@ -183,6 +190,25 @@ internal class VRUIManager : MonoBehaviour
 		catch (Exception e)
 		{
 			DredgeVRLogger.Error($"Couldn't set up intro cutscene ui: {e}");
+		}
+	}
+
+
+	public static void HideHeldUI()
+	{
+		if (_hideUIRequests == 0)
+		{
+			HeldUIHidden?.Invoke(true);
+		}
+		_hideUIRequests++;
+	}
+
+	public static void ShowHeldUI()
+	{
+		_hideUIRequests--;
+		if (_hideUIRequests == 0)
+		{
+			HeldUIHidden?.Invoke(false);
 		}
 	}
 }
