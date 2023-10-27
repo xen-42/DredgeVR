@@ -120,16 +120,8 @@ internal class VRUIManager : MonoBehaviour
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
-		// Remove prompts that aren't bound by default anyway
-		GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer/TopBar/RightControlPrompt").SetActive(false);
-		GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer/TopBar/LeftControlPrompt").SetActive(false);
-
 		// Remove controls tab for now since it doesnt work
-		var tabbedPanelContainer = GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>();
-		var controlTab = GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer/TopBar/Tabs/ControlTab").GetComponent<TabUI>();
-		tabbedPanelContainer.tabbedPanels.Remove(tabbedPanelContainer.tabbedPanels.First(x => x.tab == controlTab));
-		tabbedPanelContainer.showablePanelIndexes.RemoveAt(tabbedPanelContainer.showablePanelIndexes.Count() - 1);
-		controlTab.gameObject.SetActive(false);
+		RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
 
 		// These canvases are on the Manager scene and will persist the way they are
 		if (!_hasInitialized)
@@ -178,6 +170,9 @@ internal class VRUIManager : MonoBehaviour
 
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
+
+		// Remove controls tab since it doesn't work in UI
+		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
 	}
 
 	private void OnIntroCutsceneStart()
@@ -204,6 +199,13 @@ internal class VRUIManager : MonoBehaviour
 		}
 	}
 
+	private void RemoveControlsTab(TabbedPanelContainer tabbedPanelContainer)
+	{
+		var controlTab = tabbedPanelContainer.transform.Find("TopBar/Tabs/ControlTab").GetComponent<TabUI>();
+		tabbedPanelContainer.tabbedPanels.Remove(tabbedPanelContainer.tabbedPanels.First(x => x.tab == controlTab));
+		tabbedPanelContainer.showablePanelIndexes.RemoveAt(tabbedPanelContainer.showablePanelIndexes.Count() - 1);
+		controlTab.gameObject.SetActive(false);
+	}
 
 	public static void HideHeldUI()
 	{
