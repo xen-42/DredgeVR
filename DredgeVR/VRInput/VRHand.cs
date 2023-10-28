@@ -7,12 +7,13 @@ namespace DredgeVR.VRInput;
 public class VRHand : MonoBehaviour
 {
 	public Camera RaycastCamera { get; private set; }
-	private GameObject _line;
+	private GameObject _line, _fadedLine;
 	public GameObject LaserPointerEnd { get; private set; }
-	private bool _graphicsInitialized;
 
-	public float defaultLength = 5.0f;
+	public float defaultLength = 0.5f;
 	public SteamVR_Input_Sources hand;
+
+	public bool IsHoveringUI { get; private set; }
 
 	public bool IsDominantHand { get; private set; }
 
@@ -39,19 +40,36 @@ public class VRHand : MonoBehaviour
 		_line.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 		_line.name = "Line";
 
-		// Disable rendering until the graphics are initialized
-		LaserPointerEnd.SetActive(false);
-		_line.SetActive(false);
+		_fadedLine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+		Component.DestroyImmediate(_fadedLine.GetComponent<Collider>());
+		_fadedLine.transform.parent = RaycastCamera.transform;
+		_fadedLine.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+		_fadedLine.name = "FadedLine";
+
+		InitGraphics();
 
 		VRInputModule.Instance.DominantHandChanged += OnDominantHandChanged;
 		OnDominantHandChanged(VRInputModule.Instance.DominantHandInputSource);
-
-		InitGraphics();
 	}
 
 	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
 	{
 		IsDominantHand = dominantHand == hand;
+
+		if (LaserPointerEnd.activeInHierarchy != IsDominantHand)
+		{
+			LaserPointerEnd.SetActive(IsDominantHand);
+		}
+
+		if (_line.activeInHierarchy != IsDominantHand)
+		{
+			_line.SetActive(IsDominantHand);
+		}
+
+		if (_fadedLine.activeInHierarchy != IsDominantHand)
+		{
+			_fadedLine.SetActive(IsDominantHand);
+		}
 	}
 
 	private void InitGraphics()
@@ -63,19 +81,18 @@ public class VRHand : MonoBehaviour
 		lineMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		lineMR.sharedMaterial = material;
 
+		var fadedLineMR = _fadedLine.GetComponent<MeshRenderer>();
+		fadedLineMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		fadedLineMR.material = material;
+
 		var endMR = LaserPointerEnd.GetComponent<MeshRenderer>();
 		endMR.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		endMR.sharedMaterial = material;
-
-		_graphicsInitialized = true;
 	}
 
 	public void Update()
 	{
-		if (!_graphicsInitialized)
-		{
-			return;
-		}
+		IsHoveringUI = false;
 
 		if (IsDominantHand)
 		{
@@ -83,26 +100,41 @@ public class VRHand : MonoBehaviour
 			var inputRaycastDistance = VRInputModule.Instance?.Data == null
 				? 0f : VRInputModule.Instance.Data.pointerCurrentRaycast.distance;
 
-			var targetLength = inputRaycastDistance == 0 ? defaultLength : inputRaycastDistance;
+			IsHoveringUI = inputRaycastDistance > 0;
+
+			var targetLength = IsHoveringUI ? inputRaycastDistance : defaultLength;
 
 			// Only collide with UI
 			var endPosition = RaycastCamera.transform.position + RaycastCamera.transform.forward * targetLength;
 
-			LaserPointerEnd.transform.position = endPosition;
+			if (IsHoveringUI)
+			{
+				_line.transform.position = (transform.position + endPosition) / 2f;
+				_line.transform.localScale = new Vector3(0.005f, (transform.position - endPosition).magnitude / 2f, 0.005f);
 
-			_line.transform.position = (transform.position + endPosition) / 2f;
-			_line.transform.localScale = new Vector3(0.005f, (transform.position - endPosition).magnitude / 2f, 0.005f);
-		}
+				LaserPointerEnd.transform.position = endPosition;
+			}
+			else
+			{
+				_fadedLine.transform.position = (transform.position + endPosition) / 2f;
+				_fadedLine.transform.localScale = new Vector3(0.001f, (transform.position - endPosition).magnitude / 2f, 0.001f);
+			}
 
-		// Only show pointers when in use
-		if (LaserPointerEnd.activeInHierarchy != IsDominantHand)
-		{
-			LaserPointerEnd.SetActive(IsDominantHand);
-		}
-		
-		if (_line.activeInHierarchy != IsDominantHand)
-		{
-			_line.SetActive(IsDominantHand);
+			// Should show when colliding with UI
+			if (_line.activeInHierarchy != IsHoveringUI)
+			{
+				_line.gameObject.SetActive(IsHoveringUI);
+			}
+			if (LaserPointerEnd.activeInHierarchy != IsHoveringUI)
+			{
+				LaserPointerEnd.gameObject.SetActive(IsHoveringUI);
+			}
+
+			// Should show when not colliding with UI
+			if (_fadedLine.activeInHierarchy == IsHoveringUI)
+			{
+				_fadedLine.gameObject.SetActive(!IsHoveringUI);
+			}
 		}
 	}
 }
