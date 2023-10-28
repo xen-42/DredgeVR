@@ -128,7 +128,7 @@ internal class WorldManager : MonoBehaviour
 		FixParticles(rain.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, false);
 
 		var rainDrops = GameObject.Find("FollowPlayer/Rain/SubEmitter_RainSplashes");
-		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveQuad, true);
+		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, true);
 
 		foreach (var inspectionPOI in GameObject.FindObjectsOfType<InspectPOI>())
 		{
