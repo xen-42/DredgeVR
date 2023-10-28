@@ -22,21 +22,29 @@ public static class ControlPromptUIPatches
 			return;
 		}
 
+		// Can't use the actual childCount because theres some overlap between deleting old prompts and making new ones where it reports too many
+		var leftChildCount = 0;
+		var rightChildCount = 0;
 		foreach (var controlPrompt in __instance.controlPrompts)
 		{
 			// For stuff that isn't bound in VR just slap them on the non-dominant hand so they can be laser pointered
-			var handName = VRInputModule.Instance.DominantHand.hand == Valve.VR.SteamVR_Input_Sources.LeftHand ? "left" : "right";
+			var handName = (controlPrompt?.dredgePlayerAction?.playerAction as PlayerAction).GetHand();
 
-			var playerAction = controlPrompt?.dredgePlayerAction?.playerAction as PlayerAction;
-			if (playerAction != null && VRInputManager.PlayerActionBindings.TryGetValue(playerAction, out var vrBinding))
-			{
-				handName = vrBinding.action.GetHandName();
-			}
 			var hand = handName == "left" ? VRUIManager.LeftHandPromptsContainer : VRUIManager.RightHandPromptsContainer;
+			var promptIndex = handName == "left" ? leftChildCount : rightChildCount;
 
-			// Moves the prompt to the right hand
+			if (handName == "left")
+			{
+				leftChildCount++;
+			}
+			else
+			{
+				rightChildCount++;
+			}
+
+			// Moves the prompt to the proper hand
 			controlPrompt.gameObject.transform.parent = hand;
-			controlPrompt.gameObject.transform.localPosition = Vector3.zero;
+			controlPrompt.gameObject.transform.localPosition = Vector3.zero + (Vector3.up * 60f * promptIndex);
 			controlPrompt.gameObject.transform.localRotation = Quaternion.identity;
 		}
 	}

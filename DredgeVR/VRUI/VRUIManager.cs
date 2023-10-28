@@ -184,12 +184,13 @@ internal class VRUIManager : MonoBehaviour
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
 
 		// Attach activity UI to hand
+		// TODO: Split ability select UI from do ability UI
 		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
+			.Init(GameManager.Instance.Input.Controls.RadialSelectShow.GetHand() == "right", new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
 
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
+			.Init(GameManager.Instance.Input.Controls.ToggleCargo.GetHand() == "right", new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
 
 		// Remove scrims
 		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
