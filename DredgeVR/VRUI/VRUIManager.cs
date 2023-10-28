@@ -1,5 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using FluffyUnderware.DevTools.Extensions;
@@ -23,6 +24,9 @@ internal class VRUIManager : MonoBehaviour
 	// So that if two things request to hide the UI we wait for both to stop before showing them
 	private static int _hideUIRequests;
 	public static Action<bool> HeldUIHidden;
+
+	public static Transform LeftHandPromptsContainer { get; private set; }
+	public static Transform RightHandPromptsContainer { get; private set; }
 
 	public void Awake()
 	{
@@ -129,12 +133,34 @@ internal class VRUIManager : MonoBehaviour
 			// Make the loading screen UI show in front of the player too
 			GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
 
-			// Attach right hand button prompts
-			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
-				.Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+			// Create game objects for the left/right hand button prompts
+			var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
+			var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
+			var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
+
+			leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
+			rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+
+			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
+			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
 
 			_hasInitialized = true;
 		}
+	}
+
+	private GameObject CreatePromptContainer(string name, Transform parent)
+	{
+		var obj = new GameObject(name);
+		obj.transform.parent = parent;
+		obj.transform.localPosition = Vector3.zero;
+		obj.transform.localRotation = Quaternion.identity;
+
+		var container = new GameObject("Container");
+		container.transform.parent = obj.transform;
+		container.transform.localPosition = Vector3.zero;
+		container.transform.localRotation = Quaternion.identity;
+
+		return obj;
 	}
 
 	private void OnGameSceneStart()
@@ -173,6 +199,22 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove controls tab since it doesn't work in UI
 		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+
+		// Reposition some character dialogue stuff for fun
+		var dialogueContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/DialogueTextContainer").transform;
+		var nameContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/CharacterNameContainer").transform;
+
+		var container = new GameObject("Container").transform;
+		container.parent = dialogueContainer.parent;
+		container.localPosition = dialogueContainer.localPosition;
+		dialogueContainer.parent = container;
+		nameContainer.parent = container;
+		container.localPosition += Vector3.back * 400f;
+		container.localRotation = Quaternion.Euler(45f, 0f, 0f);
+
+		var optionsContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/OptionsContainer").transform;
+		optionsContainer.localPosition += Vector3.back * 240f;
+		optionsContainer.localRotation = Quaternion.Euler(0f, 20f, 0f);
 	}
 
 	private void OnIntroCutsceneStart()
