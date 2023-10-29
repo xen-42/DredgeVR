@@ -9,3 +9,6 @@ TODO:
     - Relic particles beam Shader Graphs/ShimmerWarp_Shader
 
 Shader Graphs/FishParticle_Shader works properly
+
+
+Custom prompts font was Microsoft YaHei UI
