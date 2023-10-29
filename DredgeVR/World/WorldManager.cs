@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using static UnityEngine.ParticleSystem;
 
 namespace DredgeVR.World;
 
@@ -55,6 +54,11 @@ internal class WorldManager : MonoBehaviour
 			{
 				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
 			}
+			if (OptionsManager.Options.disableUnderseaDetails) 
+			{
+				// The "trees and foliage" are actually rocks on the sea floor
+				terrain.drawTreesAndFoliage = false;
+			}
 
 			terrain.treeLODBiasMultiplier = LOD_BIAS;
 		}
@@ -101,6 +105,17 @@ internal class WorldManager : MonoBehaviour
 				harvestable.gameObject.AddComponent<LODChildCuller>();
 			}
 		}
+
+		if (OptionsManager.Options.disableCullingBrain)
+		{
+			// Actually destroying this breaks loading screens
+			// Important part is disconnecting all the CullingGroup events which happens in OnDestroy
+			var cullingBrain = GameManager.Instance.CullingBrain;
+			cullingBrain.OnDestroy();
+			// OnDestroy breaks the reference to the culling brain so we reconnect it so other scripts don't NRE
+			GameManager.Instance.CullingBrain = cullingBrain;
+		}
+
 	}
 
 	public void OnPlayerSpawned()

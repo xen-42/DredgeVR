@@ -11,11 +11,21 @@ public static class SteamVRExtensions
 
 	public static string GetButtonName(this SteamVR_Action_Boolean action)
 	{
-		return action.GetRenderModelComponentName(action.activeDevice);
+		var name = action.GetRenderModelComponentName(action.activeDevice);
+
+		// Need to get direction? I.e., for using trackpad up/down/left/right as buttons
+		// No idea how to do that
+
+		return name;
 	}
 
 	public static string GetHandName(this SteamVR_Action_Boolean action)
 	{
-		return action.activeDevice == SteamVR_Input_Sources.LeftHand ? "left" : "right";
+		return action.activeDevice switch
+		{
+			SteamVR_Input_Sources.LeftHand => "left",
+			SteamVR_Input_Sources.RightHand => "right",
+			_ => null,
+		};
 	}
 }

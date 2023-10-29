@@ -23,8 +23,6 @@ namespace Valve.VR
         
         private static SteamVR_Action_Vector2 p_default_Move;
         
-        private static SteamVR_Action_Vector2 p_default_RadialSelect;
-        
         private static SteamVR_Action_Boolean p_default_Confirm;
         
         private static SteamVR_Action_Boolean p_default_Cancel;
@@ -71,6 +69,20 @@ namespace Valve.VR
         
         private static SteamVR_Action_Boolean p_default_RecenterCamera;
         
+        private static SteamVR_Action_Boolean p_default_QuickMove;
+        
+        private static SteamVR_Action_Boolean p_default_OpenJournal;
+        
+        private static SteamVR_Action_Boolean p_default_OpenMap;
+        
+        private static SteamVR_Action_Boolean p_default_OpenEncyclopedia;
+        
+        private static SteamVR_Action_Boolean p_default_OpenMessages;
+        
+        private static SteamVR_Action_Boolean p_default_TabLeft;
+        
+        private static SteamVR_Action_Boolean p_default_TabRight;
+        
         private static SteamVR_Action_Vibration p_default_Haptic;
         
         public static SteamVR_Action_Skeleton default_SkeletonLeftHand
@@ -94,14 +106,6 @@ namespace Valve.VR
             get
             {
                 return SteamVR_Actions.p_default_Move.GetCopy<SteamVR_Action_Vector2>();
-            }
-        }
-        
-        public static SteamVR_Action_Vector2 default_RadialSelect
-        {
-            get
-            {
-                return SteamVR_Actions.p_default_RadialSelect.GetCopy<SteamVR_Action_Vector2>();
             }
         }
         
@@ -289,6 +293,62 @@ namespace Valve.VR
             }
         }
         
+        public static SteamVR_Action_Boolean default_QuickMove
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_QuickMove.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_OpenJournal
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_OpenJournal.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_OpenMap
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_OpenMap.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_OpenEncyclopedia
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_OpenEncyclopedia.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_OpenMessages
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_OpenMessages.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_TabLeft
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_TabLeft.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
+        public static SteamVR_Action_Boolean default_TabRight
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_TabRight.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
         public static SteamVR_Action_Vibration default_Haptic
         {
             get
@@ -303,7 +363,6 @@ namespace Valve.VR
                     SteamVR_Actions.default_SkeletonLeftHand,
                     SteamVR_Actions.default_SkeletonRightHand,
                     SteamVR_Actions.default_Move,
-                    SteamVR_Actions.default_RadialSelect,
                     SteamVR_Actions.default_Confirm,
                     SteamVR_Actions.default_Cancel,
                     SteamVR_Actions.default_Accept,
@@ -327,12 +386,18 @@ namespace Valve.VR
                     SteamVR_Actions.default_LeftHandPose,
                     SteamVR_Actions.default_RightHandPose,
                     SteamVR_Actions.default_RecenterCamera,
+                    SteamVR_Actions.default_QuickMove,
+                    SteamVR_Actions.default_OpenJournal,
+                    SteamVR_Actions.default_OpenMap,
+                    SteamVR_Actions.default_OpenEncyclopedia,
+                    SteamVR_Actions.default_OpenMessages,
+                    SteamVR_Actions.default_TabLeft,
+                    SteamVR_Actions.default_TabRight,
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsIn = new Valve.VR.ISteamVR_Action_In[] {
                     SteamVR_Actions.default_SkeletonLeftHand,
                     SteamVR_Actions.default_SkeletonRightHand,
                     SteamVR_Actions.default_Move,
-                    SteamVR_Actions.default_RadialSelect,
                     SteamVR_Actions.default_Confirm,
                     SteamVR_Actions.default_Cancel,
                     SteamVR_Actions.default_Accept,
@@ -355,7 +420,14 @@ namespace Valve.VR
                     SteamVR_Actions.default_RemoveMarker,
                     SteamVR_Actions.default_LeftHandPose,
                     SteamVR_Actions.default_RightHandPose,
-                    SteamVR_Actions.default_RecenterCamera};
+                    SteamVR_Actions.default_RecenterCamera,
+                    SteamVR_Actions.default_QuickMove,
+                    SteamVR_Actions.default_OpenJournal,
+                    SteamVR_Actions.default_OpenMap,
+                    SteamVR_Actions.default_OpenEncyclopedia,
+                    SteamVR_Actions.default_OpenMessages,
+                    SteamVR_Actions.default_TabLeft,
+                    SteamVR_Actions.default_TabRight};
             Valve.VR.SteamVR_Input.actionsOut = new Valve.VR.ISteamVR_Action_Out[] {
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsVibration = new Valve.VR.SteamVR_Action_Vibration[] {
@@ -384,18 +456,23 @@ namespace Valve.VR
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
                     SteamVR_Actions.default_RemoveMarker,
-                    SteamVR_Actions.default_RecenterCamera};
+                    SteamVR_Actions.default_RecenterCamera,
+                    SteamVR_Actions.default_QuickMove,
+                    SteamVR_Actions.default_OpenJournal,
+                    SteamVR_Actions.default_OpenMap,
+                    SteamVR_Actions.default_OpenEncyclopedia,
+                    SteamVR_Actions.default_OpenMessages,
+                    SteamVR_Actions.default_TabLeft,
+                    SteamVR_Actions.default_TabRight};
             Valve.VR.SteamVR_Input.actionsSingle = new Valve.VR.SteamVR_Action_Single[0];
             Valve.VR.SteamVR_Input.actionsVector2 = new Valve.VR.SteamVR_Action_Vector2[] {
-                    SteamVR_Actions.default_Move,
-                    SteamVR_Actions.default_RadialSelect};
+                    SteamVR_Actions.default_Move};
             Valve.VR.SteamVR_Input.actionsVector3 = new Valve.VR.SteamVR_Action_Vector3[0];
             Valve.VR.SteamVR_Input.actionsSkeleton = new Valve.VR.SteamVR_Action_Skeleton[] {
                     SteamVR_Actions.default_SkeletonLeftHand,
                     SteamVR_Actions.default_SkeletonRightHand};
             Valve.VR.SteamVR_Input.actionsNonPoseNonSkeletonIn = new Valve.VR.ISteamVR_Action_In[] {
                     SteamVR_Actions.default_Move,
-                    SteamVR_Actions.default_RadialSelect,
                     SteamVR_Actions.default_Confirm,
                     SteamVR_Actions.default_Cancel,
                     SteamVR_Actions.default_Accept,
@@ -416,7 +493,14 @@ namespace Valve.VR
                     SteamVR_Actions.default_ZoomMapIn,
                     SteamVR_Actions.default_ZoomMapOut,
                     SteamVR_Actions.default_RemoveMarker,
-                    SteamVR_Actions.default_RecenterCamera};
+                    SteamVR_Actions.default_RecenterCamera,
+                    SteamVR_Actions.default_QuickMove,
+                    SteamVR_Actions.default_OpenJournal,
+                    SteamVR_Actions.default_OpenMap,
+                    SteamVR_Actions.default_OpenEncyclopedia,
+                    SteamVR_Actions.default_OpenMessages,
+                    SteamVR_Actions.default_TabLeft,
+                    SteamVR_Actions.default_TabRight};
         }
         
         private static void PreInitActions()
@@ -424,7 +508,6 @@ namespace Valve.VR
             SteamVR_Actions.p_default_SkeletonLeftHand = ((SteamVR_Action_Skeleton)(SteamVR_Action.Create<SteamVR_Action_Skeleton>("/actions/default/in/SkeletonLeftHand")));
             SteamVR_Actions.p_default_SkeletonRightHand = ((SteamVR_Action_Skeleton)(SteamVR_Action.Create<SteamVR_Action_Skeleton>("/actions/default/in/SkeletonRightHand")));
             SteamVR_Actions.p_default_Move = ((SteamVR_Action_Vector2)(SteamVR_Action.Create<SteamVR_Action_Vector2>("/actions/default/in/Move")));
-            SteamVR_Actions.p_default_RadialSelect = ((SteamVR_Action_Vector2)(SteamVR_Action.Create<SteamVR_Action_Vector2>("/actions/default/in/RadialSelect")));
             SteamVR_Actions.p_default_Confirm = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/Confirm")));
             SteamVR_Actions.p_default_Cancel = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/Cancel")));
             SteamVR_Actions.p_default_Accept = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/Accept")));
@@ -448,6 +531,13 @@ namespace Valve.VR
             SteamVR_Actions.p_default_LeftHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/LeftHandPose")));
             SteamVR_Actions.p_default_RightHandPose = ((SteamVR_Action_Pose)(SteamVR_Action.Create<SteamVR_Action_Pose>("/actions/default/in/RightHandPose")));
             SteamVR_Actions.p_default_RecenterCamera = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/RecenterCamera")));
+            SteamVR_Actions.p_default_QuickMove = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/QuickMove")));
+            SteamVR_Actions.p_default_OpenJournal = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/OpenJournal")));
+            SteamVR_Actions.p_default_OpenMap = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/OpenMap")));
+            SteamVR_Actions.p_default_OpenEncyclopedia = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/OpenEncyclopedia")));
+            SteamVR_Actions.p_default_OpenMessages = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/OpenMessages")));
+            SteamVR_Actions.p_default_TabLeft = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/TabLeft")));
+            SteamVR_Actions.p_default_TabRight = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/TabRight")));
             SteamVR_Actions.p_default_Haptic = ((SteamVR_Action_Vibration)(SteamVR_Action.Create<SteamVR_Action_Vibration>("/actions/default/out/Haptic")));
         }
     }
