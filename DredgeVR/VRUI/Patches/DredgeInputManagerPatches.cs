@@ -1,15 +1,8 @@
-﻿using DredgeVR.Helpers;
-using DredgeVR.VRInput;
+﻿using DredgeVR.VRInput;
 using HarmonyLib;
 using InControl;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Valve.VR;
-using static DredgeVR.VRInput.VRInputManager;
 
 namespace DredgeVR.VRUI.Patches;
 

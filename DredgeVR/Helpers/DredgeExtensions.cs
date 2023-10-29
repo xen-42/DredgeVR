@@ -14,12 +14,14 @@ public static class DredgeExtensions
 	{
 		if (action != null && VRInputManager.PlayerActionBindings.TryGetValue(action, out var vrBinding))
 		{
-			return vrBinding.action.GetHandName();
+			var handName = vrBinding.action.GetHandName();
+			if (!string.IsNullOrEmpty(handName))
+			{
+				return vrBinding.action.GetHandName();
+			}
 		}
-		else
-		{
-			var dominantIsLeft = VRInputModule.Instance.DominantHand.hand == Valve.VR.SteamVR_Input_Sources.LeftHand;
-			return dominantIsLeft == defaultToDominant ? "left" : "right";
-		}
+
+		var dominantIsLeft = VRInputModule.Instance.DominantHand.hand == Valve.VR.SteamVR_Input_Sources.LeftHand;
+		return dominantIsLeft == defaultToDominant ? "left" : "right";
 	}
 }

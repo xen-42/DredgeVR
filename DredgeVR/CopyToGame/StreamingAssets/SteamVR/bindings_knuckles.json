@@ -64,15 +64,6 @@
             {
                "inputs" : {
                   "position" : {
-                     "output" : "/actions/default/in/radialselect"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
                      "output" : "/actions/default/in/move"
                   }
                },
@@ -195,6 +186,54 @@
                },
                "mode" : "button",
                "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/repairitem"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/repairall"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "east" : {
+                     "output" : "/actions/default/in/openmessages"
+                  },
+                  "north" : {
+                     "output" : "/actions/default/in/openjournal"
+                  },
+                  "south" : {
+                     "output" : "/actions/default/in/openencyclopedia"
+                  },
+                  "west" : {
+                     "output" : "/actions/default/in/openmap"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "click"
+               },
+               "path" : "/user/hand/right/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/quickmove"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/trackpad"
             }
          ]
       },

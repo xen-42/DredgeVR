@@ -73,16 +73,6 @@
           }
         },
         {
-          "path": "/user/hand/right/input/trackpad",
-          "mode": "trackpad",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/default/in/radialselect"
-            }
-          }
-        },
-        {
           "path": "/user/hand/right/input/application_menu",
           "mode": "button",
           "parameters": {},
