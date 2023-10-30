@@ -54,7 +54,7 @@ public class OptionsConfig
 	public bool disableUnderseaDetails = true;
 
 	/// <summary>
-	/// Dredge has a custom LOD implementation that causes a lot of lag. Improves performance but might use more memory? 
+	/// Dredge has a custom LOD implementation that causes a lot of lag. Greatly improves performance but might use more memory? 
 	/// </summary>
 	[JsonProperty]
 	public bool disableCullingBrain = true;
