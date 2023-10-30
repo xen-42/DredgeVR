@@ -47,7 +47,34 @@ public static class VRControlIcons
 
 	private static ControlIconData GetIndexControlIconData(string inputSource, string hand)
 	{
-		// TODO: Get Valve Index specific control icons
+		if (inputSource.Contains("trackpad"))
+		{
+			var prefix = hand.Contains("left") ? "AssetBundles/VR Icons/Index/Index_Left_Trackpad" : "AssetBundles/VR Icons/Index/Index_Right_Trackpad";
+			if (inputSource.Contains("left"))
+			{
+				return CreateData($"{prefix}_Left.png");
+			}
+			else if (inputSource.Contains("right"))
+			{
+				return CreateData($"{prefix}_Right.png");
+			}
+			else if (inputSource.Contains("up"))
+			{
+				return CreateData($"{prefix}_Up.png");
+			}
+			else if (inputSource.Contains("down"))
+			{
+				return CreateData($"{prefix}_Down.png");
+			}
+			else if (inputSource.Contains("press"))
+			{
+				return CreateData($"{prefix}_Press.png");
+			}
+			else
+			{
+				return CreateData($"{prefix}.png");
+			}
+		}
 
 		return GetOculusControlIconData(inputSource, hand);
 	}

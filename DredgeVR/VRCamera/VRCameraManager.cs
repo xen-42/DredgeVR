@@ -69,7 +69,7 @@ public class VRCameraManager : MonoBehaviour
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
-		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 	}
@@ -77,8 +77,8 @@ public class VRCameraManager : MonoBehaviour
 	public void OnDestroy()
 	{
 		DredgeVRCore.SceneStart -= OnSceneStart;
-		DredgeVRCore.TitleSceneStart -= OnGameSceneStart;
-		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
+		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
 	}
 
 	private void OnSceneStart(string _)
@@ -108,21 +108,14 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.LookAt(worldPos);
 	}
 
-	private void OnGameSceneStart()
+	private void OnPlayerSpawned()
 	{
-		// Boat takes a frame to exist
-		Delay.RunWhen(
-			() => GameManager.Instance.Player != null,
-			() =>
-			{
-				// Make the player follow the boat
-				AnchorTransform.parent = GameManager.Instance.Player.transform;
-				AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
-				AnchorTransform.localRotation = Quaternion.identity;
+		// Make the player follow the boat
+		AnchorTransform.parent = GameManager.Instance.Player.transform;
+		ResetAnchorToBoat();
+		AnchorTransform.localRotation = Quaternion.identity;
 
-				Delay.FireOnNextUpdate(RecenterCamera);
-			}
-		);
+		Delay.FireOnNextUpdate(RecenterCamera);
 	}
 
 	public void Update()
@@ -161,9 +154,11 @@ public class VRCameraManager : MonoBehaviour
 					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
 				}
 
-				// Helps when you ram into stuff to not bounce around
-				var anchorY = OptionsManager.Options.lockCameraYPosition ? _gameAnchorYPosition : AnchorTransform.position.y;
-				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
+				// If the camera y is locked but the boat is moving around the anchor point gets offset
+				if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+				{
+					ResetAnchorToBoat();
+				}
 			}
 
 			_root.transform.position = AnchorTransform.position;
@@ -175,11 +170,28 @@ public class VRCameraManager : MonoBehaviour
 	{
 		if (AnchorTransform != null)
 		{
+			// Can be moved around by the waves
+			if (SceneManager.GetActiveScene().name == "Game")
+			{
+				ResetAnchorToBoat();
+			}
+
 			var rotationAngleY = VRPlayer.transform.rotation.eulerAngles.y - AnchorTransform.rotation.eulerAngles.y;
 			_pivot.Rotate(0, -rotationAngleY, 0);
 
 			var distanceDiff = VRPlayer.transform.position - AnchorTransform.position;
 			_pivot.position -= new Vector3(distanceDiff.x, 0f, distanceDiff.z);
+		}
+	}
+
+	private void ResetAnchorToBoat()
+	{
+		AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
+
+		// Helps when you ram into stuff to not bounce around
+		if (OptionsManager.Options.lockCameraYPosition)
+		{
+			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
 		}
 	}
 

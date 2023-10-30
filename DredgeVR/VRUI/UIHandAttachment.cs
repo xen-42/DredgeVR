@@ -1,6 +1,8 @@
 ﻿using DG.Tweening;
+using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRCamera;
+using System;
 using UnityEngine;
 
 namespace DredgeVR.VRUI;
@@ -15,6 +17,8 @@ public class UIHandAttachment : MonoBehaviour
 	public bool smoothPosition = true;
 
 	private RectTransform _rectTransform;
+
+	private bool _hidden;
 
 	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
@@ -43,9 +47,16 @@ public class UIHandAttachment : MonoBehaviour
 			_rectTransform.pivot = new Vector2(1 - _rectTransform.pivot.x, _rectTransform.pivot.y);
 		}
 
+		VRUIManager.HeldUIHidden += OnHeldUIHidden;
+
 		// TODO: Fix canvas layers
 
 		// TODO: Allow targeting by touching with hand
+	}
+
+	public void OnDestroy()
+	{
+		VRUIManager.HeldUIHidden -= OnHeldUIHidden;
 	}
 
 	public void Start()
@@ -55,6 +66,11 @@ public class UIHandAttachment : MonoBehaviour
 
 	public void Update()
 	{
+		if (_hidden)
+		{
+			return;
+		}
+
 		var handGO = _leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 
 		var rotatedOffset = Quaternion.Euler(_euler) * _offset;
@@ -75,7 +91,7 @@ public class UIHandAttachment : MonoBehaviour
 			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
 			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
 		}
-		else																								   
+		else
 		{
 			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
 			// Snap angle
@@ -84,5 +100,13 @@ public class UIHandAttachment : MonoBehaviour
 				transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
 			}
 		}
+	}
+
+	public void OnHeldUIHidden(bool hidden)
+	{
+		// Some UI elements have logic on them which breaks if we disable them
+		// Just want to make them invisible
+		_hidden = hidden;
+		transform.localScale = Vector3.one * (hidden ? 0 : _scale);
 	}
 }

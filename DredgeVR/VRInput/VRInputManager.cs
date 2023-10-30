@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
 using InControl;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Valve.VR;
@@ -18,7 +19,6 @@ public class VRInputManager : MonoBehaviour
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
 		SteamVR_Actions._default.Move.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.Any);
-		SteamVR_Actions._default.RadialSelect.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.Any);
 
 		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
 
@@ -34,6 +34,8 @@ public class VRInputManager : MonoBehaviour
 		DredgeVRCore.TitleSceneStart -= GameManager.Instance.Input.ResetAllBindings;
 		DredgeVRCore.GameSceneStart -= GameManager.Instance.Input.ResetAllBindings;
 	}
+
+	public static readonly Dictionary<PlayerAction, VRBindingSource> PlayerActionBindings = new();
 
 	public static void InitControls()
 	{
@@ -64,12 +66,32 @@ public class VRInputManager : MonoBehaviour
 		AddNewBinding(GameManager.Instance.Input.Controls.Pause, SteamVR_Actions._default.Pause); // Escape
 		AddNewBinding(GameManager.Instance.Input.Controls.Unpause, SteamVR_Actions._default.Pause); // Escape
 
+		AddNewBinding(GameManager.Instance.Input.Controls.RepairAll, SteamVR_Actions._default.RepairAll);
+		AddNewBinding(GameManager.Instance.Input.Controls.RepairItem, SteamVR_Actions._default.RepairItem);
+		AddNewBinding(GameManager.Instance.Input.Controls.RepairMode, SteamVR_Actions._default.RepairMode);
+
+		AddNewBinding(GameManager.Instance.Input.Controls.ZoomMapIn, SteamVR_Actions._default.ZoomMapIn);
+		AddNewBinding(GameManager.Instance.Input.Controls.ZoomMapOut, SteamVR_Actions._default.ZoomMapOut);
+
+		AddNewBinding(GameManager.Instance.Input.Controls.RemoveMarker, SteamVR_Actions._default.RemoveMarker);
+
+		AddNewBinding(GameManager.Instance.Input.Controls.QuickMove, SteamVR_Actions._default.QuickMove);
+
+		AddNewBinding(GameManager.Instance.Input.Controls.OpenJournal, SteamVR_Actions._default.OpenJournal);
+		AddNewBinding(GameManager.Instance.Input.Controls.OpenMap, SteamVR_Actions._default.OpenMap);
+		AddNewBinding(GameManager.Instance.Input.Controls.OpenEncyclopedia, SteamVR_Actions._default.OpenEncyclopedia);
+		AddNewBinding(GameManager.Instance.Input.Controls.OpenMessages, SteamVR_Actions._default.OpenMessages);
+
+		AddNewBinding(GameManager.Instance.Input.Controls.TabLeft, SteamVR_Actions._default.TabLeft);
+		AddNewBinding(GameManager.Instance.Input.Controls.TabRight, SteamVR_Actions._default.TabRight);
+
 		new CustomControl(SteamVR_Actions._default.RecenterCamera, VRCameraManager.Instance.RecenterCamera);
 	}
 
 	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
 	{
 		var vrBindingSource = new VRBindingSource(vrAction);
+		PlayerActionBindings[action] = vrBindingSource;
 		action.AddDefaultBinding(vrBindingSource);
 		action.AddBinding(vrBindingSource);
 

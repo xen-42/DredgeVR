@@ -45,7 +45,19 @@ public class OptionsConfig
 	/// Keep this on unless you have a beast of a PC, not sure why but the terrain LOD just obliterates my frames.
 	/// </summary>
 	[JsonProperty]
-	public bool lowerTerrainLOD = true; 
+	public bool lowerTerrainLOD = true;
+
+	/// <summary>
+	/// Gets rid of rocks and other details on the sea floor. Improves performance.
+	/// </summary>
+	[JsonProperty]
+	public bool disableUnderseaDetails = true;
+
+	/// <summary>
+	/// Dredge has a custom LOD implementation that causes a lot of lag. Greatly improves performance but might use more memory? 
+	/// </summary>
+	[JsonProperty]
+	public bool disableCullingBrain = true;
 
 	/// <summary>
 	/// Disables particles that aren't essential to gameplay. Improves performance

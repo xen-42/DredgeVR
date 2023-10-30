@@ -3,13 +3,7 @@ using DredgeVR.VRInput;
 using HarmonyLib;
 using InControl;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Valve.VR;
-using static DredgeVR.VRInput.VRInputManager;
 
 namespace DredgeVR.VRUI.Patches;
 
@@ -24,7 +18,8 @@ public static class DredgeInputManagerPatches
 		{
 			var vrAction = ((VRBindingSource)action.Bindings?.FirstOrDefault(x => x is VRBindingSource))?.action;
 
-			if (vrAction != null)
+			// Checking if hand isn't bound is a good way to see if there's no binding set up
+			if (vrAction != null && !string.IsNullOrEmpty(vrAction.GetHandName()))
 			{
 				var controlIcon = VRControlIcons.GetControlIconData(vrAction);
 				if (controlIcon != null)

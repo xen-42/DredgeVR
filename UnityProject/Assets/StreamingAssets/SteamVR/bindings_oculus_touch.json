@@ -104,16 +104,6 @@
         },
         {
           "path": "/user/hand/right/input/joystick",
-          "mode": "joystick",
-          "parameters": {},
-          "inputs": {
-            "position": {
-              "output": "/actions/default/in/radialselect"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/joystick",
           "mode": "button",
           "parameters": {},
           "inputs": {
