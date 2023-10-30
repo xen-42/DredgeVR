@@ -37,8 +37,4 @@
 		<Reference Include="../dlls/*" />
   </ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="VRCamera\Patches\" />
-	</ItemGroup>
-
 </Project>

@@ -41,7 +41,8 @@ namespace DredgeVR
 			// Dredge uses one camera for all time which is nice
 			var head = new GameObject("Head");
 			Camera.main.gameObject.transform.parent = head.transform;
-			GameObject.Instantiate(Camera.main.gameObject, head.transform);
+			Camera.main.name = "LeftEye";
+			GameObject.Instantiate(Camera.main.gameObject, head.transform).name = "RightEye";
 			head.AddComponent<VRCameraManager>();
 
 			gameObject.AddComponent<VRInputManager>();

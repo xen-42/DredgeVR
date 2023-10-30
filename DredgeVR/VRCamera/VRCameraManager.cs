@@ -2,7 +2,9 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
@@ -14,7 +16,7 @@ public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private static Camera _camera1, _camera2;
+	private static Camera _leftCamera, _rightCamera;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -32,21 +34,15 @@ public class VRCameraManager : MonoBehaviour
 
 		var cameras = GetComponentsInChildren<Camera>();
 
-		_camera1 = cameras[0];
-		_camera1.transform.parent = transform;
-		_camera1.transform.localPosition = Vector3.zero;
-		_camera1.transform.localRotation = Quaternion.identity;
-		_camera1.gameObject.AddComponent<InvertCamera>();
+		_leftCamera = cameras[0];
+		_leftCamera.transform.parent = transform;
+		_leftCamera.transform.localPosition = Vector3.zero;
+		_leftCamera.transform.localRotation = Quaternion.identity;
 
-		_camera2 = cameras[1];
-		_camera2.transform.parent = transform;
-		_camera2.transform.localPosition = Vector3.zero;
-		_camera2.transform.localRotation = Quaternion.identity;
-		_camera2.gameObject.AddComponent<InvertCamera>();
-
-		// Fixes weirdly mirrored bloom
-		_camera1.GetUniversalAdditionalCameraData().renderPostProcessing = false;
-		_camera2.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+		_rightCamera = cameras[1];
+		_rightCamera.transform.parent = transform;
+		_rightCamera.transform.localPosition = Vector3.zero;
+		_rightCamera.transform.localRotation = Quaternion.identity;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -72,6 +68,9 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
+
+		// Cameras have to be inverted
+		GL.invertCulling = true;
 	}
 
 	public void OnDestroy()
@@ -94,12 +93,24 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.position = Vector3.zero;
 		AnchorTransform.rotation = Quaternion.identity;
 
+		// Bloom is weirdly mirrored
+		foreach (var volume in GameObject.FindObjectsOfType<Volume>())
+		{
+			if (volume.profile.components.FirstOrDefault(x => x is Bloom) is Bloom bloom)
+			{
+				bloom.intensity.value = 0f;
+			}
+		}
+
 		// Weird timing on this
 		Delay.FireInNUpdates(2, RecenterCamera);
 	}
 
 	private void OnTitleSceneStart()
 	{
+		// Reflections look super weird in VR - Make sure its off when we load in
+		// GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
+
 		// Make the player look towards the lighthouse
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
 		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
@@ -118,24 +129,28 @@ public class VRCameraManager : MonoBehaviour
 		Delay.FireOnNextUpdate(RecenterCamera);
 	}
 
+	public void LateUpdate()
+	{
+		// Have to set target texture in late update else it lags 
+		_leftCamera.aspect = SteamVR.instance.aspect;
+		_leftCamera.fieldOfView = SteamVR.instance.fieldOfView;
+		_leftCamera.stereoTargetEye = StereoTargetEyeMask.Left;
+		_leftCamera.projectionMatrix = _leftCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left);
+		_leftCamera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(0);
+
+		_rightCamera.aspect = SteamVR.instance.aspect;
+		_rightCamera.fieldOfView = SteamVR.instance.fieldOfView;
+		_rightCamera.stereoTargetEye = StereoTargetEyeMask.Right;
+		_rightCamera.projectionMatrix = _rightCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
+		_rightCamera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
+
+		// Idk why but when doing target texture everything is backwards
+		_leftCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
+		_rightCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
+	}
+
 	public void Update()
 	{
-		_camera1.aspect = SteamVR.instance.aspect;
-		_camera1.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera1.stereoTargetEye = StereoTargetEyeMask.Left;
-		_camera1.projectionMatrix = _camera1.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left);
-		_camera1.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(0);
-
-		_camera2.aspect = SteamVR.instance.aspect;
-		_camera2.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera2.stereoTargetEye = StereoTargetEyeMask.Right;
-		_camera2.projectionMatrix = _camera2.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
-		_camera2.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
-
-		GL.invertCulling = true;
-		_camera2.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-		_camera1.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-
 		if (AnchorTransform != null)
 		{
 			if (Input.GetKeyDown(KeyCode.Space))
@@ -192,19 +207,6 @@ public class VRCameraManager : MonoBehaviour
 		if (OptionsManager.Options.lockCameraYPosition)
 		{
 			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
-		}
-	}
-
-	public class InvertCamera : MonoBehaviour
-	{
-		public void OnPreCull()
-		{
-			//GL.invertCulling = true;
-		}
-
-		public void OnPostRender()
-		{
-			//GL.invertCulling = false;
 		}
 	}
 }

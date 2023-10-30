@@ -28,10 +28,6 @@ internal class WorldManager : MonoBehaviour
 
 		QualitySettings.vSyncCount = 2;
 
-		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
-		// Shadows do not work in OpenVR with URP
-		// urp.SetValue("m_MainLightShadowsSupported", false);
-
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
@@ -42,7 +38,6 @@ internal class WorldManager : MonoBehaviour
 		DredgeVRCore.SceneStart -= OnSceneStart;
 		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
 		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
-
 	}
 
 	private void OnSceneStart(string scene)
@@ -63,14 +58,14 @@ internal class WorldManager : MonoBehaviour
 			terrain.treeLODBiasMultiplier = LOD_BIAS;
 		}
 
-		// Reflections look super weird in VR - Make sure its off when we load in
-		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
+		/*
 		// Replace shader reflection texture
 		Shader.SetGlobalTexture(Shader.PropertyToID("_PlanarReflectionTexture"), new Texture2D(2, 2));
 
 		var waterMat = GameObject.FindObjectOfType<ReflectionSettingResponder>().waterMat;
 		waterMat.DisableKeyword("_REFLECTIONS");
 		waterMat.SetFloat("_ReflectionStrength", 0f);
+		*/
 
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{
