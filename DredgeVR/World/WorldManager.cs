@@ -58,25 +58,11 @@ internal class WorldManager : MonoBehaviour
 			terrain.treeLODBiasMultiplier = LOD_BIAS;
 		}
 
-		/*
-		// Replace shader reflection texture
-		Shader.SetGlobalTexture(Shader.PropertyToID("_PlanarReflectionTexture"), new Texture2D(2, 2));
-
-		var waterMat = GameObject.FindObjectOfType<ReflectionSettingResponder>().waterMat;
-		waterMat.DisableKeyword("_REFLECTIONS");
-		waterMat.SetFloat("_ReflectionStrength", 0f);
-		*/
-
 		foreach (var particleSystem in GameObject.FindObjectsOfType<ParticleSystem>())
 		{
 			if (OptionsManager.Options.disableExtraParticleEffects)
 			{
 				particleSystem.gameObject.SetActive(particleSystem.gameObject.GetComponentInParent<HarvestableParticles>() != null);
-			}
-			else
-			{
-				var emission = particleSystem.emission;
-				emission.rateOverTimeMultiplier = 0.5f;
 			}
 		}
 
@@ -92,13 +78,6 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnGameSceneStart()
 	{
-		// Ghost rocks only work in one eye, have to change their shader to one that works in both
-		// Unfortunately this gets rid of their cool effect and just makes them regular rocks
-		foreach (var ghostRock in GameObject.FindObjectsOfType<GhostRock>())
-		{
-			ghostRock.rockMeshObject.GetComponent<MeshRenderer>().material.shader = AssetLoader.LitShader;
-		}
-
 		if (OptionsManager.Options.disableDistantParticleEffects)
 		{
 			foreach (var harvestable in GameObject.FindObjectsOfType<HarvestableParticles>(true))
@@ -121,58 +100,8 @@ internal class WorldManager : MonoBehaviour
 
 	public void OnPlayerSpawned()
 	{
-		// Smoke columns use line renderers which don't work in VR
-		foreach (var smokeColumn in GameObject.FindObjectsOfType<SmokeColumn>(true))
-		{
-			smokeColumn.gameObject.SetActive(false);
-		}
-
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
-
-		FixAllParticles();
-	}
-
-	private void FixAllParticles()
-	{
-		// ParticleSystemRenderers that don't use RenderMode = Mesh only show in one eye
-		// Well, think it's more that alignment View doesn't actually face the right eye when rendering or something
-
-		// TODO: Orient the rain so the particles follow their velocity
-		var rain = GameObject.Find("FollowPlayer/Rain");
-		FixParticles(rain.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, false);
-
-		var rainDrops = GameObject.Find("FollowPlayer/Rain/SubEmitter_RainSplashes");
-		FixParticles(rainDrops.GetComponent<ParticleSystemRenderer>(), AssetLoader.PrimitiveCylinder, true);
-
-		foreach (var inspectionPOI in GameObject.FindObjectsOfType<InspectPOI>())
-		{
-			FixParticles(inspectionPOI.GetComponentInChildren<ParticleSystemRenderer>(), AssetLoader.DoubleSidedQuad, true);
-		}
-
-		foreach (var harvestableParticles in GameObject.FindObjectsOfType<HarvestableParticles>())
-		{
-			var beams = harvestableParticles.transform.Find("Beam")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
-			var embers = harvestableParticles.transform.Find("Embers")?.GetComponentsInChildren<ParticleSystemRenderer>() ?? new ParticleSystemRenderer[] { };
-			foreach (var particle in beams.Concat(embers))
-			{
-				FixParticles(particle, AssetLoader.DoubleSidedQuad, true);
-			}
-		}
-	}
-
-	private void FixParticles(ParticleSystemRenderer renderer, Mesh mesh, bool lookAtPlayer)
-	{
-		if (renderer != null)
-		{
-			renderer.renderMode = ParticleSystemRenderMode.Mesh;
-			if (lookAtPlayer)
-			{
-				renderer.gameObject.AddComponent<LookAtPlayer>();
-			}
-			renderer.mesh = mesh;
-			renderer.alignment = ParticleSystemRenderSpace.Local;
-		}
 	}
 }

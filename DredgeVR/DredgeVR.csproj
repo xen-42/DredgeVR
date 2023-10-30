@@ -37,4 +37,11 @@
 		<Reference Include="../dlls/*" />
   </ItemGroup>
 
+	<ItemGroup>
+	  <Compile Remove="VRCamera\NewFolder\**" />
+	  <EmbeddedResource Remove="VRCamera\NewFolder\**" />
+	  <None Remove="VRCamera\NewFolder\**" />
+	  <Reference Remove="VRCamera\NewFolder\**" />
+	</ItemGroup>
+
 </Project>

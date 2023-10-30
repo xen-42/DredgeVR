@@ -16,7 +16,8 @@ public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private static Camera _leftCamera, _rightCamera;
+	private Camera _leftCamera, _rightCamera;
+	private UniversalAdditionalCameraData _leftData, _rightData;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -44,6 +45,13 @@ public class VRCameraManager : MonoBehaviour
 		_rightCamera.transform.localPosition = Vector3.zero;
 		_rightCamera.transform.localRotation = Quaternion.identity;
 
+		// Else it tries to set these values back
+		GameObject.Destroy(_leftCamera.GetComponent<AntiAliasingSettingResponder>());
+		GameObject.Destroy(_rightCamera.GetComponent<AntiAliasingSettingResponder>());
+
+		_leftData = _leftCamera.GetUniversalAdditionalCameraData();
+		_rightData = _rightCamera.GetUniversalAdditionalCameraData();
+
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
 
@@ -68,9 +76,6 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
-
-		// Cameras have to be inverted
-		GL.invertCulling = true;
 	}
 
 	public void OnDestroy()
@@ -109,7 +114,7 @@ public class VRCameraManager : MonoBehaviour
 	private void OnTitleSceneStart()
 	{
 		// Reflections look super weird in VR - Make sure its off when we load in
-		// GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
+		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
 
 		// Make the player look towards the lighthouse
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
@@ -144,9 +149,20 @@ public class VRCameraManager : MonoBehaviour
 		_rightCamera.projectionMatrix = _rightCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
 		_rightCamera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
 
+		// Something was setting these back so we set them every frame
+		// Else there's weird reflections in the water
+		_leftData.antialiasing = AntialiasingMode.None;
+		_leftData.requiresDepthTexture = false;
+
+		_rightData.antialiasing = AntialiasingMode.None;
+		_rightData.requiresDepthTexture = false;
+
 		// Idk why but when doing target texture everything is backwards
 		_leftCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 		_rightCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
+
+		// Cameras have to be inverted
+		GL.invertCulling = true;
 	}
 
 	public void Update()
