@@ -11,6 +11,7 @@ public class RenderToScreen : MonoBehaviour
 {
 	private XRDisplaySubsystem _displaySubsystem;
 	private Material _flipYAxisMaterial;
+	private Texture _blackScreenTexture;
 
 	public void Awake()
 	{
@@ -19,20 +20,26 @@ public class RenderToScreen : MonoBehaviour
 		// VR render texture is upsidedown so we have to put a material on the texture
 		_flipYAxisMaterial = new Material(AssetLoader.FlipYAxisShader);
 
-		RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
+		_blackScreenTexture = Texture2D.blackTexture;
 	}
 
-	private void OnBeginContextRendering(ScriptableRenderContext arg1, System.Collections.Generic.List<Camera> arg2)
+	// OnGUI drew a second copy of the textures in world space
+	// OnBeginContextRendering drew several copies
+	// OnEndContextRendering only drew worldspace 
+	// LateUpdate worked then broke randomly somehow
+	// Update seems to work but we'll see
+	public void Update()
 	{
 		DrawToScreen();
 	}
 
 	private void DrawToScreen()
 	{
+		Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _blackScreenTexture, null, pass: 0);
 		var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
 		if (texture != null)
 		{
-			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial);
+			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial, pass: 0);
 		}
 	}
 
