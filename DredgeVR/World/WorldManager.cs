@@ -1,6 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
+using DredgeVR.VRUI;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -72,7 +73,7 @@ internal class WorldManager : MonoBehaviour
 			{
 				tree.SetActive(false);
 			}
-			GameObject.Find("TheMarrows/Islands/LittleMarrow/Details").SetActive(false);
+			GameObject.Find("TheMarrows/Islands/LittleMarrow/Details")?.SetActive(false);
 		}
 	}
 
