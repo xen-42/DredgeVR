@@ -1,6 +1,8 @@
 ﻿using DredgeVR.Helpers;
 using System;
+using System.Drawing.Text;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR;
 
 namespace DredgeVR.VRCamera;
@@ -16,12 +18,22 @@ public class RenderToScreen : MonoBehaviour
 
 		// VR render texture is upsidedown so we have to put a material on the texture
 		_flipYAxisMaterial = new Material(AssetLoader.FlipYAxisShader);
+
+		RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
 	}
 
-	public void LateUpdate()
+	private void OnBeginContextRendering(ScriptableRenderContext arg1, System.Collections.Generic.List<Camera> arg2)
+	{
+		DrawToScreen();
+	}
+
+	private void DrawToScreen()
 	{
 		var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
-		Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial);
+		if (texture != null)
+		{
+			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial);
+		}
 	}
 
 	private Rect FitToScreen(float screenWidth, float screenHeight, float textureWidth, float textureHeight, bool fitWidth = true)

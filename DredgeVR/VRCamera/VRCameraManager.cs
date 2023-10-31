@@ -160,6 +160,7 @@ public class VRCameraManager : MonoBehaviour
 		//_rightData.renderPostProcessing = false;
 
 		// Idk why but when doing target texture everything is backwards
+		GL.invertCulling = true;
 		_leftCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 		_rightCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 	}
