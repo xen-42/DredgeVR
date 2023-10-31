@@ -16,8 +16,6 @@ public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private Camera _leftCamera, _rightCamera;
-	private UniversalAdditionalCameraData _leftData, _rightData;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -27,30 +25,23 @@ public class VRCameraManager : MonoBehaviour
 
 	private float _gameAnchorYPosition = 0.8f;
 
-	private XRDisplaySubsystem _displaySubsystem;
-
 	public void Awake()
 	{
 		Instance = this;
 
 		var cameras = GetComponentsInChildren<Camera>();
 
-		_leftCamera = cameras[0];
-		_leftCamera.transform.parent = transform;
-		_leftCamera.transform.localPosition = Vector3.zero;
-		_leftCamera.transform.localRotation = Quaternion.identity;
+		var leftCamera = cameras[0];
+		leftCamera.transform.parent = transform;
+		leftCamera.transform.localPosition = Vector3.zero;
+		leftCamera.transform.localRotation = Quaternion.identity;
+		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
 
-		_rightCamera = cameras[1];
-		_rightCamera.transform.parent = transform;
-		_rightCamera.transform.localPosition = Vector3.zero;
-		_rightCamera.transform.localRotation = Quaternion.identity;
-
-		// Else it tries to set these values back
-		GameObject.Destroy(_leftCamera.GetComponent<AntiAliasingSettingResponder>());
-		GameObject.Destroy(_rightCamera.GetComponent<AntiAliasingSettingResponder>());
-
-		_leftData = _leftCamera.GetUniversalAdditionalCameraData();
-		_rightData = _rightCamera.GetUniversalAdditionalCameraData();
+		var rightCamera = cameras[1];
+		rightCamera.transform.parent = transform;
+		rightCamera.transform.localPosition = Vector3.zero;
+		rightCamera.transform.localRotation = Quaternion.identity;
+		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -74,8 +65,6 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
-
-		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 
 		gameObject.AddComponent<RenderToScreen>();
 	}
@@ -131,38 +120,6 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.localRotation = Quaternion.identity;
 
 		Delay.FireOnNextUpdate(RecenterCamera);
-	}
-
-	public void LateUpdate()
-	{
-		// Have to set target texture in late update else it lags 
-		_leftCamera.aspect = SteamVR.instance.aspect;
-		_leftCamera.fieldOfView = SteamVR.instance.fieldOfView;
-		_leftCamera.stereoTargetEye = StereoTargetEyeMask.Left;
-		_leftCamera.projectionMatrix = _leftCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Left);
-		_leftCamera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(0);
-
-		_rightCamera.aspect = SteamVR.instance.aspect;
-		_rightCamera.fieldOfView = SteamVR.instance.fieldOfView;
-		_rightCamera.stereoTargetEye = StereoTargetEyeMask.Right;
-		_rightCamera.projectionMatrix = _rightCamera.GetStereoNonJitteredProjectionMatrix(Camera.StereoscopicEye.Right);
-		_rightCamera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(1);
-
-		// Something was setting these back so we set them every frame
-		// Else there's weird reflections in the water
-		//_leftData.antialiasing = AntialiasingMode.None;
-		//_leftData.requiresDepthTexture = false;
-
-		//_rightData.antialiasing = AntialiasingMode.None;
-		//_rightData.requiresDepthTexture = false;
-
-		//_leftData.renderPostProcessing = false;
-		//_rightData.renderPostProcessing = false;
-
-		// Idk why but when doing target texture everything is backwards
-		GL.invertCulling = true;
-		_leftCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-		_rightCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 	}
 
 	public void Update()
