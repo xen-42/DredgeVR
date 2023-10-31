@@ -25,6 +25,8 @@ public class AssetLoader
 	}
 	private static Shader _litShader;
 
+	public static Shader FlipYAxisShader { get; private set; }
+
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
 	public static Mesh PrimitiveCylinder { get; private set; }
@@ -36,6 +38,7 @@ public class AssetLoader
 		var bundle = AssetBundle.LoadFromFile(Path.Combine(DredgeVRCore.ModPath, "AssetBundles/dredgevr"));
 		LeftHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_left.prefab");
 		RightHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_right.prefab");
+		FlipYAxisShader = LoadAsset<Shader>(bundle, "FlipYAxis.shader");
 
 		var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
 		PrimitiveQuad = quad.GetComponent<MeshFilter>().mesh;

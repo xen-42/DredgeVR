@@ -76,6 +76,8 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
+
+		gameObject.AddComponent<RenderToScreen>();
 	}
 
 	public void OnDestroy()
@@ -113,9 +115,6 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnTitleSceneStart()
 	{
-		// Reflections look super weird in VR - Make sure its off when we load in
-		GameObject.Find("ReflectionCamera")?.gameObject?.SetActive(false);
-
 		// Make the player look towards the lighthouse
 		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
 		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
@@ -151,18 +150,18 @@ public class VRCameraManager : MonoBehaviour
 
 		// Something was setting these back so we set them every frame
 		// Else there's weird reflections in the water
-		_leftData.antialiasing = AntialiasingMode.None;
-		_leftData.requiresDepthTexture = false;
+		//_leftData.antialiasing = AntialiasingMode.None;
+		//_leftData.requiresDepthTexture = false;
 
-		_rightData.antialiasing = AntialiasingMode.None;
-		_rightData.requiresDepthTexture = false;
+		//_rightData.antialiasing = AntialiasingMode.None;
+		//_rightData.requiresDepthTexture = false;
+
+		//_leftData.renderPostProcessing = false;
+		//_rightData.renderPostProcessing = false;
 
 		// Idk why but when doing target texture everything is backwards
 		_leftCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
 		_rightCamera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-
-		// Cameras have to be inverted
-		GL.invertCulling = true;
 	}
 
 	public void Update()
