@@ -10,6 +10,7 @@ using UnityEngine.Rendering;
 using System.Security.Policy;
 using DredgeVR.Helpers;
 using UnityEngine;
+using System.Drawing.Drawing2D;
 
 namespace DredgeVR.World.Patches;
 
@@ -26,31 +27,6 @@ public static class RenderObjectsPassPatches
 		var water = dataLists.First().rendererFeatures.First() as RenderObjects;
 		_target = water.GetValue<RenderObjectsPass>("renderObjectsPass");
 	}
-
-	/*
-	[HarmonyPrefix]
-	[HarmonyPatch(nameof(RenderObjectsPass.Execute))]
-	public static void RenderObjectsPass_Execute_Pre(RenderObjectsPass __instance, ScriptableRenderContext context, ref RenderingData renderingData)
-	{
-		if (__instance != _target) return;
-
-		var camera = renderingData.cameraData.camera;
-		var t = camera.transform;
-		t.LookAt(t.transform.position - t.forward, -t.up);
-	}
-
-	[HarmonyPostfix]
-	[HarmonyPatch(nameof(RenderObjectsPass.Execute))]
-	public static void RenderObjectsPass_Execute_Post(RenderObjectsPass __instance, ScriptableRenderContext context, ref RenderingData renderingData)
-	{
-		if (__instance != _target) return;
-
-		var camera = renderingData.cameraData.camera;
-		var t = camera.transform;
-		t.LookAt(t.transform.position - t.forward, -t.up);
-	}
-	*/
-
 
 	[HarmonyPrefix]
 	[HarmonyPatch(nameof(RenderObjectsPass.Execute))]
@@ -86,47 +62,22 @@ public static class RenderObjectsPassPatches
 
 			using (new ProfilingScope(cmd, m_ProfilingSampler))
 			{
-				/*
-				_texture ??= new RenderTexture(camera.targetTexture);
-
-				cmd.SetRenderTarget(camera.targetTexture);
-
-				context.ExecuteCommandBuffer(cmd);
-				cmd.Clear();
-
-				context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
-
-				context.ExecuteCommandBuffer(cmd);
-				cmd.Clear();
-
-				cmd.Blit(camera.targetTexture, _texture);
-
-				//cmd.Blit(camera.targetTexture, camera.targetTexture, AssetLoader.FlipYAxisMaterial);
-				Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _texture);
-				*/
-
-				cmd.SetProjectionMatrix(cameraData.GetProjectionMatrix() * Matrix4x4.Scale(new Vector3(1, -1, 1)));
+				var matrix = cameraData.GetProjectionMatrix();
+				cmd.SetProjectionMatrix(matrix * Matrix4x4.Scale(new Vector3(1, -1, 1)));
 				cmd.SetInvertCulling(false);
 
 				context.ExecuteCommandBuffer(cmd);
 				cmd.Clear();
 
+				// Draws the water but its in the sky
 				context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
 
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
 				// Put it back
-				cmd.SetProjectionMatrix(cameraData.GetProjectionMatrix() * Matrix4x4.Scale(new Vector3(1, -1, 1)));
+				cmd.SetProjectionMatrix(matrix);
 				cmd.SetInvertCulling(true);
-
-				context.ExecuteCommandBuffer(cmd);
-				cmd.Clear();
-
-				// Blit the texture to the screen
-				cmd.SetRenderTarget(BuiltinRenderTextureType.CurrentActive);
-
-				context.ExecuteCommandBuffer(cmd);
-				cmd.Clear();
-
-				cmd.Blit(_texture, BuiltinRenderTextureType.CurrentActive, AssetLoader.FlipYAxisMaterial);
 			}
 
 			context.ExecuteCommandBuffer(cmd);
