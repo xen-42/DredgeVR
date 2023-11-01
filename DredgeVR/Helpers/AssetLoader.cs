@@ -26,9 +26,10 @@ public class AssetLoader
 	private static Shader _litShader;
 
 	public static Shader FlipYAxisShader { get; private set; }
-	public static Shader ShowDepthTexture { get; private set; }
+	public static Shader ShowDepthShader { get; private set; }
 
 	public static Material FlipYAxisMaterial { get; private set; }
+	public static Material ShowDepthMaterial { get; private set; }
 
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
@@ -43,7 +44,7 @@ public class AssetLoader
 		RightHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_right.prefab");
 
 		FlipYAxisShader = LoadAsset<Shader>(bundle, "FlipYAxis.shader");
-		ShowDepthTexture = LoadAsset<Shader>(bundle, "ShowDepthTexture.shader");
+		ShowDepthShader = LoadAsset<Shader>(bundle, "ShowDepthTexture.shader");
 
 		var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
 		PrimitiveQuad = quad.GetComponent<MeshFilter>().mesh;
@@ -56,6 +57,7 @@ public class AssetLoader
 		GameObject.Destroy(cylinder);
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
+		ShowDepthMaterial = new Material(ShowDepthShader);
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object
