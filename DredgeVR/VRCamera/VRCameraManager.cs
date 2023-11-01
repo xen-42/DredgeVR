@@ -79,11 +79,13 @@ public class VRCameraManager : MonoBehaviour
 		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
 		var water = dataLists.First().rendererFeatures.First() as RenderObjects;
 
+
 		/*
 		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
 		depthRenderFeature.renderPassEvent = RenderPassEvent.BeforeRendering;
 		dataLists.First().rendererFeatures.Insert(0, depthRenderFeature);
 		*/
+
 
 		/*
 		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();

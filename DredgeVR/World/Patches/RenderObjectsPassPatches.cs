@@ -17,6 +17,7 @@ namespace DredgeVR.World.Patches;
 public static class RenderObjectsPassPatches
 {
 	private static RenderObjectsPass _target;
+	private static RenderTexture _texture;
 
 	static RenderObjectsPassPatches()
 	{
@@ -59,53 +60,78 @@ public static class RenderObjectsPassPatches
 
 		try
 		{
-			SortingCriteria sortingCriteria = (__instance.GetValue<RenderQueueType>("renderQueueType") == RenderQueueType.Transparent)
-							? SortingCriteria.CommonTransparent
-							: renderingData.cameraData.defaultOpaqueSortFlags;
+			var sortingCriteria = SortingCriteria.CommonTransparent;
 
-			DrawingSettings drawingSettings = __instance.CreateDrawingSettings(__instance.GetValue<List<ShaderTagId>>("m_ShaderTagIdList"), ref renderingData, sortingCriteria);
+			var m_ShaderTagIdList = __instance.GetValue<List<ShaderTagId>>("m_ShaderTagIdList");
+			var drawingSettings = __instance.CreateDrawingSettings(m_ShaderTagIdList, ref renderingData, sortingCriteria);
 			drawingSettings.overrideMaterial = __instance.overrideMaterial;
 			drawingSettings.overrideMaterialPassIndex = __instance.overrideMaterialPassIndex;
 
-			ref CameraData cameraData = ref renderingData.cameraData;
-			Camera camera = cameraData.camera;
+			var m_CameraSettings = __instance.GetValue<RenderObjects.CustomCameraSettings>("m_CameraSettings");
+			var m_FilteringSettings = __instance.GetValue<FilteringSettings>("m_FilteringSettings");
+			var m_RenderStateBlock = __instance.GetValue<RenderStateBlock>("m_RenderStateBlock");
 
-			Rect pixelRect = renderingData.cameraData.GetValue<Rect>("pixelRect");
-			float cameraAspect = (float)pixelRect.width / (float)pixelRect.height;
-			CommandBuffer cmd = CommandBufferPool.Get(__instance.GetValue<string>("m_ProfilerTag"));
-			using (new ProfilingScope(cmd, __instance.GetValue<ProfilingSampler>("m_ProfilingSampler")))
+			var m_ProfilerTag = __instance.GetValue<string>("m_ProfilerTag");
+			var m_ProfilingSampler = __instance.GetValue<ProfilingSampler>("m_ProfilingSampler");
+
+			ref var cameraData = ref renderingData.cameraData;
+			var camera = cameraData.camera;
+
+			var cmd = CommandBufferPool.Get(m_ProfilerTag);
+
+			// Reset all to defaults
+			//m_FilteringSettings = new FilteringSettings();
+			//m_RenderStateBlock = new RenderStateBlock();
+			//drawingSettings = new DrawingSettings();
+
+			using (new ProfilingScope(cmd, m_ProfilingSampler))
 			{
+				/*
+				_texture ??= new RenderTexture(camera.targetTexture);
+
+				cmd.SetRenderTarget(camera.targetTexture);
+
 				context.ExecuteCommandBuffer(cmd);
 				cmd.Clear();
 
-				var m_CameraSettings = __instance.GetValue<RenderObjects.CustomCameraSettings>("m_CameraSettings");
-				var m_FilteringSettings = __instance.GetValue<FilteringSettings>("m_FilteringSettings");
-				var m_RenderStateBlock = __instance.GetValue<RenderStateBlock>("m_RenderStateBlock");
+				context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
 
-				if (m_CameraSettings.overrideCamera)
-				{
-					Matrix4x4 projectionMatrix = Matrix4x4.Perspective(m_CameraSettings.cameraFieldOfView, cameraAspect,
-						camera.nearClipPlane, camera.farClipPlane);
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
 
-					Matrix4x4 viewMatrix = camera.worldToCameraMatrix;
-					Vector4 cameraTranslation = viewMatrix.GetColumn(3);
-					viewMatrix.SetColumn(3, cameraTranslation + m_CameraSettings.offset);
+				cmd.Blit(camera.targetTexture, _texture);
 
-					cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix);
-					context.ExecuteCommandBuffer(cmd);
-				}
+				//cmd.Blit(camera.targetTexture, camera.targetTexture, AssetLoader.FlipYAxisMaterial);
+				Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _texture);
+				*/
 
-				context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref m_FilteringSettings,
-					ref m_RenderStateBlock);
+				cmd.SetProjectionMatrix(cameraData.GetProjectionMatrix() * Matrix4x4.Scale(new Vector3(1, -1, 1)));
+				cmd.SetInvertCulling(false);
 
-				if (m_CameraSettings.overrideCamera && m_CameraSettings.restoreCamera)
-				{
-					cmd.Clear();
-					cmd.SetViewProjectionMatrices(cameraData.GetValue<Matrix4x4>("viewMatrix"), cameraData.GetValue<Matrix4x4>("projectionMatrix"));
-				}
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
+				context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
+
+				// Put it back
+				cmd.SetProjectionMatrix(cameraData.GetProjectionMatrix() * Matrix4x4.Scale(new Vector3(1, -1, 1)));
+				cmd.SetInvertCulling(true);
+
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
+				// Blit the texture to the screen
+				cmd.SetRenderTarget(BuiltinRenderTextureType.CurrentActive);
+
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
+				cmd.Blit(_texture, BuiltinRenderTextureType.CurrentActive, AssetLoader.FlipYAxisMaterial);
 			}
+
 			context.ExecuteCommandBuffer(cmd);
 			CommandBufferPool.Release(cmd);
+
 		}
 		catch (Exception e)
 		{
