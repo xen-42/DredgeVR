@@ -33,17 +33,24 @@ public class InvertDepthBuffer : MonoBehaviour
 		// Also want to add our depth buffer inverter
 		dataLists.ForEach(x => x.rendererFeatures.Add(ScriptableObject.CreateInstance<CustomDepthBufferModifier>()));
 
-		RenderPipelineManager.beginContextRendering += RenderPipelineManager_beginContextRendering;
+		RenderPipelineManager.beginFrameRendering += RenderPipelineManager_beginFrameRendering;
 	}
 
 	public void OnDestroy()
 	{
-		RenderPipelineManager.beginContextRendering -= RenderPipelineManager_beginContextRendering;
+		RenderPipelineManager.beginFrameRendering -= RenderPipelineManager_beginFrameRendering;
 	}
 
-	private void RenderPipelineManager_beginContextRendering(ScriptableRenderContext arg1, List<Camera> arg2)
+	private void RenderPipelineManager_beginFrameRendering(ScriptableRenderContext ctx, Camera[] cameras)
 	{
-		//throw new NotImplementedException();
+
+		foreach (var camera in cameras)
+		{
+			if (camera.actualRenderingPath == RenderingPath.DeferredShading)
+			{
+
+			}
+		}
 	}
 
 	public class CustomDepthBufferModifier : ScriptableRendererFeature
@@ -53,7 +60,7 @@ public class InvertDepthBuffer : MonoBehaviour
 		public override void Create()
 		{
 			_pass = new();
-			_pass.renderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
+			_pass.renderPassEvent = RenderPassEvent.BeforeRenderingOpaques;
 		}
 
 		public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
@@ -69,9 +76,11 @@ public class InvertDepthBuffer : MonoBehaviour
 			var camera = renderingData.cameraData.camera;
 			//DredgeVRLogger.Debug($"GO! {camera.name}");
 			CommandBuffer cmd = CommandBufferPool.Get(nameof(CustomDepthPass));
-			//cmd.Blit(BuiltinRenderTextureType.Depth, BuiltinRenderTextureType.Depth, AssetLoader.FlipYAxisMaterial);
-			//cmd.SetRenderTarget(camera.targetTexture);
-			//cmd.Blit(camera.targetTexture, camera.targetTexture, AssetLoader.ShowDepthMaterial);
+
+			cmd.SetRenderTarget(renderingData.cameraData.camera.targetTexture);
+			cmd.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, AssetLoader.FlipYAxisMaterial, 0, 0);
+			//cmd.ClearRenderTarget(true, true, Color.clear);
+
 			context.ExecuteCommandBuffer(cmd);
 			CommandBufferPool.Release(cmd);
 		}
