@@ -96,7 +96,6 @@ internal class WorldManager : MonoBehaviour
 			// OnDestroy breaks the reference to the culling brain so we reconnect it so other scripts don't NRE
 			GameManager.Instance.CullingBrain = cullingBrain;
 		}
-
 	}
 
 	public void OnPlayerSpawned()
@@ -104,5 +103,19 @@ internal class WorldManager : MonoBehaviour
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+
+		// This has to happen here else the shader is null
+		// Put a giant black square at the bottom of the sea
+		// Since ocean depth shading is broken this stops us seeing out of the map
+		var seaFloorCover = new GameObject("SeaFloorCover");
+		seaFloorCover.transform.position = new Vector3(0, -100, 0);
+		seaFloorCover.transform.rotation = Quaternion.Euler(90, 0, 0);
+		seaFloorCover.transform.localScale = Vector3.one * 10000;
+
+		seaFloorCover.AddComponent<MeshFilter>().mesh = AssetLoader.PrimitiveQuad;
+
+		var material = new Material(AssetLoader.UnlitShader);
+		seaFloorCover.AddComponent<MeshRenderer>().material = material;
+		material.mainTexture = Texture2D.blackTexture;
 	}
 }

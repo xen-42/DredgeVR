@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Valve.VR;
 using Winch.Core;
@@ -15,15 +16,8 @@ public class AssetLoader
 	public static GameObject LeftHandBase { get; private set; }
 	public static GameObject RightHandBase { get; private set; }
 
-	public static Shader LitShader
-	{
-		get
-		{
-			_litShader ??= Shader.Find("Shader Graphs/Lit_Shader");
-			return _litShader;
-		}
-	}
-	private static Shader _litShader;
+	public static Shader LitShader { get; private set; }
+	public static Shader UnlitShader { get; private set; }
 
 	public static Shader FlipYAxisShader { get; private set; }
 	public static Shader ShowDepthTexture { get; private set; }
@@ -58,6 +52,9 @@ public class AssetLoader
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
 		ShowDepthMaterial = new Material(ShowDepthTexture);
+
+		LitShader = Shader.Find("Shader Graphs/Lit_Shader");
+		UnlitShader = LoadAsset<Shader>(bundle, "Scenes/Unlit.shader");
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object

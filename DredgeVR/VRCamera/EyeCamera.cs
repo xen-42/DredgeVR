@@ -22,6 +22,10 @@ public class EyeCamera : MonoBehaviour
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 		_camera = GetComponent<Camera>();
 
+		// This stops the water shader from getting all weird about the depth buffer being inverted
+		// Some day I'd like to fix that, but for now this looks decent enough
+		_camera.GetUniversalAdditionalCameraData().requiresDepthOption = CameraOverrideOption.Off;
+
 		GameObject.Destroy(_camera.GetComponent<AntiAliasingSettingResponder>());
 	}
 

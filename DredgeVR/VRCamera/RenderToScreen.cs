@@ -11,15 +11,11 @@ namespace DredgeVR.VRCamera;
 public class RenderToScreen : MonoBehaviour
 {
 	private XRDisplaySubsystem _displaySubsystem;
-	private Material _flipYAxisMaterial;
 	private Texture _blackScreenTexture;
 
 	public void Awake()
 	{
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
-
-		// VR render texture is upsidedown so we have to put a material on the texture
-		_flipYAxisMaterial = new Material(AssetLoader.ShowDepthTexture);
 
 		_blackScreenTexture = Texture2D.blackTexture;
 	}
@@ -34,16 +30,15 @@ public class RenderToScreen : MonoBehaviour
 		DrawToScreen();
 	}
 
-	private XRRenderPass pass;
 	private void DrawToScreen()
 	{
 		Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _blackScreenTexture, null, pass: 0);
-		_displaySubsystem.GetRenderPass(0, out pass);
 		
 		var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
 		if (texture != null)
 		{
-			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial, pass: 0);
+			// Have to flip it because it's upsidedown
+			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, AssetLoader.FlipYAxisMaterial, pass: 0);
 		}
 	}
 

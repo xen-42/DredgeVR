@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4196809338
+CRC: 279628177
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 48566be4c65e7850499c26ae336b0ac7
+    Hash: e402d1d4c3669452b7f32aea91983ad3
   TypeTreeHash:
     serializedVersion: 2
     Hash: 98adf697c6833b5b33b6c58fabd5743d
@@ -64,6 +64,7 @@ Assets:
 - Assets/SteamVR/Models/Materials/vr_glove_normal.png
 - Assets/SteamVR/InteractionSystem/Poses/fallback_relaxed.asset
 - Assets/ShowDepthTexture.shader
+- Assets/Scenes/Unlit.shader
 - Assets/SteamVR/Prefabs/vr_glove_right.prefab
 - Assets/FlipYAxis.shader
 - Assets/SteamVR/Prefabs/vr_glove_left.prefab
