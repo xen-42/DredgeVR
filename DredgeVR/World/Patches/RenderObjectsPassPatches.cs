@@ -10,11 +10,12 @@ using UnityEngine.Rendering.Universal;
 
 namespace DredgeVR.World.Patches;
 
-//[HarmonyPatch]
+[HarmonyPatch]
 public static class RenderObjectsPassPatches
 {
 	private static RenderObjectsPass _target;
 	private static RenderTexture _texture;
+	private static int _depthTextureID = Shader.PropertyToID("_CameraDepthTexture");
 
 	static RenderObjectsPassPatches()
 	{
@@ -25,39 +26,10 @@ public static class RenderObjectsPassPatches
 	}
 
 	[HarmonyPrefix]
-	[HarmonyPatch(typeof(RenderObjectsPass), nameof(RenderObjectsPass.SetDetphState))]
-	public static bool No3(RenderObjectsPass __instance)
-	{
-		if (__instance != _target) return true;
-
-		return false;
-	}
-
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(RenderObjectsPass), nameof(RenderObjectsPass.SetDetphState))]
-	public static bool No(RenderObjectsPass __instance)
-	{
-		if (__instance != _target) return true;
-
-		return false;
-	}
-
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(RenderObjectsPass), nameof(RenderObjectsPass.SetStencilState))]
-	public static bool Noo(RenderObjectsPass __instance)
-	{
-		if (__instance != _target) return true;
-
-		return false;
-	}
-
-	[HarmonyPrefix]
 	[HarmonyPatch(typeof(RenderObjectsPass), nameof(RenderObjectsPass.Execute))]
 	public static bool RenderObjectsPass_Execute_Pre(RenderObjectsPass __instance, ScriptableRenderContext context, ref RenderingData renderingData)
 	{
 		if (__instance != _target) return true;
-
-		return false;
 
 		try
 		{
@@ -87,30 +59,27 @@ public static class RenderObjectsPassPatches
 
 			using (new ProfilingScope(cmd, m_ProfilingSampler))
 			{
-				/*
-				var matrix = cameraData.GetProjectionMatrix();
-				cmd.SetProjectionMatrix(matrix * Matrix4x4.Scale(new Vector3(1, -1, 1)));
-				cmd.SetInvertCulling(false);
+				_texture ??= new RenderTexture(new RenderTextureDescriptor());
+
+				cmd.Blit(renderingData.cameraData.renderer.cameraDepthTarget, _texture, AssetLoader.ShowDepthMaterial);
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
+				//cmd.Blit(_texture, _texture, AssetLoader.FlipYAxisMaterial);
+				context.ExecuteCommandBuffer(cmd);
+				cmd.Clear();
+
+				cmd.SetGlobalTexture(_depthTextureID, _texture);
 
 				context.ExecuteCommandBuffer(cmd);
 				cmd.Clear();
-				*/
 
 				camera.ResetCullingMatrix();
 				camera.TryGetCullingParameters(true, out var cullingParameters);
 				var cullResults = context.Cull(ref cullingParameters);
 
 				// Draws the water but its in the sky
-				//context.DrawRenderers(cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
-
-				/*
-				context.ExecuteCommandBuffer(cmd);
-				cmd.Clear();
-
-				// Put it back
-				cmd.SetProjectionMatrix(matrix);
-				cmd.SetInvertCulling(true);
-				*/
+				context.DrawRenderers(cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
 			}
 
 			context.ExecuteCommandBuffer(cmd);

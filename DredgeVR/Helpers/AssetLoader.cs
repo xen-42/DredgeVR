@@ -29,6 +29,7 @@ public class AssetLoader
 	public static Shader ShowDepthTexture { get; private set; }
 
 	public static Material FlipYAxisMaterial { get; private set; }
+	public static Material ShowDepthMaterial { get; private set; }
 
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
@@ -56,6 +57,7 @@ public class AssetLoader
 		GameObject.Destroy(cylinder);
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
+		ShowDepthMaterial = new Material(ShowDepthTexture);
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object
