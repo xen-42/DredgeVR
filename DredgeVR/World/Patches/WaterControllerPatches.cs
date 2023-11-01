@@ -24,8 +24,8 @@ public static class WaterControllerPatches
 
 		if (GameManager.Instance.Player != null)
 		{
-			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 60, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
-			var realDepth = currentDepth * Mathf.Lerp(2000, 600, t);
+			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 40, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
+			var realDepth = currentDepth * Mathf.Lerp(1400, 600, t);
 
 			float depthToUse;
 
