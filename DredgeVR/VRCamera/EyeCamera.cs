@@ -7,6 +7,13 @@ using Valve.VR;
 
 namespace DredgeVR.VRCamera;
 
+/// <summary>
+/// Using the default camera setup results in a lot of things missing in the right eye
+/// Some are shader related that can be worked around easily enough
+/// However, shadows are just broken in the right eye. Limitation of OpenVR and URP according to Rai
+/// Non-directional lights were also broken
+/// Doing it this way breaks the depth buffer though (its upsidedown) but I prefer that over having no lights
+/// </summary>
 [RequireComponent(typeof(Camera))]
 public class EyeCamera : MonoBehaviour
 {
@@ -23,8 +30,11 @@ public class EyeCamera : MonoBehaviour
 		// This stops the water shader from getting all weird about the depth buffer being inverted
 		// Some day I'd like to fix that, but for now this looks decent enough
 		_camera.GetUniversalAdditionalCameraData().requiresDepthOption = CameraOverrideOption.Off;
+
+		// Everything I've ever read implies that antialiasing causes a slew of problems so let's just avoid all that
 		_camera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.None;
 
+		// Have to prevent the game settings from trying to take over anti-aliasing
 		GameObject.Destroy(_camera.GetComponent<AntiAliasingSettingResponder>());
 
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;

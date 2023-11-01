@@ -1,10 +1,7 @@
 ﻿using DredgeVR.Helpers;
-using System;
-using System.Drawing.Text;
+using DredgeVR.Options;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.XR;
-using static UnityEngine.XR.XRDisplaySubsystem;
 
 namespace DredgeVR.VRCamera;
 
@@ -34,11 +31,14 @@ public class RenderToScreen : MonoBehaviour
 	{
 		Graphics.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _blackScreenTexture, null, pass: 0);
 		
-		var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
-		if (texture != null)
+		if (!OptionsManager.Options.disableMonitor)
 		{
-			// Have to flip it because it's upsidedown
-			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, AssetLoader.FlipYAxisMaterial, pass: 0);
+			var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
+			if (texture != null)
+			{
+				// Have to flip it because it's upsidedown
+				Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, AssetLoader.FlipYAxisMaterial, pass: 0);
+			}
 		}
 	}
 

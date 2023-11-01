@@ -4,6 +4,9 @@ using UnityEngine.Rendering;
 
 namespace DredgeVR.VRCamera.Patches;
 
+/// <summary>
+/// Reflections look super strange in VR, this seemed to fix them but we could just disable them again
+/// </summary>
 [HarmonyPatch]
 public static class PlanarReflectionsPatches
 {

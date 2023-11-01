@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
-using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
@@ -13,22 +10,27 @@ namespace DredgeVR.Helpers;
 /// </summary>
 public class AssetLoader
 {
+	// Objects
 	public static GameObject LeftHandBase { get; private set; }
 	public static GameObject RightHandBase { get; private set; }
 
+	// Shaders
 	public static Shader LitShader { get; private set; }
 	public static Shader UnlitShader { get; private set; }
 
 	public static Shader FlipYAxisShader { get; private set; }
 	public static Shader ShowDepthTexture { get; private set; }
 
+	// Materials (just easier access to the shaders)
 	public static Material FlipYAxisMaterial { get; private set; }
 	public static Material ShowDepthMaterial { get; private set; }
 
+	// Primitive shapes (not actually loaded, just generated when we start)
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
 	public static Mesh PrimitiveCylinder { get; private set; }
 
+	// All our loaded control icons
 	private static readonly Dictionary<string, Texture2D> _icons = new();
 
 	public AssetLoader()
@@ -39,22 +41,26 @@ public class AssetLoader
 
 		FlipYAxisShader = LoadAsset<Shader>(bundle, "FlipYAxis.shader");
 		ShowDepthTexture = LoadAsset<Shader>(bundle, "ShowDepthTexture.shader");
+		// This shader is taken out of the game and works okay
+		// A lot of shaders in game aren't accessible using Shader.Find for some reason, return null even if they obviously exist
+		// Also some standard unity shaders are missing, because Dredge uses URP
+		LitShader = Shader.Find("Shader Graphs/Lit_Shader");
+		UnlitShader = LoadAsset<Shader>(bundle, "Scenes/Unlit.shader");
 
-		var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-		PrimitiveQuad = quad.GetComponent<MeshFilter>().mesh;
-		GameObject.Destroy(quad);
-
+		PrimitiveQuad = CreatePrimitiveMesh(PrimitiveType.Quad);
 		DoubleSidedQuad = GeometryHelper.MakeMeshDoubleFaced(PrimitiveQuad);
-
-		var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-		PrimitiveCylinder = cylinder.GetComponent<MeshFilter>().mesh;
-		GameObject.Destroy(cylinder);
+		PrimitiveCylinder = CreatePrimitiveMesh(PrimitiveType.Cylinder);
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
 		ShowDepthMaterial = new Material(ShowDepthTexture);
+	}
 
-		LitShader = Shader.Find("Shader Graphs/Lit_Shader");
-		UnlitShader = LoadAsset<Shader>(bundle, "Scenes/Unlit.shader");
+	private Mesh CreatePrimitiveMesh(PrimitiveType primitiveType)
+	{
+		var primitive = GameObject.CreatePrimitive(primitiveType);
+		var primitiveMesh = primitive.GetComponent<MeshFilter>().mesh;
+		GameObject.Destroy(primitive);
+		return primitiveMesh;
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object

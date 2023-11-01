@@ -4,6 +4,12 @@ namespace DredgeVR.Helpers;
 
 public static class GeometryHelper
 {
+	/// <summary>
+	/// Returns a copy of the mesh but with double sided faces
+	/// Originally got it from Marshmallow, written by _nebula unless they also copied it from somewhere
+	/// </summary>
+	/// <param name="mesh"></param>
+	/// <returns></returns>
 	public static Mesh MakeMeshDoubleFaced(Mesh mesh)
 	{
 		var vertices = mesh.vertices;

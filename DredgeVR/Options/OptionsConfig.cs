@@ -82,4 +82,10 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool removeTrees = false;
+
+	/// <summary>
+	/// Do not mirror the VR view to the monitor
+	/// </summary>
+	[JsonProperty]
+	public bool disableMonitor = false;
 }

@@ -12,6 +12,7 @@ public static class HasteVolumePatches
 	{
 		// Vignette and motion blur are a bad idea in VR anyway
 		// But mostly this thing flips the y axis of the camera when you use it
+		// Hopefully no other volumes do this but we'll have to see
 		Component.Destroy(__instance.volume);
 	}
 }
