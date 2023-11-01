@@ -2,8 +2,11 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -67,6 +70,30 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		gameObject.AddComponent<RenderToScreen>();
+
+		// Add render feature for fixing the depth texture
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// The list has ForwardRenderer, WaveHeightMaskRenderer, and SteppedDepthMaskRenderer. Maybe the invert should happen in a different one or all of them
+		// ForwardRenderer has "Water" as a rendererFeature, so that could also be something
+		// Put the depth render feature first so it goes before water
+		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
+		var water = dataLists.First().rendererFeatures.First() as RenderObjects;
+
+		/*
+		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
+		depthRenderFeature.renderPassEvent = RenderPassEvent.BeforeRendering;
+		dataLists.First().rendererFeatures.Insert(0, depthRenderFeature);
+		*/
+
+		/*
+		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
+		depthRenderFeature.renderPassEvent = RenderPassEvent.AfterRendering;
+		dataLists.First().rendererFeatures.Insert(0, depthRenderFeature);
+
+		var depthRenderFeature2 = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
+		depthRenderFeature2.renderPassEvent = RenderPassEvent.AfterRendering;
+		dataLists.First().rendererFeatures.Insert(2, depthRenderFeature2);
+		*/
 	}
 
 	public void OnDestroy()

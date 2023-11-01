@@ -28,6 +28,8 @@ public class AssetLoader
 	public static Shader FlipYAxisShader { get; private set; }
 	public static Shader ShowDepthTexture { get; private set; }
 
+	public static Material FlipYAxisMaterial { get; private set; }
+
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
 	public static Mesh PrimitiveCylinder { get; private set; }
@@ -52,6 +54,8 @@ public class AssetLoader
 		var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		PrimitiveCylinder = cylinder.GetComponent<MeshFilter>().mesh;
 		GameObject.Destroy(cylinder);
+
+		FlipYAxisMaterial = new Material(FlipYAxisShader);
 	}
 
 	private T LoadAsset<T>(AssetBundle bundle, string prefabName) where T : UnityEngine.Object
