@@ -87,30 +87,26 @@ public static class RenderObjectsPassPatches
 
 			using (new ProfilingScope(cmd, m_ProfilingSampler))
 			{
-				/*
 				var matrix = cameraData.GetProjectionMatrix();
 				cmd.SetProjectionMatrix(matrix * Matrix4x4.Scale(new Vector3(1, -1, 1)));
 				cmd.SetInvertCulling(false);
 
 				context.ExecuteCommandBuffer(cmd);
 				cmd.Clear();
-				*/
 
 				camera.ResetCullingMatrix();
 				camera.TryGetCullingParameters(true, out var cullingParameters);
 				var cullResults = context.Cull(ref cullingParameters);
 
 				// Draws the water but its in the sky
-				//context.DrawRenderers(cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
+				context.DrawRenderers(cullResults, ref drawingSettings, ref m_FilteringSettings, ref m_RenderStateBlock);
 
-				/*
 				context.ExecuteCommandBuffer(cmd);
 				cmd.Clear();
 
 				// Put it back
 				cmd.SetProjectionMatrix(matrix);
 				cmd.SetInvertCulling(true);
-				*/
 			}
 
 			context.ExecuteCommandBuffer(cmd);

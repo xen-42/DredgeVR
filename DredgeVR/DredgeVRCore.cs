@@ -50,6 +50,7 @@ namespace DredgeVR
 			gameObject.AddComponent<VRUIManager>();
 			gameObject.AddComponent<WorldManager>();
 			gameObject.AddComponent<VRTutorialManager>();
+			gameObject.AddComponent<InvertDepthBuffer>();
 
 			Delay.FireOnNextUpdate(() =>
 			{
