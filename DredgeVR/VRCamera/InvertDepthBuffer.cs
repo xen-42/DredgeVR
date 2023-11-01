@@ -31,7 +31,8 @@ public class InvertDepthBuffer : MonoBehaviour
 		dataLists.First().rendererFeatures.Add(renderObject);
 
 		// Also want to add our depth buffer inverter
-		dataLists.ForEach(x => x.rendererFeatures.Add(ScriptableObject.CreateInstance<CustomDepthBufferModifier>()));
+		//dataLists.ForEach(x => x.rendererFeatures.Add(ScriptableObject.CreateInstance<CustomDepthBufferModifier>()));
+		//dataLists.First().rendererFeatures.Add(ScriptableObject.CreateInstance<CustomDepthBufferModifier>());
 
 		RenderPipelineManager.beginFrameRendering += RenderPipelineManager_beginFrameRendering;
 	}
@@ -77,9 +78,7 @@ public class InvertDepthBuffer : MonoBehaviour
 			//DredgeVRLogger.Debug($"GO! {camera.name}");
 			CommandBuffer cmd = CommandBufferPool.Get(nameof(CustomDepthPass));
 
-			cmd.SetRenderTarget(renderingData.cameraData.camera.targetTexture);
-			cmd.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, AssetLoader.FlipYAxisMaterial, 0, 0);
-			//cmd.ClearRenderTarget(true, true, Color.clear);
+			cmd.Blit(camera.targetTexture, camera.targetTexture, AssetLoader.FlipYAxisMaterial);
 
 			context.ExecuteCommandBuffer(cmd);
 			CommandBufferPool.Release(cmd);

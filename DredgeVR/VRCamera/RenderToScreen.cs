@@ -1,27 +1,19 @@
 ﻿using DredgeVR.Helpers;
-using System;
-using System.Drawing.Text;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.XR;
-using static UnityEngine.XR.XRDisplaySubsystem;
 
 namespace DredgeVR.VRCamera;
 
 public class RenderToScreen : MonoBehaviour
 {
 	private XRDisplaySubsystem _displaySubsystem;
-	private Material _flipYAxisMaterial;
 	private Texture _blackScreenTexture;
 
 	public void Awake()
 	{
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 
-		// VR render texture is upsidedown so we have to put a material on the texture
-		_flipYAxisMaterial = new Material(AssetLoader.ShowDepthShader);
-
-		_blackScreenTexture = Texture2D.blackTexture;
+		_blackScreenTexture = Texture2D.whiteTexture;
 	}
 
 	// OnGUI drew a second copy of the textures in world space
@@ -41,11 +33,11 @@ public class RenderToScreen : MonoBehaviour
 		var texture = _displaySubsystem.GetRenderTextureForRenderPass(0);
 		if (texture != null)
 		{
-			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, _flipYAxisMaterial, pass: 0);
+			Graphics.DrawTexture(FitToScreen(Screen.width, Screen.height, texture.width, texture.height), texture, AssetLoader.ShowDepthMaterial, pass: 0);
 		}
 	}
 
-	private Rect FitToScreen(float screenWidth, float screenHeight, float textureWidth, float textureHeight, bool fitWidth = true)
+	public static Rect FitToScreen(float screenWidth, float screenHeight, float textureWidth, float textureHeight, bool fitWidth = true)
 	{
 		var ratioX = screenWidth / textureWidth;
 		var ratioY = screenHeight / textureHeight;
