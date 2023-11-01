@@ -1,8 +1,5 @@
-﻿using DG.Tweening;
-using DredgeVR.Helpers;
-using DredgeVR.Options;
+﻿using DredgeVR.Options;
 using DredgeVR.VRCamera;
-using System;
 using UnityEngine;
 
 namespace DredgeVR.VRUI;

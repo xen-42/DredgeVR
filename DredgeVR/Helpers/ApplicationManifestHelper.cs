@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
 /// <summary>
-/// From NomaiVR
+/// From NomaiVR, thanks Rai! Unless Artum wrote it
 /// The application manifest tells SteamVR about our mod
 /// </summary>
 internal class ApplicationManifestHelper
@@ -33,7 +33,11 @@ internal class ApplicationManifestHelper
                                             }}]
                                         }}";
 
-			File.WriteAllText(manifestPath, appManifestContent);
+			// Appearances matter to me okay
+			var dictContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(appManifestContent);
+			var prettyString = JsonConvert.SerializeObject(dictContent, Formatting.Indented);
+
+			File.WriteAllText(manifestPath, prettyString);
 
 			var error = OpenVR.Applications.AddApplicationManifest(manifestPath, false);
 			if (error != EVRApplicationError.None)

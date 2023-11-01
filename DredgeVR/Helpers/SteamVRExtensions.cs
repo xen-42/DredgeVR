@@ -15,6 +15,7 @@ public static class SteamVRExtensions
 
 		// Need to get direction? I.e., for using trackpad up/down/left/right as buttons
 		// No idea how to do that
+		// Have checked NomaiVR and TwoForksVR and neither were able to implement it, might be a limitation of OpenVR
 
 		return name;
 	}

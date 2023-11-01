@@ -2,6 +2,10 @@
 
 namespace DredgeVR.Helpers;
 
+/// <summary>
+/// Encapsulates calls to WinchCore.Log
+/// If we were to ever switch off of Winch and use a different mod loader, can just change these
+/// </summary>
 public static class DredgeVRLogger
 {
 	public static void Info(object msg) => WinchCore.Log.Info(msg);
