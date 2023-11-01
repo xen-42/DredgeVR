@@ -77,25 +77,13 @@ public class VRCameraManager : MonoBehaviour
 		// ForwardRenderer has "Water" as a rendererFeature, so that could also be something
 		// Put the depth render feature first so it goes before water
 		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
-		var water = dataLists.First().rendererFeatures.First() as RenderObjects;
+		//var water = dataLists.First().rendererFeatures.First() as RenderObjects;
 
-
-		/*
-		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
-		depthRenderFeature.renderPassEvent = RenderPassEvent.BeforeRendering;
-		dataLists.First().rendererFeatures.Insert(0, depthRenderFeature);
-		*/
-
-
-		/*
-		var depthRenderFeature = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
-		depthRenderFeature.renderPassEvent = RenderPassEvent.AfterRendering;
-		dataLists.First().rendererFeatures.Insert(0, depthRenderFeature);
-
-		var depthRenderFeature2 = ScriptableObject.CreateInstance<InvertDepthTextureRenderFeature>();
-		depthRenderFeature2.renderPassEvent = RenderPassEvent.AfterRendering;
-		dataLists.First().rendererFeatures.Insert(2, depthRenderFeature2);
-		*/
+		// This makes the camera not upsidedown wtf
+		// Other ways of not being upside-down mess with the haste smoke flame effects (and probably others)
+		var renderObject = new RenderObjects { name = "Flip" };
+		Delay.FireOnNextUpdate(() => renderObject.GetValue<RenderObjectsPass>("renderObjectsPass").renderPassEvent = RenderPassEvent.AfterRendering);
+		dataLists.First().rendererFeatures.Insert(0, renderObject);
 	}
 
 	public void OnDestroy()
