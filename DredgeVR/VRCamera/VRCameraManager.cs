@@ -35,13 +35,14 @@ public class VRCameraManager : MonoBehaviour
 		leftCamera.transform.parent = transform;
 		leftCamera.transform.localPosition = Vector3.zero;
 		leftCamera.transform.localRotation = Quaternion.identity;
-		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
+		leftCamera.gameObject.AddComponent<EyeCamera>().LeftEye = true;
 
 		var rightCamera = cameras[1];
 		rightCamera.transform.parent = transform;
 		rightCamera.transform.localPosition = Vector3.zero;
 		rightCamera.transform.localRotation = Quaternion.identity;
-		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
+		//rightCamera.gameObject.AddComponent<EyeCamera>().LeftEye = false;
+		rightCamera.gameObject.SetActive(false);
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
