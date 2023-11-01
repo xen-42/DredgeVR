@@ -2,18 +2,20 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using Valve.VR;
 
 namespace DredgeVR.VRCamera;
 
-[RequireComponent(typeof(Camera))]
 public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private static Camera _camera;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -27,7 +29,19 @@ public class VRCameraManager : MonoBehaviour
 	{
 		Instance = this;
 
-		_camera = GetComponent<Camera>();
+		var cameras = GetComponentsInChildren<Camera>();
+
+		var leftCamera = cameras[0];
+		leftCamera.transform.parent = transform;
+		leftCamera.transform.localPosition = Vector3.zero;
+		leftCamera.transform.localRotation = Quaternion.identity;
+		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
+
+		var rightCamera = cameras[1];
+		rightCamera.transform.parent = transform;
+		rightCamera.transform.localPosition = Vector3.zero;
+		rightCamera.transform.localRotation = Quaternion.identity;
+		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -51,6 +65,18 @@ public class VRCameraManager : MonoBehaviour
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
+
+		gameObject.AddComponent<RenderToScreen>();
+
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
+
+		// This makes the camera not upsidedown wtf
+		// Other ways of not being upside-down mess with the haste smoke flame effects (and probably others)
+		// First in the dataLists is the Forward renderer
+		var renderObject = new RenderObjects { name = "Flip" };
+		Delay.FireOnNextUpdate(() => renderObject.GetValue<RenderObjectsPass>("renderObjectsPass").renderPassEvent = RenderPassEvent.AfterRendering);
+		dataLists.First().rendererFeatures.Insert(0, renderObject);
 	}
 
 	public void OnDestroy()
@@ -72,6 +98,16 @@ public class VRCameraManager : MonoBehaviour
 
 		AnchorTransform.position = Vector3.zero;
 		AnchorTransform.rotation = Quaternion.identity;
+
+		// Bloom is weirdly mirrored since we switched away from using the default camera setup
+		// Disable it in every scene
+		foreach (var volume in GameObject.FindObjectsOfType<Volume>())
+		{
+			if (volume.profile.components.FirstOrDefault(x => x is Bloom) is Bloom bloom)
+			{
+				bloom.intensity.value = 0f;
+			}
+		}
 
 		// Weird timing on this
 		Delay.FireInNUpdates(2, RecenterCamera);
@@ -99,11 +135,9 @@ public class VRCameraManager : MonoBehaviour
 
 	public void Update()
 	{
-		_camera.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera.aspect = SteamVR.instance.aspect;
-
 		if (AnchorTransform != null)
 		{
+			// There's also a VR control binding for this, but in case they don't have enough buttons I put it on space
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				RecenterCamera();

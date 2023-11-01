@@ -38,7 +38,10 @@
   </ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="VRCamera\Patches\" />
+	  <Compile Remove="VRCamera\NewFolder\**" />
+	  <EmbeddedResource Remove="VRCamera\NewFolder\**" />
+	  <None Remove="VRCamera\NewFolder\**" />
+	  <Reference Remove="VRCamera\NewFolder\**" />
 	</ItemGroup>
 
 </Project>
