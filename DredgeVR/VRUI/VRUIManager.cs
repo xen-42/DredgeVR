@@ -198,6 +198,8 @@ internal class VRUIManager : MonoBehaviour
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
 
+		GameObject.FindObjectOfType<CompassUI>().gameObject.AddComponent<HeldCompass>();
+
 		// Remove controls tab since it doesn't work in UI
 		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
 
