@@ -11,6 +11,7 @@ public class UIHandAttachment : MonoBehaviour
 	public float _scale = 1f;
 	public bool _leftHand;
 
+	public bool smoothRotation = true;
 	public bool smoothPosition = true;
 
 	private RectTransform _rectTransform;
@@ -86,11 +87,18 @@ public class UIHandAttachment : MonoBehaviour
 		if (smoothPosition)
 		{
 			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+		}
+		else
+		{
+			transform.position = targetPosition;
+		}
+
+		if (smoothRotation)
+		{
 			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
 		}
 		else
 		{
-			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
 			// Snap angle
 			if (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
 			{

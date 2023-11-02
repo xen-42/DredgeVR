@@ -17,4 +17,10 @@ public static class UnityExtensions
 		go.transform.localRotation = Quaternion.identity;
 		return go;
 	}
+
+	public static Renderer SetMaterial(this Renderer renderer, Material material)
+	{
+		renderer.material = material;
+		return renderer;
+	}
 }

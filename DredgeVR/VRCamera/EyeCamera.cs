@@ -50,10 +50,19 @@ public class EyeCamera : MonoBehaviour
 
 	public void SetUpCamera()
 	{
+		var targetEyeMask = left ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
+		var targetEye = left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
+
+		// Magic number that some reddit thread told me was right
+		var eyeDistance = 63 / 1000f; //mm
+
+		transform.localPosition = left ? Vector3.left * eyeDistance / 2f : Vector3.right * eyeDistance / 2f;
+
 		_camera.aspect = SteamVR.instance.aspect;
 		_camera.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera.stereoTargetEye = left ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
-		_camera.projectionMatrix = _camera.GetStereoProjectionMatrix(left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right);
+		_camera.stereoTargetEye = targetEyeMask;
+		_camera.projectionMatrix = _camera.GetStereoNonJitteredProjectionMatrix(targetEye);
+
 		_camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
 	}
 }

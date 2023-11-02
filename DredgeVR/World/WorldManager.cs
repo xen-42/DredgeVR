@@ -1,11 +1,8 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
-using DredgeVR.VRUI;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 namespace DredgeVR.World;
 

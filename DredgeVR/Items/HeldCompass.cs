@@ -1,11 +1,7 @@
 ﻿using Cinemachine.Utility;
+using DredgeVR.Helpers;
 using DredgeVR.VRInput;
 using DredgeVR.VRUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DredgeVR.Items;
@@ -21,9 +17,12 @@ public class HeldCompass : MonoBehaviour
 	{
 		var uiHand = gameObject.AddComponent<UIHandAttachment>();
 
+		uiHand.smoothRotation = false;
+		uiHand.smoothPosition = false;
+
 		// Hold in off hand
 		var inRightHand = VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand;
-		uiHand.Init(inRightHand, new Vector3(0, 90, 45), new Vector3(0.04f, -0.09f, 0.01f), 1f);
+		uiHand.Init(inRightHand, new Vector3(0, 90, 48), new Vector3(0.04f, -0.09f, 0.005f), 0.9f);
 
 		// We will be overwriting the base compass behaviour
 		_compassUI = GetComponent<CompassUI>();
@@ -36,6 +35,38 @@ public class HeldCompass : MonoBehaviour
 
 		_cover = _compassFace.Find("CompassFace (1)");
 		_cover.transform.localPosition = new Vector3(0, 0, -2);
+
+		// Add the model
+		var compass = GameObject.Instantiate(AssetLoader.Compass).SetParent(transform);
+		compass.name = "Compass";
+		compass.transform.localScale = Vector3.one * 6300f;
+		compass.transform.localRotation = Quaternion.Euler(0, 90, 270);
+		compass.transform.localPosition = new Vector3(0, 0, 10);
+		compass.transform.Find("compass").localRotation = Quaternion.Euler(0, 293, 0);
+	}
+
+	private void OnHeldUIHidden(bool hidden)
+	{
+		if (hidden)
+		{
+			VRInputModule.Instance.OffHand.StopHolding();
+		}
+		else
+		{
+			VRInputModule.Instance.OffHand.HoldCompass();
+		}
+	}
+
+	public void OnEnable()
+	{
+		VRUIManager.HeldUIHidden += OnHeldUIHidden;
+		VRInputModule.Instance.OffHand.HoldCompass();
+	}
+
+	public void OnDisable()
+	{
+		VRUIManager.HeldUIHidden -= OnHeldUIHidden;
+		VRInputModule.Instance.OffHand.StopHolding();
 	}
 
 	public void Update()
