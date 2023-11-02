@@ -98,7 +98,7 @@ internal class WorldManager : MonoBehaviour
 	public void OnPlayerSpawned()
 	{
 		// Set up held items
-		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(570, 300);
+		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
 
 		// This has to happen here else the shader is null
