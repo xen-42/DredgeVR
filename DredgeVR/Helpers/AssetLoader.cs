@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FluffyUnderware.DevTools.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class AssetLoader
 	// Objects
 	public static GameObject LeftHandBase { get; private set; }
 	public static GameObject RightHandBase { get; private set; }
+	public static GameObject Compass { get; private set; }
 
 	// Shaders
 	public static Shader LitShader { get; private set; }
@@ -36,8 +38,6 @@ public class AssetLoader
 	public AssetLoader()
 	{
 		var bundle = AssetBundle.LoadFromFile(Path.Combine(DredgeVRCore.ModPath, "AssetBundles/dredgevr"));
-		LeftHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_left.prefab");
-		RightHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_right.prefab");
 
 		FlipYAxisShader = LoadAsset<Shader>(bundle, "FlipYAxis.shader");
 		ShowDepthTexture = LoadAsset<Shader>(bundle, "ShowDepthTexture.shader");
@@ -53,7 +53,28 @@ public class AssetLoader
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
 		ShowDepthMaterial = new Material(ShowDepthTexture);
+
+		// Put lit shader on hands
+		LeftHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_left.prefab");
+		RightHandBase = LoadAsset<GameObject>(bundle, "SteamVR/Prefabs/vr_glove_right.prefab");
+
+		// Compass needs materials and stuff
+		Compass = LoadAsset<GameObject>(bundle, "Prefabs/Compass/compass.prefab");
+		foreach (var meshRenderer in Compass.GetComponentsInChildren<MeshRenderer>())
+		{
+			SwapMaterialToLit(meshRenderer);
+		}
 	}
+
+	private void SwapMaterialToLit(MeshRenderer meshRenderer)
+	{
+		// Swap the unity main texture over and use the lit shader
+		var texture = meshRenderer.material.mainTexture;
+		meshRenderer.SetMaterial(new Material(LitShader)).material.SetTexture(LitShaderAlbedo, texture);
+	}
+
+	public int LitShaderAlbedo = Shader.PropertyToID("Texture2D_9aa7ba2263944b48bbf43c218dc48459");
+	public int LitShaderEmission = Shader.PropertyToID("Texture2D_c7b8c5c57d6443a5a9f86b68269754f3");
 
 	private Mesh CreatePrimitiveMesh(PrimitiveType primitiveType)
 	{
@@ -96,6 +117,13 @@ public class AssetLoader
 			_icons[path] = null;
 		}
 		return _icons[path];
+	}
 
+	public static Texture2D CreateTexture(Color colour)
+	{
+		var texture = new Texture2D(1, 1);
+		texture.SetPixel(1, 1, colour);
+		texture.Apply();
+		return texture;
 	}
 }

@@ -20,7 +20,7 @@ public class HeldUI : MonoBehaviour
 		// Hold in off hand
 		_inRightHand = VRInputModule.Instance.DominantHandInputSource == Valve.VR.SteamVR_Input_Sources.LeftHand;
 		uiHand.Init(_inRightHand, new Vector3(0, 90, 45), new Vector3(0.05f, -0.1f, 0f), 0.5f);
-		uiHand.smoothPosition = false;
+		uiHand.smoothRotation = false;
 		_container = transform.Find("Container").transform;
 		_container.localRotation = Quaternion.Euler(0, _inRightHand ? -45 : 45, 0);
 	}

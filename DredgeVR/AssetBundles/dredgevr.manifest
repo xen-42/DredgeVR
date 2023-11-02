@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 279628177
+CRC: 4211012529
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: e402d1d4c3669452b7f32aea91983ad3
+    Hash: 81b59829468772d342b7c6cd891bd9c9
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 98adf697c6833b5b33b6c58fabd5743d
+    Hash: 4adba5f42b2dc311b0709aacf69f286d
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -15,7 +15,11 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 21
   Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
 - Class: 28
+  Script: {instanceID: 0}
+- Class: 33
   Script: {instanceID: 0}
 - Class: 43
   Script: {instanceID: 0}
@@ -63,9 +67,11 @@ SerializeReferenceClassIdentifiers:
 Assets:
 - Assets/SteamVR/Models/Materials/vr_glove_normal.png
 - Assets/SteamVR/InteractionSystem/Poses/fallback_relaxed.asset
+- Assets/Prefabs/Compass/compass.fbx
 - Assets/ShowDepthTexture.shader
 - Assets/Scenes/Unlit.shader
 - Assets/SteamVR/Prefabs/vr_glove_right.prefab
 - Assets/FlipYAxis.shader
 - Assets/SteamVR/Prefabs/vr_glove_left.prefab
+- Assets/Prefabs/Compass/compass.prefab
 Dependencies: []
