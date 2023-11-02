@@ -42,16 +42,30 @@ public class HeldCompass : MonoBehaviour
 		compass.transform.localScale = Vector3.one * 6300f;
 		compass.transform.localRotation = Quaternion.Euler(0, 90, 270);
 		compass.transform.localPosition = new Vector3(0, 0, 10);
-		compass.transform.Find("compass").localRotation = Quaternion.Euler(0, 300, 0);
+		compass.transform.Find("compass").localRotation = Quaternion.Euler(0, 293, 0);
+	}
+
+	private void OnHeldUIHidden(bool hidden)
+	{
+		if (hidden)
+		{
+			VRInputModule.Instance.OffHand.StopHolding();
+		}
+		else
+		{
+			VRInputModule.Instance.OffHand.HoldCompass();
+		}
 	}
 
 	public void OnEnable()
 	{
+		VRUIManager.HeldUIHidden += OnHeldUIHidden;
 		VRInputModule.Instance.OffHand.HoldCompass();
 	}
 
 	public void OnDisable()
 	{
+		VRUIManager.HeldUIHidden -= OnHeldUIHidden;
 		VRInputModule.Instance.OffHand.StopHolding();
 	}
 
