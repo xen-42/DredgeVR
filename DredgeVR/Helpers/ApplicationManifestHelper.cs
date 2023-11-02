@@ -33,11 +33,7 @@ internal class ApplicationManifestHelper
                                             }}]
                                         }}";
 
-			// Appearances matter to me okay
-			var dictContent = JsonConvert.DeserializeObject<Dictionary<string, string>>(appManifestContent);
-			var prettyString = JsonConvert.SerializeObject(dictContent, Formatting.Indented);
-
-			File.WriteAllText(manifestPath, prettyString);
+			File.WriteAllText(manifestPath, appManifestContent);
 
 			var error = OpenVR.Applications.AddApplicationManifest(manifestPath, false);
 			if (error != EVRApplicationError.None)
