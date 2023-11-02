@@ -1,4 +1,5 @@
-﻿using DredgeVR.VRInput;
+﻿using DredgeVR.VRCamera;
+using DredgeVR.VRInput;
 using DredgeVR.VRUI;
 using UnityEngine;
 

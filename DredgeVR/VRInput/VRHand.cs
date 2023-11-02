@@ -148,8 +148,6 @@ public class VRHand : MonoBehaviour
 
 	public void StopHolding()
 	{
-		StopAllCoroutines();
-
 		_animator.enabled = true;
 		_skeleton.enabled = true;
 	}
@@ -201,5 +199,26 @@ public class VRHand : MonoBehaviour
 		pinky.localRotation = Quaternion.Euler(295.442f, 39.8577f, 228.2713f);
 		var pinky2 = pinky.Find("finger_pinky_0_r/finger_pinky_1_r/finger_pinky_2_r");
 		pinky2.localRotation = Quaternion.Euler(0.5303f, 5.913f, 303.5219f);
+	}
+
+	public void HoldPaper()
+	{
+		StartCoroutine(HoldPaperCoroutine());
+	}
+
+	private IEnumerator HoldPaperCoroutine()
+	{
+		// Skeleton has to go first so it can set the hand back to its default pose
+		_skeleton.enabled = false;
+
+		// Wait a frame for it to do that
+		yield return null;
+
+		_animator.enabled = false;
+
+		var root = transform.Find("vr_glove_model/Root");
+
+		var wrist = root.Find("wrist_r");
+		wrist.localRotation = Quaternion.Euler(329.2117f, 183.1089f, 44.982f);
 	}
 }
