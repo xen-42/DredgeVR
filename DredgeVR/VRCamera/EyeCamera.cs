@@ -19,30 +19,30 @@ public class EyeCamera : MonoBehaviour
 {
 	public bool left;
 
-	private Camera _camera;
+	public Camera Camera { get; private set; }
 	private XRDisplaySubsystem _displaySubsystem;
 
 	public void Awake()
 	{
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
-		_camera = GetComponent<Camera>();
+		Camera = GetComponent<Camera>();
 
 		// This stops the water shader from getting all weird about the depth buffer being inverted
 		// Some day I'd like to fix that, but for now this looks decent enough
-		_camera.GetUniversalAdditionalCameraData().requiresDepthOption = CameraOverrideOption.Off;
+		Camera.GetUniversalAdditionalCameraData().requiresDepthOption = CameraOverrideOption.Off;
 
 		// Everything I've ever read implies that antialiasing causes a slew of problems so let's just avoid all that
-		_camera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.None;
+		Camera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.None;
 
 		// Have to prevent the game settings from trying to take over anti-aliasing
-		GameObject.Destroy(_camera.GetComponent<AntiAliasingSettingResponder>());
+		GameObject.Destroy(Camera.GetComponent<AntiAliasingSettingResponder>());
 
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;
 	}
 
 	private void RenderPipelineManager_beginCameraRendering(ScriptableRenderContext context, Camera camera)
 	{
-		if (camera == _camera)
+		if (camera == Camera)
 		{
 			SetUpCamera();
 		}
@@ -58,11 +58,11 @@ public class EyeCamera : MonoBehaviour
 
 		transform.localPosition = left ? Vector3.left * eyeDistance / 2f : Vector3.right * eyeDistance / 2f;
 
-		_camera.aspect = SteamVR.instance.aspect;
-		_camera.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera.stereoTargetEye = targetEyeMask;
-		_camera.projectionMatrix = _camera.GetStereoNonJitteredProjectionMatrix(targetEye);
+		Camera.aspect = SteamVR.instance.aspect;
+		Camera.fieldOfView = SteamVR.instance.fieldOfView;
+		Camera.stereoTargetEye = targetEyeMask;
+		Camera.projectionMatrix = Camera.GetStereoNonJitteredProjectionMatrix(targetEye);
 
-		_camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
+		Camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
 	}
 }

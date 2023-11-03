@@ -144,6 +144,8 @@ internal class VRUIManager : MonoBehaviour
 			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
 			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
 
+			GameObject.FindObjectOfType<LoadingScreen>().gameObject.AddComponent<VRLoadingScene>();
+
 			_hasInitialized = true;
 		}
 	}

@@ -51,6 +51,7 @@ public class AssetLoader
 		PrimitiveQuad = CreatePrimitiveMesh(PrimitiveType.Quad);
 		DoubleSidedQuad = GeometryHelper.MakeMeshDoubleFaced(PrimitiveQuad);
 		PrimitiveCylinder = CreatePrimitiveMesh(PrimitiveType.Cylinder);
+		PrimitiveSphere = CreatePrimitiveMesh(PrimitiveType.Sphere);
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
 		ShowDepthMaterial = new Material(ShowDepthTexture);
