@@ -204,10 +204,16 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove controls tab since it doesn't work in UI
 		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+		GameObject.Find("GameCanvases/SettingsDialog/Scrim").transform.localScale = Vector3.zero; // Other things were reactivating it so hacky it is
+		GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").transform.localPosition = Vector3.forward * -100f;
+		GameObject.Find("GameCanvases/SettingsDialog/PopupDialogContainer").transform.localPosition = Vector3.forward * -200f;
 
 		// Reposition some character dialogue stuff for fun
 		var dialogueContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/DialogueTextContainer").transform;
 		var nameContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/CharacterNameContainer").transform;
+
+		// Remove encyclopedia scrim
+		GameObject.Find("GameCanvases/PopupCanvas/EncyclopediaWindow/Container/Scrim").SetActive(false);
 
 		var container = new GameObject("Container").transform;
 		container.parent = dialogueContainer.parent;

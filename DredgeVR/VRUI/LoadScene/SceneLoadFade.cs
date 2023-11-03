@@ -63,6 +63,9 @@ public class VRLoadingScene : MonoBehaviour
 			VRCameraManager.LeftEye.Camera.cullingMask = 1 << LayerHelper.UI;
 			VRCameraManager.RightEye.Camera.cullingMask = 1 << LayerHelper.UI;
 
+			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Depth;
+			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Depth;
+
 			_meshRenderer.forceRenderingOff = false;
 		}
 	}
@@ -74,6 +77,10 @@ public class VRLoadingScene : MonoBehaviour
 			_isInLoadingScreen = false;
 			VRCameraManager.LeftEye.Camera.cullingMask = _cameraLayerCache;
 			VRCameraManager.RightEye.Camera.cullingMask = _cameraLayerCache;
+
+			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Skybox;
+			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Skybox;
+
 			_meshRenderer.forceRenderingOff = true;
 		}
 	}
