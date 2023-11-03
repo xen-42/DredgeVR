@@ -2,6 +2,8 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using DredgeVR.VRUI;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
@@ -20,6 +22,9 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
 
+	public static EyeCamera LeftEye { get; private set; }
+	public static EyeCamera RightEye { get; private set; }
+
 	public static Transform AnchorTransform { get; private set; }
 	private Transform _pivot, _root;
 
@@ -35,13 +40,15 @@ public class VRCameraManager : MonoBehaviour
 		leftCamera.transform.parent = transform;
 		leftCamera.transform.localPosition = Vector3.zero;
 		leftCamera.transform.localRotation = Quaternion.identity;
-		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
+		LeftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
+		LeftEye.left = true;
 
 		var rightCamera = cameras[1];
 		rightCamera.transform.parent = transform;
 		rightCamera.transform.localPosition = Vector3.zero;
 		rightCamera.transform.localRotation = Quaternion.identity;
-		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
+		RightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
+		RightEye.left = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();

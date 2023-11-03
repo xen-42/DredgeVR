@@ -120,7 +120,7 @@ internal class VRUIManager : MonoBehaviour
 		// We place the title screen canvas on the beach
 		var canvas = GameObject.Find("Canvases");
 
-		canvas.transform.position = new Vector3(-5.4f, 0.35f, 1.6f);
+		canvas.transform.position = new Vector3(-5.6f, 0.35f, 1f);
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
@@ -143,6 +143,8 @@ internal class VRUIManager : MonoBehaviour
 
 			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
 			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
+
+			GameObject.FindObjectOfType<LoadingScreen>().gameObject.AddComponent<VRLoadingScene>();
 
 			_hasInitialized = true;
 		}
@@ -202,10 +204,20 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove controls tab since it doesn't work in UI
 		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+		GameObject.Find("GameCanvases/SettingsDialog/Scrim").transform.localScale = Vector3.zero; // Other things were reactivating it so hacky it is
+		GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").transform.localPosition = Vector3.forward * -100f;
+		GameObject.Find("GameCanvases/SettingsDialog/PopupDialogContainer").transform.localPosition = Vector3.forward * -200f;
 
 		// Reposition some character dialogue stuff for fun
 		var dialogueContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/DialogueTextContainer").transform;
 		var nameContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/CharacterNameContainer").transform;
+
+		// Remove time pass scrim
+		GameObject.Find("GameCanvases/TimePassCanvas/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/TimePassCanvas/Container").transform.localPosition = Vector3.forward * -100f;
+
+		// Remove encyclopedia scrim
+		GameObject.Find("GameCanvases/PopupCanvas/EncyclopediaWindow/Container/Scrim").SetActive(false);
 
 		var container = new GameObject("Container").transform;
 		container.parent = dialogueContainer.parent;
