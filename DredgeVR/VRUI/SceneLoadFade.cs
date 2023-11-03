@@ -6,6 +6,7 @@ namespace DredgeVR.VRUI;
 public class SceneLoadFade : MonoBehaviour
 {
 	private Material _material;
+	private MeshRenderer _meshRenderer;
 	private float _targetAlpha;
 
 	public void Awake()
@@ -13,10 +14,10 @@ public class SceneLoadFade : MonoBehaviour
 		var mf = gameObject.AddComponent<MeshFilter>();
 		mf.mesh = GeometryHelper.MakeMeshDoubleFaced(AssetLoader.PrimitiveSphere);
 
-		var mr = gameObject.AddComponent<MeshRenderer>();
-		_material = new Material(AssetLoader.LitShader);
+		_meshRenderer = gameObject.AddComponent<MeshRenderer>();
+		_material = new Material(AssetLoader.UnlitShader);
 		_material.color = new Color(0f, 0f, 0f, _targetAlpha);
-		mr.material = _material;
+		_meshRenderer.material = _material;
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.SceneUnloaded += OnSceneUnloaded;
@@ -51,6 +52,7 @@ public class SceneLoadFade : MonoBehaviour
 	private void SetAlpha(float alpha)
 	{
 		_material.color = new Color(_material.color.r, _material.color.g, _material.color.b, alpha);
+		_meshRenderer.forceRenderingOff = alpha == 0f;
 	}
 
 	public void FadeIn(bool instant)

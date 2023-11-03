@@ -64,9 +64,7 @@ public class VRCameraManager : MonoBehaviour
 		LeftHand.transform.parent = _pivot;
 		RightHand.transform.parent = _pivot;
 
-		var sceneLoadFade = new GameObject(nameof(SceneLoadFade), new Type[] { typeof(SceneLoadFade) });
-		sceneLoadFade.transform.parent = transform;
-		sceneLoadFade.transform.localPosition = Vector3.zero;	
+		//new GameObject(nameof(SceneLoadFade), new Type[] { typeof(SceneLoadFade) }).SetParent(transform);
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
