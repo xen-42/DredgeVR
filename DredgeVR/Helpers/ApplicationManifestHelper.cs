@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Valve.VR;
-using Winch.Core;
 
 namespace DredgeVR.Helpers;
 
 /// <summary>
-/// From NomaiVR
+/// From NomaiVR, thanks Rai! Unless Artum wrote it
 /// The application manifest tells SteamVR about our mod
 /// </summary>
 internal class ApplicationManifestHelper

@@ -7,6 +7,7 @@ using System.Reflection;
 using Unity.XR.OpenVR;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
+using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using Valve.VR;
 
@@ -64,6 +65,8 @@ namespace DredgeVR
 													"Dredge VR mod",
 													steamBuild: SteamManager.Initialized,
 													steamAppId: 1562430);
+
+			
 
 			// Improves frames by about 10ms
 			SteamVR_Settings.instance.lockPhysicsUpdateRateToRenderFrequency = OptionsManager.Options.lockPhysicsUpdateRateToRenderFrequency;

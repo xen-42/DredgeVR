@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DredgeVR.World.Patches;
 
 [HarmonyPatch(typeof(WeatherController))]
-internal class WeatherControllerPatches
+public static class WeatherControllerPatches
 {
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(WeatherController.Update))]

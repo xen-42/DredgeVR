@@ -1,9 +1,6 @@
 ﻿using DredgeVR.VRCamera;
-using DredgeVR.VRInput;
 using HarmonyLib;
-using System;
 using UnityEngine;
-using Winch.Core;
 
 namespace DredgeVR.VRUI.Patches;
 

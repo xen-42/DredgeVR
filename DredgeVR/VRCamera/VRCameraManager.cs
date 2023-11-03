@@ -1,22 +1,23 @@
-﻿using Cinemachine;
-using Cinemachine.Utility;
+﻿using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
 using DredgeVR.VRUI;
 using System;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using Valve.VR;
 
 namespace DredgeVR.VRCamera;
 
-[RequireComponent(typeof(Camera))]
 public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
 	public static SteamVR_TrackedObject VRPlayer { get; private set; }
-	private static Camera _camera;
 
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
@@ -30,7 +31,19 @@ public class VRCameraManager : MonoBehaviour
 	{
 		Instance = this;
 
-		_camera = GetComponent<Camera>();
+		var cameras = GetComponentsInChildren<Camera>();
+
+		var leftCamera = cameras[0];
+		leftCamera.transform.parent = transform;
+		leftCamera.transform.localPosition = Vector3.zero;
+		leftCamera.transform.localRotation = Quaternion.identity;
+		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
+
+		var rightCamera = cameras[1];
+		rightCamera.transform.parent = transform;
+		rightCamera.transform.localPosition = Vector3.zero;
+		rightCamera.transform.localRotation = Quaternion.identity;
+		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -57,14 +70,26 @@ public class VRCameraManager : MonoBehaviour
 
 		DredgeVRCore.SceneStart += OnSceneStart;
 		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
-		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
+
+		gameObject.AddComponent<RenderToScreen>();
+
+		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
+
+		// This makes the camera not upsidedown wtf
+		// Other ways of not being upside-down mess with the haste smoke flame effects (and probably others)
+		// First in the dataLists is the Forward renderer
+		var renderObject = new RenderObjects { name = "Flip" };
+		Delay.FireOnNextUpdate(() => renderObject.GetValue<RenderObjectsPass>("renderObjectsPass").renderPassEvent = RenderPassEvent.AfterRendering);
+		dataLists.First().rendererFeatures.Insert(0, renderObject);
 	}
 
 	public void OnDestroy()
 	{
 		DredgeVRCore.SceneStart -= OnSceneStart;
-		DredgeVRCore.TitleSceneStart -= OnGameSceneStart;
-		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
+		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
 	}
 
 	private void OnSceneStart(string _)
@@ -80,6 +105,16 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.position = Vector3.zero;
 		AnchorTransform.rotation = Quaternion.identity;
 
+		// Bloom is weirdly mirrored since we switched away from using the default camera setup
+		// Disable it in every scene
+		foreach (var volume in GameObject.FindObjectsOfType<Volume>())
+		{
+			if (volume.profile.components.FirstOrDefault(x => x is Bloom) is Bloom bloom)
+			{
+				bloom.intensity.value = 0f;
+			}
+		}
+
 		// Weird timing on this
 		Delay.FireInNUpdates(2, RecenterCamera);
 	}
@@ -94,30 +129,21 @@ public class VRCameraManager : MonoBehaviour
 		AnchorTransform.LookAt(worldPos);
 	}
 
-	private void OnGameSceneStart()
+	private void OnPlayerSpawned()
 	{
-		// Boat takes a frame to exist
-		Delay.RunWhen(
-			() => GameManager.Instance.Player != null,
-			() =>
-			{
-				// Make the player follow the boat
-				AnchorTransform.parent = GameManager.Instance.Player.transform;
-				AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
-				AnchorTransform.localRotation = Quaternion.identity;
+		// Make the player follow the boat
+		AnchorTransform.parent = GameManager.Instance.Player.transform;
+		ResetAnchorToBoat();
+		AnchorTransform.localRotation = Quaternion.identity;
 
-				Delay.FireOnNextUpdate(RecenterCamera);
-			}
-		);
+		Delay.FireOnNextUpdate(RecenterCamera);
 	}
 
 	public void Update()
 	{
-		_camera.fieldOfView = SteamVR.instance.fieldOfView;
-		_camera.aspect = SteamVR.instance.aspect;
-
 		if (AnchorTransform != null)
 		{
+			// There's also a VR control binding for this, but in case they don't have enough buttons I put it on space
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				RecenterCamera();
@@ -134,9 +160,11 @@ public class VRCameraManager : MonoBehaviour
 					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
 				}
 
-				// Helps when you ram into stuff to not bounce around
-				var anchorY = OptionsManager.Options.lockCameraYPosition ? _gameAnchorYPosition : AnchorTransform.position.y;
-				AnchorTransform.position = new Vector3(AnchorTransform.position.x, anchorY, AnchorTransform.position.z);
+				// If the camera y is locked but the boat is moving around the anchor point gets offset
+				if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+				{
+					ResetAnchorToBoat();
+				}
 			}
 
 			_root.transform.position = AnchorTransform.position;
@@ -148,11 +176,28 @@ public class VRCameraManager : MonoBehaviour
 	{
 		if (AnchorTransform != null)
 		{
+			// Can be moved around by the waves
+			if (SceneManager.GetActiveScene().name == "Game")
+			{
+				ResetAnchorToBoat();
+			}
+
 			var rotationAngleY = VRPlayer.transform.rotation.eulerAngles.y - AnchorTransform.rotation.eulerAngles.y;
 			_pivot.Rotate(0, -rotationAngleY, 0);
 
 			var distanceDiff = VRPlayer.transform.position - AnchorTransform.position;
 			_pivot.position -= new Vector3(distanceDiff.x, 0f, distanceDiff.z);
+		}
+	}
+
+	private void ResetAnchorToBoat()
+	{
+		AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
+
+		// Helps when you ram into stuff to not bounce around
+		if (OptionsManager.Options.lockCameraYPosition)
+		{
+			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
 		}
 	}
 }

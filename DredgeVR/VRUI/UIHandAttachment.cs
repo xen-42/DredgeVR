@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using DredgeVR.Options;
+﻿using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using UnityEngine;
 
@@ -12,9 +11,12 @@ public class UIHandAttachment : MonoBehaviour
 	public float _scale = 1f;
 	public bool _leftHand;
 
+	public bool smoothRotation = true;
 	public bool smoothPosition = true;
 
 	private RectTransform _rectTransform;
+
+	private bool _hidden;
 
 	public void Init(bool rightHand, Vector3 euler, Vector3 offset, float scale)
 	{
@@ -43,9 +45,16 @@ public class UIHandAttachment : MonoBehaviour
 			_rectTransform.pivot = new Vector2(1 - _rectTransform.pivot.x, _rectTransform.pivot.y);
 		}
 
+		VRUIManager.HeldUIHidden += OnHeldUIHidden;
+
 		// TODO: Fix canvas layers
 
 		// TODO: Allow targeting by touching with hand
+	}
+
+	public void OnDestroy()
+	{
+		VRUIManager.HeldUIHidden -= OnHeldUIHidden;
 	}
 
 	public void Start()
@@ -55,6 +64,11 @@ public class UIHandAttachment : MonoBehaviour
 
 	public void Update()
 	{
+		if (_hidden)
+		{
+			return;
+		}
+
 		var handGO = _leftHand ? VRCameraManager.LeftHand : VRCameraManager.RightHand;
 
 		var rotatedOffset = Quaternion.Euler(_euler) * _offset;
@@ -73,16 +87,31 @@ public class UIHandAttachment : MonoBehaviour
 		if (smoothPosition)
 		{
 			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
+		}
+		else
+		{
+			transform.position = targetPosition;
+		}
+
+		if (smoothRotation)
+		{
 			transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
 		}
-		else																								   
+		else
 		{
-			transform.position = Vector3.Lerp(transform.position, targetPosition, t);
 			// Snap angle
 			if (Quaternion.Angle(transform.rotation, targetRotation) > 0.5f)
 			{
 				transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, t);
 			}
 		}
+	}
+
+	public void OnHeldUIHidden(bool hidden)
+	{
+		// Some UI elements have logic on them which breaks if we disable them
+		// Just want to make them invisible
+		_hidden = hidden;
+		transform.localScale = Vector3.one * (hidden ? 0 : _scale);
 	}
 }

@@ -41,14 +41,6 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Vector2 RadialSelect
-        {
-            get
-            {
-                return SteamVR_Actions.default_RadialSelect;
-            }
-        }
-        
         public virtual SteamVR_Action_Boolean Confirm
         {
             get
@@ -230,6 +222,62 @@ namespace Valve.VR
             get
             {
                 return SteamVR_Actions.default_RecenterCamera;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean QuickMove
+        {
+            get
+            {
+                return SteamVR_Actions.default_QuickMove;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean OpenJournal
+        {
+            get
+            {
+                return SteamVR_Actions.default_OpenJournal;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean OpenMap
+        {
+            get
+            {
+                return SteamVR_Actions.default_OpenMap;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean OpenEncyclopedia
+        {
+            get
+            {
+                return SteamVR_Actions.default_OpenEncyclopedia;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean OpenMessages
+        {
+            get
+            {
+                return SteamVR_Actions.default_OpenMessages;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean TabLeft
+        {
+            get
+            {
+                return SteamVR_Actions.default_TabLeft;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean TabRight
+        {
+            get
+            {
+                return SteamVR_Actions.default_TabRight;
             }
         }
         

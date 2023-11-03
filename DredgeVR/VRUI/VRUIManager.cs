@@ -1,5 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
+using DredgeVR.Options;
 using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using FluffyUnderware.DevTools.Extensions;
@@ -19,6 +20,13 @@ namespace DredgeVR.VRUI;
 internal class VRUIManager : MonoBehaviour
 {
 	private bool _hasInitialized;
+
+	// So that if two things request to hide the UI we wait for both to stop before showing them
+	private static int _hideUIRequests;
+	public static Action<bool> HeldUIHidden;
+
+	public static Transform LeftHandPromptsContainer { get; private set; }
+	public static Transform RightHandPromptsContainer { get; private set; }
 
 	public void Awake()
 	{
@@ -50,6 +58,9 @@ internal class VRUIManager : MonoBehaviour
 
 	private void OnSceneStart(string scene)
 	{
+		// Probably safest to reset this between scenes
+		_hideUIRequests = 0;
+
 		// On new save files theres a prompt they need to press here
 		if (scene == "Startup")
 		{
@@ -113,18 +124,43 @@ internal class VRUIManager : MonoBehaviour
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
+		// Remove controls tab for now since it doesnt work
+		RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+
 		// These canvases are on the Manager scene and will persist the way they are
 		if (!_hasInitialized)
 		{
 			// Make the loading screen UI show in front of the player too
 			GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
 
-			// Attach right hand button prompts
-			GameObject.Find("Canvas/ControlPromptPanel").AddComponent<UIHandAttachment>()
-				.Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+			// Create game objects for the left/right hand button prompts
+			var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
+			var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
+			var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
+
+			leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
+			rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+
+			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
+			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
 
 			_hasInitialized = true;
 		}
+	}
+
+	private GameObject CreatePromptContainer(string name, Transform parent)
+	{
+		var obj = new GameObject(name);
+		obj.transform.parent = parent;
+		obj.transform.localPosition = Vector3.zero;
+		obj.transform.localRotation = Quaternion.identity;
+
+		var container = new GameObject("Container");
+		container.transform.parent = obj.transform;
+		container.transform.localPosition = Vector3.zero;
+		container.transform.localRotation = Quaternion.identity;
+
+		return obj;
 	}
 
 	private void OnGameSceneStart()
@@ -148,18 +184,40 @@ internal class VRUIManager : MonoBehaviour
 		GameObject.Find("GameCanvases/GameCanvas/DockUI/SpeakersContainer").transform.localScale = Vector3.one * 1.5f;
 
 		// Attach activity UI to hand
+		// TODO: Split ability select UI from do ability UI
 		GameObject.Find("GameCanvases/GameCanvas/Abilities/ActiveAbility").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
+			.Init(GameManager.Instance.Input.Controls.RadialSelectShow.GetHand() == "right", new Vector3(0, 90, 45), new Vector3(0.1f, 0.1f, 0f), 1f);
 
 		// Attach inventory tab UI to hand
 		GameObject.Find("GameCanvases/GameCanvas/PlayerSlidePanel/SlidePanelTab").AddComponent<UIHandAttachment>()
-			.Init(false, new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
+			.Init(GameManager.Instance.Input.Controls.ToggleCargo.GetHand() == "right", new Vector3(0, 90, 45), new Vector3(0.1f, 0.05f, 0f), 1f);
 
 		// Remove scrims
 		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
 
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
+
+		GameObject.FindObjectOfType<CompassUI>().gameObject.AddComponent<HeldCompass>();
+
+		// Remove controls tab since it doesn't work in UI
+		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+
+		// Reposition some character dialogue stuff for fun
+		var dialogueContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/DialogueTextContainer").transform;
+		var nameContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/CharacterNameContainer").transform;
+
+		var container = new GameObject("Container").transform;
+		container.parent = dialogueContainer.parent;
+		container.localPosition = dialogueContainer.localPosition;
+		dialogueContainer.parent = container;
+		nameContainer.parent = container;
+		container.localPosition += Vector3.back * 400f;
+		container.localRotation = Quaternion.Euler(45f, 0f, 0f);
+
+		var optionsContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/OptionsContainer").transform;
+		optionsContainer.localPosition += Vector3.back * 240f;
+		optionsContainer.localRotation = Quaternion.Euler(0f, 20f, 0f);
 	}
 
 	private void OnIntroCutsceneStart()
@@ -183,6 +241,32 @@ internal class VRUIManager : MonoBehaviour
 		catch (Exception e)
 		{
 			DredgeVRLogger.Error($"Couldn't set up intro cutscene ui: {e}");
+		}
+	}
+
+	private void RemoveControlsTab(TabbedPanelContainer tabbedPanelContainer)
+	{
+		var controlTab = tabbedPanelContainer.transform.Find("TopBar/Tabs/ControlTab").GetComponent<TabUI>();
+		tabbedPanelContainer.tabbedPanels.Remove(tabbedPanelContainer.tabbedPanels.First(x => x.tab == controlTab));
+		tabbedPanelContainer.showablePanelIndexes.RemoveAt(tabbedPanelContainer.showablePanelIndexes.Count() - 1);
+		controlTab.gameObject.SetActive(false);
+	}
+
+	public static void HideHeldUI()
+	{
+		if (_hideUIRequests == 0)
+		{
+			HeldUIHidden?.Invoke(true);
+		}
+		_hideUIRequests++;
+	}
+
+	public static void ShowHeldUI()
+	{
+		_hideUIRequests--;
+		if (_hideUIRequests == 0)
+		{
+			HeldUIHidden?.Invoke(false);
 		}
 	}
 }

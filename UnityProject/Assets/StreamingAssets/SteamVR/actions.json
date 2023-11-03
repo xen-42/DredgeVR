@@ -18,11 +18,6 @@
       "requirement": "mandatory"
     },
     {
-      "name": "/actions/default/in/RadialSelect",
-      "type": "vector2",
-      "requirement": "mandatory"
-    },
-    {
       "name": "/actions/default/in/Confirm",
       "type": "boolean",
       "requirement": "mandatory"
@@ -127,6 +122,41 @@
       "requirement": "optional"
     },
     {
+      "name": "/actions/default/in/QuickMove",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/OpenJournal",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/OpenMap",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/OpenEncyclopedia",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/OpenMessages",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/TabLeft",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/in/TabRight",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -208,7 +238,6 @@
       "/actions/default/in/RotateCounterClockwise": "RotateCounterClockwise",
       "/actions/default/in/ToggleCargo": "Toggle Cargo",
       "/actions/default/in/Pause": "Pause",
-      "/actions/default/in/RadialSelect": "Radial Select",
       "/actions/default/in/RadialSelectShow": "Radial Select Show",
       "/actions/default/in/Move": "Move",
       "/actions/default/in/BuyItem": "Buy Item",
@@ -220,7 +249,14 @@
       "/actions/default/in/RemoveMarker": "RemoveMarker",
       "/actions/default/in/LeftHandPose": "Left Hand Pose",
       "/actions/default/in/RightHandPose": "Right Hand Pose",
-      "/actions/default/in/RecenterCamera": "Recenter Camera"
+      "/actions/default/in/RecenterCamera": "Recenter Camera",
+      "/actions/default/in/QuickMove": "Quick Move",
+      "/actions/default/in/OpenJournal": "Open Journal",
+      "/actions/default/in/OpenMap": "Open Map",
+      "/actions/default/in/OpenEncyclopedia": "Open Encyclopedia",
+      "/actions/default/in/OpenMessages": "Open Messages",
+      "/actions/default/in/TabLeft": "Tab Left",
+      "/actions/default/in/TabRight": "Tab Right"
     }
   ]
 }
