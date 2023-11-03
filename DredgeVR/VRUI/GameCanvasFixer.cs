@@ -9,7 +9,7 @@ namespace DredgeVR.VRUI;
 internal class GameCanvasFixer : MonoBehaviour
 {
 	// Public for testing in UnityExplorer
-	public Vector3 Offset = new (0f, 1f, 1.5f);
+	public Vector3 Offset = new (0f, 1f, 1.25f);
 
 	public void Update()
 	{
