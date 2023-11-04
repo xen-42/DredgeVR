@@ -196,6 +196,8 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove scrims
 		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/GameCanvas/UpgradeWindow/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/GameCanvas/UpgradeWindow").transform.localPosition += Vector3.forward * 50f;
 
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
