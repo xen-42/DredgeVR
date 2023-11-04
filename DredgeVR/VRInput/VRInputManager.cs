@@ -33,6 +33,9 @@ public class VRInputManager : MonoBehaviour
 	{
 		DredgeVRCore.TitleSceneStart -= GameManager.Instance.Input.ResetAllBindings;
 		DredgeVRCore.GameSceneStart -= GameManager.Instance.Input.ResetAllBindings;
+
+		// For some reason next time you play the game flat none of your controls work
+		GameManager.Instance.Input.ResetAllBindings();
 	}
 
 	public static readonly Dictionary<PlayerAction, VRBindingSource> PlayerActionBindings = new();
