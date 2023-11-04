@@ -130,24 +130,29 @@ internal class VRUIManager : MonoBehaviour
 		// These canvases are on the Manager scene and will persist the way they are
 		if (!_hasInitialized)
 		{
-			// Make the loading screen UI show in front of the player too
-			GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
-
-			// Create game objects for the left/right hand button prompts
-			var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
-			var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
-			var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
-
-			leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
-			rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
-
-			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
-			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
-
-			GameObject.FindObjectOfType<LoadingScreen>().gameObject.AddComponent<VRLoadingScene>();
-
-			_hasInitialized = true;
+			InitializeManagerScene();
 		}
+	}
+
+	private void InitializeManagerScene()
+	{
+		// Make the loading screen UI show in front of the player too
+		GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
+
+		// Create game objects for the left/right hand button prompts
+		var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
+		var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
+		var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
+
+		leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
+		rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+
+		LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
+		RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
+
+		GameObject.FindObjectOfType<LoadingScreen>().gameObject.AddComponent<VRLoadingScene>();
+
+		_hasInitialized = true;
 	}
 
 	private GameObject CreatePromptContainer(string name, Transform parent)
@@ -172,7 +177,7 @@ internal class VRUIManager : MonoBehaviour
 		{
 			// When finding objects of type make sure they are in the game scene, could be on Manager or DontDestroyOnLoad or whatever
 			// Also ignore canvases that have parent canvases, since they will inherit their position
-			if (canvas.gameObject.scene.name == "Game" && canvas.transform.parent?.GetComponentInParent<Canvas>() == null)
+			if (canvas.gameObject.scene.name == "Game" && canvas.isRootCanvas)
 			{
 				canvas.gameObject.AddComponent<GameCanvasFixer>();
 			}
