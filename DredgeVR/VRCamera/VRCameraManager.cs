@@ -80,6 +80,9 @@ public class VRCameraManager : MonoBehaviour
 		gameObject.AddComponent<RenderToScreen>();
 
 		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// Disable depth texture since its upsidedown
+		urp.supportsCameraDepthTexture = false;
+
 		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
 
 		// This makes the camera not upsidedown wtf

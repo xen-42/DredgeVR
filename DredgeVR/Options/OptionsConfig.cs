@@ -94,4 +94,10 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool smoothRotation = false;
+
+	/// <summary>
+	/// If you're experiencing graphical bugs you can just disable post processing.
+	/// </summary>
+	[JsonProperty]
+	public bool disablePostProcessing = false;
 }

@@ -1,4 +1,6 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.Options;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -20,22 +22,22 @@ public class EyeCamera : MonoBehaviour
 	public bool left;
 
 	public Camera Camera { get; private set; }
+	private UniversalAdditionalCameraData _data;
 	private XRDisplaySubsystem _displaySubsystem;
 
 	public void Awake()
 	{
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 		Camera = GetComponent<Camera>();
+		_data = Camera.GetUniversalAdditionalCameraData();
+
 
 		// This stops the water shader from getting all weird about the depth buffer being inverted
 		// Some day I'd like to fix that, but for now this looks decent enough
-		Camera.GetUniversalAdditionalCameraData().requiresDepthOption = CameraOverrideOption.Off;
+		Camera.depthTextureMode = DepthTextureMode.None;
+		_data.requiresDepthOption = CameraOverrideOption.Off;
 
-		// Everything I've ever read implies that antialiasing causes a slew of problems so let's just avoid all that
-		Camera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.None;
-
-		// Have to prevent the game settings from trying to take over anti-aliasing
-		GameObject.Destroy(Camera.GetComponent<AntiAliasingSettingResponder>());
+		_data.renderPostProcessing = !OptionsManager.Options.disablePostProcessing;
 
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;
 	}
@@ -62,7 +64,6 @@ public class EyeCamera : MonoBehaviour
 		Camera.fieldOfView = SteamVR.instance.fieldOfView;
 		Camera.stereoTargetEye = targetEyeMask;
 		Camera.projectionMatrix = Camera.GetStereoNonJitteredProjectionMatrix(targetEye);
-
 		Camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
 	}
 }
