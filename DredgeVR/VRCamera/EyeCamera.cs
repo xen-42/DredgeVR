@@ -1,6 +1,5 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Options;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -30,7 +29,6 @@ public class EyeCamera : MonoBehaviour
 		_displaySubsystem = SteamVRHelper.GetSubSystem<XRDisplaySubsystem>();
 		Camera = GetComponent<Camera>();
 		_data = Camera.GetUniversalAdditionalCameraData();
-
 
 		// This stops the water shader from getting all weird about the depth buffer being inverted
 		// Some day I'd like to fix that, but for now this looks decent enough
