@@ -29,8 +29,6 @@ namespace DredgeVR
 
 		public static string ModPath => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-		private GameObject _loadSceneSphere;
-
 		public void Awake()
 		{
 			Instance = this;
