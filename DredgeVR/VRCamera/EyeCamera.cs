@@ -38,6 +38,24 @@ public class EyeCamera : MonoBehaviour
 		_data.renderPostProcessing = !OptionsManager.Options.disablePostProcessing;
 
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;
+		RenderPipelineManager.endCameraRendering += RenderPipelineManager_endCameraRendering;
+	}
+
+	public void OnDestroy()
+	{
+		RenderPipelineManager.beginCameraRendering -= RenderPipelineManager_beginCameraRendering;
+		RenderPipelineManager.endCameraRendering -= RenderPipelineManager_endCameraRendering;
+	}
+
+	private void RenderPipelineManager_endCameraRendering(ScriptableRenderContext context, Camera camera)
+	{
+		if (camera == Camera)
+		{
+			if (OptionsManager.Options.disablePostProcessing)
+			{
+				GL.invertCulling = false;
+			}
+		}
 	}
 
 	private void RenderPipelineManager_beginCameraRendering(ScriptableRenderContext context, Camera camera)
@@ -45,6 +63,12 @@ public class EyeCamera : MonoBehaviour
 		if (camera == Camera)
 		{
 			SetUpCamera();
+
+			if (OptionsManager.Options.disablePostProcessing)
+			{
+				GL.invertCulling = true;
+				Camera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
+			}
 		}
 	}
 
