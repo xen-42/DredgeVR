@@ -10,6 +10,7 @@ internal class GameCanvasFixer : MonoBehaviour
 {
 	// Public for testing in UnityExplorer
 	public Vector3 Offset = new (0f, 1f, 1.25f);
+	public float scale = 0.001f;
 
 	public void Update()
 	{
@@ -19,7 +20,7 @@ internal class GameCanvasFixer : MonoBehaviour
 		{
 			transform.position = uiParent.transform.TransformPoint(Offset);
 			transform.rotation = Quaternion.Euler(0f, uiParent.rotation.eulerAngles.y, 0f);
-			transform.localScale = Vector3.one * 0.001f;
+			transform.localScale = Vector3.one * scale;
 		}
 	}
 }
