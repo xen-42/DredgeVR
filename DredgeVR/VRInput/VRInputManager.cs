@@ -19,6 +19,7 @@ public class VRInputManager : MonoBehaviour
 		SteamVR_Actions._default.RightHandPose.AddOnUpdateListener(SteamVR_Input_Sources.RightHand, RightHandUpdate);
 
 		SteamVR_Actions._default.Move.AddOnUpdateListener(LeftThumbStickUpdate, SteamVR_Input_Sources.Any);
+		SteamVR_Actions._default.MoveCamera.AddOnUpdateListener(RightThumbStickUpdate, SteamVR_Input_Sources.Any);
 
 		DredgeVRLogger.Debug($"Commands are: {string.Join(", ", SteamVR_Actions._default.allActions.Select(x => x.GetShortName()))}");
 

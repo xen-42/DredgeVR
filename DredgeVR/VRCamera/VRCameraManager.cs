@@ -11,6 +11,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using Valve.VR;
+using static Mono.Math.BigInteger;
 
 namespace DredgeVR.VRCamera;
 
@@ -26,9 +27,12 @@ public class VRCameraManager : MonoBehaviour
 	public static EyeCamera RightEye { get; private set; }
 
 	public static Transform AnchorTransform { get; private set; }
-	private Transform _pivot, _root;
+	private Transform _pivot, _rotationPivot, _root;
 
 	private float _gameAnchorYPosition = 0.8f;
+
+	public float minX = 0.5f;
+	private bool _justTurned;
 
 	public void Awake()
 	{
@@ -61,8 +65,8 @@ public class VRCameraManager : MonoBehaviour
 
 		// Parent everything to a new "pivot" object
 		_root = new GameObject("PlayerRoot").transform;
-		_pivot = new GameObject("VRCameraPivot").transform;
-		_pivot.parent = _root;
+		_rotationPivot = new GameObject("Rotation").SetParent(_root).transform;
+		_pivot = new GameObject("VRCameraPivot").SetParent(_rotationPivot).transform;
 		VRPlayer.origin = _pivot;
 
 		transform.parent = _pivot;
@@ -170,6 +174,8 @@ public class VRCameraManager : MonoBehaviour
 
 			_root.transform.position = AnchorTransform.position;
 			_root.transform.rotation = AnchorTransform.rotation;
+
+			UpdateCameraRotation();
 		}
 	}
 
@@ -200,5 +206,37 @@ public class VRCameraManager : MonoBehaviour
 		{
 			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
 		}
+	}
+
+	private void UpdateCameraRotation()
+	{
+		var x = VRInputManager.RightThumbStick.x;
+		var sign = Mathf.Sign(x);
+		var magnitude = Mathf.Clamp01((Mathf.Abs(x) - minX) / (1f - minX));
+
+		if (OptionsManager.Options.smoothRotation)
+		{
+			if (magnitude > 0)
+			{
+				_rotationPivot.Rotate(0, sign * magnitude * 180f * Time.unscaledDeltaTime, 0);
+			}
+		}
+		else
+		{
+			if (magnitude > 0)
+			{
+				if (!_justTurned)
+				{
+					_rotationPivot.Rotate(0, sign * 45f, 0);
+					_justTurned = true;
+				}
+			}
+			else
+			{
+				_justTurned = false;
+			}
+		}
+
+
 	}
 }
