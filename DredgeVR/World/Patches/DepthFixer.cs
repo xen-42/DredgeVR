@@ -4,10 +4,13 @@ using UnityEngine;
 namespace DredgeVR.World.Patches;
 
 [HarmonyPatch(typeof(WaterController))]
-public static class WaterControllerPatches
+public static class DepthFixer
 {
 	private static int _depthID = Shader.PropertyToID("_Depth");
 	private static float _previousDepth;
+
+	// Exposed for testing with unity explorer
+	public static float depthModifier = 1f;
 
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(WaterController.Update))]
@@ -24,9 +27,9 @@ public static class WaterControllerPatches
 
 		if (GameManager.Instance.Player != null)
 		{
-			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 40, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
+			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 30, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
 			// High "depth" is clearer than low "depth"
-			var realDepth = currentDepth * Mathf.Lerp(1400, 400, t*t);
+			var realDepth = currentDepth * Mathf.Lerp(1200, 400, t*t);
 
 			float depthToUse;
 
@@ -41,7 +44,7 @@ public static class WaterControllerPatches
 			}
 
 			_previousDepth = depthToUse;
-			Shader.SetGlobalFloat(_depthID, depthToUse);
+			Shader.SetGlobalFloat(_depthID, depthToUse * depthModifier);
 		}
 		else 
 		{

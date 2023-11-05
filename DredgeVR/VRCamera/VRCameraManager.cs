@@ -2,6 +2,7 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using HarmonyLib;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
@@ -12,6 +13,7 @@ using Valve.VR;
 
 namespace DredgeVR.VRCamera;
 
+[HarmonyPatch]
 public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
@@ -20,10 +22,18 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
 
+	public static EyeCamera LeftEye { get; private set; }
+	public static EyeCamera RightEye { get; private set; }
+
 	public static Transform AnchorTransform { get; private set; }
-	private Transform _pivot, _root;
+	private Transform _pivot, _rotationPivot, _root;
 
 	private float _gameAnchorYPosition = 0.8f;
+
+	public float minX = 0.5f;
+	private bool _justTurned;
+
+	private bool _inFinaleCutscene;
 
 	public void Awake()
 	{
@@ -35,13 +45,15 @@ public class VRCameraManager : MonoBehaviour
 		leftCamera.transform.parent = transform;
 		leftCamera.transform.localPosition = Vector3.zero;
 		leftCamera.transform.localRotation = Quaternion.identity;
-		leftCamera.gameObject.AddComponent<EyeCamera>().left = true;
+		LeftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
+		LeftEye.left = true;
 
 		var rightCamera = cameras[1];
 		rightCamera.transform.parent = transform;
 		rightCamera.transform.localPosition = Vector3.zero;
 		rightCamera.transform.localRotation = Quaternion.identity;
-		rightCamera.gameObject.AddComponent<EyeCamera>().left = false;
+		RightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
+		RightEye.left = false;
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -54,8 +66,8 @@ public class VRCameraManager : MonoBehaviour
 
 		// Parent everything to a new "pivot" object
 		_root = new GameObject("PlayerRoot").transform;
-		_pivot = new GameObject("VRCameraPivot").transform;
-		_pivot.parent = _root;
+		_rotationPivot = new GameObject("Rotation").SetParent(_root).transform;
+		_pivot = new GameObject("VRCameraPivot").SetParent(_rotationPivot).transform;
 		VRPlayer.origin = _pivot;
 
 		transform.parent = _pivot;
@@ -69,6 +81,9 @@ public class VRCameraManager : MonoBehaviour
 		gameObject.AddComponent<RenderToScreen>();
 
 		var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+		// Disable depth texture since its upsidedown
+		urp.supportsCameraDepthTexture = false;
+
 		var dataLists = urp.GetValue<ScriptableRendererData[]>("m_RendererDataList");
 
 		// This makes the camera not upsidedown wtf
@@ -125,6 +140,8 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnPlayerSpawned()
 	{
+		_inFinaleCutscene = false;
+
 		// Make the player follow the boat
 		AnchorTransform.parent = GameManager.Instance.Player.transform;
 		ResetAnchorToBoat();
@@ -147,22 +164,31 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
+				if (_inFinaleCutscene)
 				{
-					// Don't take on origin pitch rotation because that is turbo motion sickness
-					var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
-					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
-				}
 
-				// If the camera y is locked but the boat is moving around the anchor point gets offset
-				if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+				}
+				else
 				{
-					ResetAnchorToBoat();
+					if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
+					{
+						// Don't take on origin pitch rotation because that is turbo motion sickness
+						var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
+						AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
+					}
+
+					// If the camera y is locked but the boat is moving around the anchor point gets offset
+					if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+					{
+						ResetAnchorToBoat();
+					}
 				}
 			}
 
 			_root.transform.position = AnchorTransform.position;
 			_root.transform.rotation = AnchorTransform.rotation;
+
+			UpdateCameraRotation();
 		}
 	}
 
@@ -186,6 +212,8 @@ public class VRCameraManager : MonoBehaviour
 
 	private void ResetAnchorToBoat()
 	{
+		if (_inFinaleCutscene) return;
+
 		AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
 
 		// Helps when you ram into stuff to not bounce around
@@ -194,4 +222,59 @@ public class VRCameraManager : MonoBehaviour
 			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
 		}
 	}
+
+	private void UpdateCameraRotation()
+	{
+		var x = VRInputManager.RightThumbStick.x;
+		var sign = Mathf.Sign(x);
+		var magnitude = Mathf.Clamp01((Mathf.Abs(x) - minX) / (1f - minX));
+
+		if (OptionsManager.Options.smoothRotation)
+		{
+			if (magnitude > 0)
+			{
+				_rotationPivot.Rotate(0, sign * magnitude * 180f * Time.unscaledDeltaTime, 0);
+			}
+		}
+		else
+		{
+			if (magnitude > 0)
+			{
+				if (!_justTurned)
+				{
+					_rotationPivot.Rotate(0, sign * 45f, 0);
+					_justTurned = true;
+				}
+			}
+			else
+			{
+				_justTurned = false;
+			}
+		}
+	}
+
+	private void OnCutToCredits()
+	{
+		_inFinaleCutscene = true;
+		AnchorTransform.parent = null;
+		AnchorTransform.transform.position = new Vector3(18, 7, 4);
+		AnchorTransform.transform.rotation = Quaternion.Euler(0, 270, 0);
+
+		// Rain only falls over the player, move it to our camera
+		foreach (var followPlayer in GameObject.FindObjectsOfType<FollowPlayerInWorld>())
+		{
+			followPlayer.playerRef = AnchorTransform;
+		}
+
+		// The post processing here is way too intense
+		// Will also want to tone down/disable lightning too
+		foreach (var volume in GameObject.FindObjectsOfType<Volume>())
+		{
+			volume.enabled = false;
+		}
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(FinaleCutsceneLogic), nameof(FinaleCutsceneLogic.CutToCredits))]
+	public static void FinaleCutsceneLogic_CutToCredits() => Instance.OnCutToCredits();
 }

@@ -157,6 +157,10 @@
       "requirement": "optional"
     },
     {
+      "name": "/actions/default/in/MoveCamera",
+      "type": "vector2"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -256,7 +260,8 @@
       "/actions/default/in/OpenEncyclopedia": "Open Encyclopedia",
       "/actions/default/in/OpenMessages": "Open Messages",
       "/actions/default/in/TabLeft": "Tab Left",
-      "/actions/default/in/TabRight": "Tab Right"
+      "/actions/default/in/TabRight": "Tab Right",
+      "/actions/default/in/MoveCamera": "Move Camera"
     }
   ]
 }

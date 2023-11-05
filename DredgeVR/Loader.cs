@@ -6,8 +6,6 @@ using System.IO;
 using System.Reflection;
 using Unity.XR.OpenVR;
 using UnityEngine;
-using UnityEngine.Localization.Settings;
-using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using Valve.VR;
 

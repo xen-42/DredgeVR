@@ -31,6 +31,7 @@ public class AssetLoader
 	public static Mesh PrimitiveQuad { get; private set; }
 	public static Mesh DoubleSidedQuad { get; private set; }
 	public static Mesh PrimitiveCylinder { get; private set; }
+	public static Mesh PrimitiveSphere { get; private set; }
 
 	// All our loaded control icons
 	private static readonly Dictionary<string, Texture2D> _icons = new();
@@ -50,6 +51,7 @@ public class AssetLoader
 		PrimitiveQuad = CreatePrimitiveMesh(PrimitiveType.Quad);
 		DoubleSidedQuad = GeometryHelper.MakeMeshDoubleFaced(PrimitiveQuad);
 		PrimitiveCylinder = CreatePrimitiveMesh(PrimitiveType.Cylinder);
+		PrimitiveSphere = CreatePrimitiveMesh(PrimitiveType.Sphere);
 
 		FlipYAxisMaterial = new Material(FlipYAxisShader);
 		ShowDepthMaterial = new Material(ShowDepthTexture);

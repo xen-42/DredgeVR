@@ -1,13 +1,9 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
-using DredgeVR.Options;
-using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
-using FluffyUnderware.DevTools.Extensions;
 using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -120,7 +116,7 @@ internal class VRUIManager : MonoBehaviour
 		// We place the title screen canvas on the beach
 		var canvas = GameObject.Find("Canvases");
 
-		canvas.transform.position = new Vector3(-5.4f, 0.35f, 1.6f);
+		canvas.transform.position = new Vector3(-5.6f, 0.35f, 1f);
 		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 		canvas.transform.localScale = Vector3.one * 0.002f;
 
@@ -130,22 +126,29 @@ internal class VRUIManager : MonoBehaviour
 		// These canvases are on the Manager scene and will persist the way they are
 		if (!_hasInitialized)
 		{
-			// Make the loading screen UI show in front of the player too
-			GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
-
-			// Create game objects for the left/right hand button prompts
-			var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
-			var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
-			var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
-
-			leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
-			rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
-
-			LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
-			RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
-
-			_hasInitialized = true;
+			InitializeManagerScene();
 		}
+	}
+
+	private void InitializeManagerScene()
+	{
+		// Make the loading screen UI show in front of the player too
+		GameObject.Find("Canvas").AddComponent<GameCanvasFixer>();
+
+		// Create game objects for the left/right hand button prompts
+		var controlPromptPanel = GameObject.Find("Canvas/ControlPromptPanel").transform;
+		var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
+		var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
+
+		leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
+		rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+
+		LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
+		RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
+
+		GameObject.FindObjectOfType<LoadingScreen>().gameObject.AddComponent<VRLoadingScene>();
+
+		_hasInitialized = true;
 	}
 
 	private GameObject CreatePromptContainer(string name, Transform parent)
@@ -170,7 +173,7 @@ internal class VRUIManager : MonoBehaviour
 		{
 			// When finding objects of type make sure they are in the game scene, could be on Manager or DontDestroyOnLoad or whatever
 			// Also ignore canvases that have parent canvases, since they will inherit their position
-			if (canvas.gameObject.scene.name == "Game" && canvas.transform.parent?.GetComponentInParent<Canvas>() == null)
+			if (canvas.gameObject.scene.name == "Game" && canvas.isRootCanvas)
 			{
 				canvas.gameObject.AddComponent<GameCanvasFixer>();
 			}
@@ -194,6 +197,8 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove scrims
 		GameObject.Find("GameCanvases/PopupCanvas/QuestWindow/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/GameCanvas/UpgradeWindow/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/GameCanvas/UpgradeWindow").transform.localPosition += Vector3.forward * 50f;
 
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow").AddComponent<HeldUI>().SetOffset(450, 50);
 		GameObject.Find("GameCanvases/PopupCanvas/QuestDetailWindow/Container/Scrim").SetActive(false);
@@ -202,10 +207,20 @@ internal class VRUIManager : MonoBehaviour
 
 		// Remove controls tab since it doesn't work in UI
 		RemoveControlsTab(GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+		GameObject.Find("GameCanvases/SettingsDialog/Scrim").transform.localScale = Vector3.zero; // Other things were reactivating it so hacky it is
+		GameObject.Find("GameCanvases/SettingsDialog/TabbedPanelContainer").transform.localPosition = Vector3.forward * -100f;
+		GameObject.Find("GameCanvases/SettingsDialog/PopupDialogContainer").transform.localPosition = Vector3.forward * -200f;
 
 		// Reposition some character dialogue stuff for fun
 		var dialogueContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/DialogueTextContainer").transform;
 		var nameContainer = GameObject.Find("GameCanvases/GameCanvas/DialogueView/Container/CharacterNameContainer").transform;
+
+		// Remove time pass scrim
+		GameObject.Find("GameCanvases/TimePassCanvas/Container/Scrim").SetActive(false);
+		GameObject.Find("GameCanvases/TimePassCanvas/Container").transform.localPosition = Vector3.forward * -100f;
+
+		// Remove encyclopedia scrim
+		GameObject.Find("GameCanvases/PopupCanvas/EncyclopediaWindow/Container/Scrim").SetActive(false);
 
 		var container = new GameObject("Container").transform;
 		container.parent = dialogueContainer.parent;

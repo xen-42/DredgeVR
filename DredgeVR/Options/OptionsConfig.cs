@@ -88,4 +88,10 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool disableMonitor = false;
+
+	/// <summary>
+	/// Enable smooth rotation with the right thumbstick instead of snapping
+	/// </summary>
+	[JsonProperty]
+	public bool smoothRotation = false;
 }

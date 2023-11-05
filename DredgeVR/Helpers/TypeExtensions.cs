@@ -49,4 +49,29 @@ public static class TypeExtensions
 			_ => throw new Exception($"Type {obj.GetType()} has no field or property named {name}"),
 		};
 	}
+
+	public static void CopyPropertiesFrom(this object destination, object source)
+	{
+		// Get the type
+		Type type = source.GetType();
+
+		// Get all fields and properties
+		FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+		PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+		// Loop through fields and copy their values
+		foreach (FieldInfo field in fields)
+		{
+			field.SetValue(destination, field.GetValue(source));
+		}
+
+		// Loop through properties and copy their values
+		foreach (PropertyInfo property in properties)
+		{
+			if (property.CanWrite)
+			{
+				property.SetValue(destination, property.GetValue(source));
+			}
+		}
+	}
 }
