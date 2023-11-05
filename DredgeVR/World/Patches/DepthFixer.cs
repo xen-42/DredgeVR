@@ -10,7 +10,7 @@ public static class DepthFixer
 	private static float _previousDepth;
 
 	// Exposed for testing with unity explorer
-	public static float depthModifier = 0.5f;
+	public static float depthModifier = 1f;
 
 	[HarmonyPostfix]
 	[HarmonyPatch(nameof(WaterController.Update))]
@@ -27,9 +27,9 @@ public static class DepthFixer
 
 		if (GameManager.Instance.Player != null)
 		{
-			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 40, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
+			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 30, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
 			// High "depth" is clearer than low "depth"
-			var realDepth = currentDepth * Mathf.Lerp(1400, 400, t*t);
+			var realDepth = currentDepth * Mathf.Lerp(1200, 400, t*t);
 
 			float depthToUse;
 
