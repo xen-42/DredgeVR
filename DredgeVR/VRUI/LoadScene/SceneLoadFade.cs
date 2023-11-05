@@ -79,12 +79,9 @@ public class VRLoadingScene : MonoBehaviour
 		if (!_isInLoadingScreen)
 		{
 			_isInLoadingScreen = true;
-			_cameraLayerCache = VRCameraManager.LeftEye.Camera.cullingMask;
-			VRCameraManager.LeftEye.Camera.cullingMask = 1 << LayerHelper.UI;
-			VRCameraManager.RightEye.Camera.cullingMask = 1 << LayerHelper.UI;
 
-			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Depth;
-			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Depth;
+			_cameraLayerCache = VRCameraManager.GetCurrentCameraCullingMask();
+			VRCameraManager.SetCameraCullingMask(1 << LayerHelper.UI, CameraClearFlags.Depth);
 
 			_meshRenderer.forceRenderingOff = false;
 		}
@@ -95,11 +92,8 @@ public class VRLoadingScene : MonoBehaviour
 		if (_isInLoadingScreen)
 		{
 			_isInLoadingScreen = false;
-			VRCameraManager.LeftEye.Camera.cullingMask = _cameraLayerCache;
-			VRCameraManager.RightEye.Camera.cullingMask = _cameraLayerCache;
 
-			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Skybox;
-			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Skybox;
+			VRCameraManager.SetCameraCullingMask(_cameraLayerCache, CameraClearFlags.Skybox);
 
 			_meshRenderer.forceRenderingOff = true;
 		}

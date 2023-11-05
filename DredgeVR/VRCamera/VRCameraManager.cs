@@ -22,8 +22,7 @@ public class VRCameraManager : MonoBehaviour
 	public static VRHand LeftHand { get; private set; }
 	public static VRHand RightHand { get; private set; }
 
-	public static EyeCamera LeftEye { get; private set; }
-	public static EyeCamera RightEye { get; private set; }
+	private EyeCamera _leftEye, _rightEye, _singleEye;
 
 	public static Transform AnchorTransform { get; private set; }
 	private Transform _pivot, _rotationPivot, _root;
@@ -41,19 +40,30 @@ public class VRCameraManager : MonoBehaviour
 
 		var cameras = GetComponentsInChildren<Camera>();
 
-		var leftCamera = cameras[0];
-		leftCamera.transform.parent = transform;
-		leftCamera.transform.localPosition = Vector3.zero;
-		leftCamera.transform.localRotation = Quaternion.identity;
-		LeftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
-		LeftEye.left = true;
+		if (OptionsManager.Options.useBuiltinUnityVR)
+		{
+			var singleCamera = cameras[0];
+			singleCamera.name = "Camera";
+			singleCamera.gameObject.SetParent(transform);
+			_singleEye = singleCamera.gameObject.AddComponent<EyeCamera>();
+			_singleEye.targetEye = StereoTargetEyeMask.Both;
 
-		var rightCamera = cameras[1];
-		rightCamera.transform.parent = transform;
-		rightCamera.transform.localPosition = Vector3.zero;
-		rightCamera.transform.localRotation = Quaternion.identity;
-		RightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
-		RightEye.left = false;
+			// Get rid of the right eye
+			GameObject.Destroy(cameras[1].gameObject);
+		}
+		else
+		{
+			var leftCamera = cameras[0];
+			leftCamera.transform.SetParent(transform);
+			_leftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
+			_leftEye.targetEye = StereoTargetEyeMask.Left;
+
+			var rightCamera = cameras[1];
+			rightCamera.transform.SetParent(transform);
+			_rightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
+			_rightEye.targetEye = StereoTargetEyeMask.Right;
+		}
+
 
 		// Adds tracking to the head
 		VRPlayer = gameObject.AddComponent<SteamVR_TrackedObject>();
@@ -250,6 +260,30 @@ public class VRCameraManager : MonoBehaviour
 			{
 				_justTurned = false;
 			}
+		}
+	}
+
+	public static void SetCameraCullingMask(int cullingMask, CameraClearFlags clearFlags)
+	{
+		foreach (var eye in new EyeCamera[] {Instance._leftEye, Instance._rightEye, Instance._singleEye})
+		{
+			if (eye != null)
+			{
+				eye.Camera.cullingMask = cullingMask;
+				eye.Camera.clearFlags = clearFlags;
+			}
+		}
+	}
+
+	public static int GetCurrentCameraCullingMask()
+	{
+		if (Instance._leftEye != null)
+		{
+			return Instance._leftEye.Camera.cullingMask;
+		}
+		else
+		{
+			return Instance._singleEye.Camera.cullingMask;
 		}
 	}
 

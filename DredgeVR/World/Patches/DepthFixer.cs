@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using DredgeVR.Options;
+using HarmonyLib;
 using UnityEngine;
 
 namespace DredgeVR.World.Patches;
@@ -22,6 +23,10 @@ public static class DepthFixer
 
 	private static void UpdateDepth(WaterController __instance)
 	{
+		// Built in Unity VR doesn't need this but it also breaks the right eye generally
+		// Some people were complaining that the recent version broke everything so maybe this will help them
+		if (OptionsManager.Options.useBuiltinUnityVR) return;
+
 		// Was good at 800-2000 when originally it was 1
 		var currentDepth = Shader.GetGlobalFloat(_depthID);
 

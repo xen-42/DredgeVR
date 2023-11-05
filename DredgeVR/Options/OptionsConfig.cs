@@ -100,4 +100,11 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool disablePostProcessing = false;
+
+	/// <summary>
+	/// If you're experiencing graphical glitches turn this on and see if it fixes things.
+	/// Will not show shadows/lights/particles in the right eye.
+	/// </summary>
+	[JsonProperty]
+	public bool useBuiltinUnityVR = false;
 }

@@ -18,7 +18,7 @@ namespace DredgeVR.VRCamera;
 [RequireComponent(typeof(Camera))]
 public class EyeCamera : MonoBehaviour
 {
-	public bool left;
+	public StereoTargetEyeMask targetEye;
 
 	public Camera Camera { get; private set; }
 	private UniversalAdditionalCameraData _data;
@@ -32,8 +32,11 @@ public class EyeCamera : MonoBehaviour
 
 		// This stops the water shader from getting all weird about the depth buffer being inverted
 		// Some day I'd like to fix that, but for now this looks decent enough
-		Camera.depthTextureMode = DepthTextureMode.None;
-		_data.requiresDepthOption = CameraOverrideOption.Off;
+		if (targetEye != StereoTargetEyeMask.Both)
+		{
+			Camera.depthTextureMode = DepthTextureMode.None;
+			_data.requiresDepthOption = CameraOverrideOption.Off;
+		}
 
 		_data.renderPostProcessing = !OptionsManager.Options.disablePostProcessing;
 
@@ -51,7 +54,8 @@ public class EyeCamera : MonoBehaviour
 	{
 		if (camera == Camera)
 		{
-			if (OptionsManager.Options.disablePostProcessing)
+			// Weird edge case where everything is rendered upsidedown
+			if (OptionsManager.Options.disablePostProcessing && targetEye != StereoTargetEyeMask.Both)
 			{
 				GL.invertCulling = false;
 			}
@@ -64,7 +68,8 @@ public class EyeCamera : MonoBehaviour
 		{
 			SetUpCamera();
 
-			if (OptionsManager.Options.disablePostProcessing)
+			// Weird edge case where everything is rendered upsidedown
+			if (OptionsManager.Options.disablePostProcessing && targetEye != StereoTargetEyeMask.Both)
 			{
 				GL.invertCulling = true;
 				Camera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
@@ -74,18 +79,26 @@ public class EyeCamera : MonoBehaviour
 
 	public void SetUpCamera()
 	{
-		var targetEyeMask = left ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
-		var targetEye = left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
-
-		// Magic number that some reddit thread told me was right
-		var eyeDistance = 63 / 1000f; //mm
-
-		transform.localPosition = left ? Vector3.left * eyeDistance / 2f : Vector3.right * eyeDistance / 2f;
-
 		Camera.aspect = SteamVR.instance.aspect;
 		Camera.fieldOfView = SteamVR.instance.fieldOfView;
-		Camera.stereoTargetEye = targetEyeMask;
-		Camera.projectionMatrix = Camera.GetStereoNonJitteredProjectionMatrix(targetEye);
-		Camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
+
+		if (targetEye == StereoTargetEyeMask.Both)
+		{
+			// Unity will handle it
+		}
+		else
+		{
+			var left = targetEye == StereoTargetEyeMask.Left;
+			var stereoTargetEye = left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
+
+			// Magic number that some reddit thread told me was right
+			var eyeDistance = 63 / 1000f; //mm
+
+			transform.localPosition = left ? Vector3.left * eyeDistance / 2f : Vector3.right * eyeDistance / 2f;
+
+			Camera.stereoTargetEye = targetEye;
+			Camera.projectionMatrix = Camera.GetStereoNonJitteredProjectionMatrix(stereoTargetEye);
+			Camera.targetTexture = _displaySubsystem.GetRenderTextureForRenderPass(left ? 0 : 1);
+		}
 	}
 }
