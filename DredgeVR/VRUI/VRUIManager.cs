@@ -1,13 +1,9 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
-using DredgeVR.Options;
-using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
-using FluffyUnderware.DevTools.Extensions;
 using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Valve.VR;
 
