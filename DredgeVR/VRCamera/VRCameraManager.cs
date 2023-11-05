@@ -2,8 +2,7 @@
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
-using DredgeVR.VRUI;
-using System;
+using HarmonyLib;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
@@ -11,10 +10,10 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using Valve.VR;
-using static Mono.Math.BigInteger;
 
 namespace DredgeVR.VRCamera;
 
+[HarmonyPatch]
 public class VRCameraManager : MonoBehaviour
 {
 	public static VRCameraManager Instance { get; private set; }
@@ -33,6 +32,8 @@ public class VRCameraManager : MonoBehaviour
 
 	public float minX = 0.5f;
 	private bool _justTurned;
+
+	private bool _inFinaleCutscene;
 
 	public void Awake()
 	{
@@ -139,6 +140,8 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnPlayerSpawned()
 	{
+		_inFinaleCutscene = false;
+
 		// Make the player follow the boat
 		AnchorTransform.parent = GameManager.Instance.Player.transform;
 		ResetAnchorToBoat();
@@ -161,17 +164,24 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
+				if (_inFinaleCutscene)
 				{
-					// Don't take on origin pitch rotation because that is turbo motion sickness
-					var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
-					AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
-				}
 
-				// If the camera y is locked but the boat is moving around the anchor point gets offset
-				if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+				}
+				else
 				{
-					ResetAnchorToBoat();
+					if (OptionsManager.Options.lockViewToHorizon && AnchorTransform.parent != null)
+					{
+						// Don't take on origin pitch rotation because that is turbo motion sickness
+						var forwardOnPlane = AnchorTransform.parent.forward.ProjectOntoPlane(Vector3.up);
+						AnchorTransform.transform.rotation = Quaternion.LookRotation(forwardOnPlane, Vector3.up);
+					}
+
+					// If the camera y is locked but the boat is moving around the anchor point gets offset
+					if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+					{
+						ResetAnchorToBoat();
+					}
 				}
 			}
 
@@ -202,6 +212,8 @@ public class VRCameraManager : MonoBehaviour
 
 	private void ResetAnchorToBoat()
 	{
+		if (_inFinaleCutscene) return;
+
 		AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
 
 		// Helps when you ram into stuff to not bounce around
@@ -239,7 +251,30 @@ public class VRCameraManager : MonoBehaviour
 				_justTurned = false;
 			}
 		}
-
-
 	}
+
+	private void OnCutToCredits()
+	{
+		_inFinaleCutscene = true;
+		AnchorTransform.parent = null;
+		AnchorTransform.transform.position = new Vector3(18, 7, 4);
+		AnchorTransform.transform.rotation = Quaternion.Euler(0, 270, 0);
+
+		// Rain only falls over the player, move it to our camera
+		foreach (var followPlayer in GameObject.FindObjectsOfType<FollowPlayerInWorld>())
+		{
+			followPlayer.playerRef = AnchorTransform;
+		}
+
+		// The post processing here is way too intense
+		// Will also want to tone down/disable lightning too
+		foreach (var volume in GameObject.FindObjectsOfType<Volume>())
+		{
+			volume.enabled = false;
+		}
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(FinaleCutsceneLogic), nameof(FinaleCutsceneLogic.CutToCredits))]
+	public static void FinaleCutsceneLogic_CutToCredits() => Instance.OnCutToCredits();
 }

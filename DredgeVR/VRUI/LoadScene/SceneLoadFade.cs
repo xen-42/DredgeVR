@@ -1,16 +1,19 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.VRCamera;
+using HarmonyLib;
 using UnityEngine;
 
 namespace DredgeVR.VRUI;
 
 
+[HarmonyPatch]
 public class VRLoadingScene : MonoBehaviour
 {
 	private MeshRenderer _meshRenderer;
 	private int _cameraLayerCache;
 
 	private bool _isInLoadingScreen;
+	private bool _isInGameScene;
 
 	private LoadingScreen _loadingScreen;
 
@@ -33,14 +36,31 @@ public class VRLoadingScene : MonoBehaviour
 
 		sphere.transform.localScale = Vector3.one * 10f;
 
+		DredgeVRCore.GameSceneStart += OnGameSceneStart;
+		DredgeVRCore.SceneUnloaded += OnSceneUnloaded;
+
 		HideLoadScreen();
+	}
+
+	public void OnDestroy()
+	{
+		DredgeVRCore.GameSceneStart -= OnGameSceneStart;
+		DredgeVRCore.SceneUnloaded -= OnSceneUnloaded;
+	}
+
+	private void OnGameSceneStart() => _isInGameScene = true;
+	private void OnSceneUnloaded(string name)
+	{
+		if (name == "Game")
+			_isInGameScene = false;
 	}
 
 	public void Update()
 	{
 		// Hacky but works
 		// Tried patching the fade method but it threw tons of weird errors
-		var shouldShow = _loadingScreen.loadingScreenCanvasGroup.alpha == 1f;
+		// Also do it for the HUD cover scrim which is used for the ending
+		var shouldShow = _loadingScreen.loadingScreenCanvasGroup.alpha == 1f || (_isInGameScene && GameManager.Instance.UI.HUDCoverScrim.enabled && GameManager.Instance.UI.HUDCoverScrim.color.a == 1f);
 		if (shouldShow != _isInLoadingScreen)
 		{
 			if (shouldShow)
