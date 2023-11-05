@@ -35,8 +35,6 @@ public class EyeCamera : MonoBehaviour
 		Camera.depthTextureMode = DepthTextureMode.None;
 		_data.requiresDepthOption = CameraOverrideOption.Off;
 
-		_data.renderPostProcessing = !OptionsManager.Options.disablePostProcessing;
-
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;
 		RenderPipelineManager.endCameraRendering += RenderPipelineManager_endCameraRendering;
 	}
@@ -51,10 +49,7 @@ public class EyeCamera : MonoBehaviour
 	{
 		if (camera == Camera)
 		{
-			if (OptionsManager.Options.disablePostProcessing)
-			{
-				GL.invertCulling = false;
-			}
+
 		}
 	}
 
@@ -63,12 +58,6 @@ public class EyeCamera : MonoBehaviour
 		if (camera == Camera)
 		{
 			SetUpCamera();
-
-			if (OptionsManager.Options.disablePostProcessing)
-			{
-				GL.invertCulling = true;
-				Camera.projectionMatrix *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-			}
 		}
 	}
 
