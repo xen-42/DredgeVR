@@ -1,5 +1,4 @@
 ﻿using DredgeVR.Helpers;
-using FluffyUnderware.DevTools.Extensions;
 using HarmonyLib;
 using System;
 using System.Linq;
@@ -11,6 +10,7 @@ namespace DredgeVR.VRUI.Patches;
 [HarmonyPatch]
 public static class CharacterDialoguePatches
 {
+	private static GameObject _portraitContainer;
 	private static Camera _dialogueCameraHack;
 
 	[HarmonyPostfix]
@@ -28,60 +28,34 @@ public static class CharacterDialoguePatches
 		// Very hacky
 		// The UI particles align to face the worldCamera, which is in your hand for raycasting, which looks awful
 		// We want them to just be flat in the plane so we make a disabled camera that looks directly at the UI
-		if (_dialogueCameraHack == null)
+		if (_portraitContainer == null)
 		{
-			_dialogueCameraHack = new GameObject("DialogueCameraHack").SetParent(__instance.transform).AddComponent<Camera>();
+			_portraitContainer = new GameObject("PortraitContainer");
+
+			_dialogueCameraHack = new GameObject("DialogueCameraHack").SetParent(_portraitContainer.transform).AddComponent<Camera>();
 			_dialogueCameraHack.enabled = false;
-			_dialogueCameraHack.transform.localPosition = Vector3.forward;
-		}
+			_dialogueCameraHack.transform.localPosition = -Vector3.forward;
+			_dialogueCameraHack.transform.LookAt(_portraitContainer.transform);
 
-		CharacterPortraitFixer.Setup();
-	}
+			_portraitContainer.GetAddComponent<CanvasGroup>();
+			_portraitContainer.GetAddComponent<GraphicRaycaster>();
+			_portraitContainer.GetAddComponent<GameCanvasFixer>();
 
-	public class CharacterPortraitFixer : MonoBehaviour
-	{
-		private static GameObject _portraitContainer;
-		private static Canvas _originalCanvas;
-
-		internal static void Setup()
-		{
-			_originalCanvas = GameManager.Instance.UI.dialogueView.characterPortraitContainer.GetComponentInChildren<Canvas>().rootCanvas;
-
-			if (_portraitContainer == null)
-			{
-				_portraitContainer = new GameObject("PortraitContainer").AddComponent<CharacterPortraitFixer>().gameObject;
-			}
-
-			GameManager.Instance.UI.dialogueView.characterPortraitContainer.SetParentPreserveLocal(_portraitContainer.transform);
-			GameManager.Instance.UI.dialogueView.characterPortraitContainer.transform.localScale = Vector3.one;
-		}
-
-		public void Awake()
-		{
-			// Very hacky
-			// The UI particles align to face the worldCamera, which is in your hand for raycasting, which looks awful
-			// We want them to just be flat in the plane so we make a disabled camera that looks directly at the UI
-
-			transform.parent = null;
-
-			var dialogueCameraHack = new GameObject("DialogueCameraHack").SetParent(transform).AddComponent<Camera>();
-			dialogueCameraHack.transform.LookAt(transform);
-			dialogueCameraHack.enabled = false;
-			dialogueCameraHack.transform.localPosition = Vector3.forward;
-
-			gameObject.GetAddComponent<CanvasGroup>();
-			gameObject.GetAddComponent<GraphicRaycaster>();
-
-			gameObject.GetAddComponent<GameCanvasFixer>();
-
-			var canvas = gameObject.GetAddComponent<Canvas>();
+			var canvas = _portraitContainer.GetAddComponent<Canvas>();
 			var name = canvas.name;
 			// Had to copy all this else it wouldnt get it right
-			canvas.CopyPropertiesFrom(_originalCanvas);
-			gameObject.GetComponent<RectTransform>().CopyPropertiesFrom(_originalCanvas.GetComponent<RectTransform>());
+			var parentCanvas = GameManager.Instance.UI.dialogueView.characterPortraitContainer.GetComponentInParent<Canvas>();
+			var rootCanvas = parentCanvas.isRootCanvas ? parentCanvas : parentCanvas.rootCanvas;
+			canvas.CopyPropertiesFrom(rootCanvas);
+			_portraitContainer.GetComponent<RectTransform>().CopyPropertiesFrom(rootCanvas.GetComponent<RectTransform>());
 			// Don't copy the name
 			canvas.name = name;
-			canvas.worldCamera = dialogueCameraHack;
+			canvas.worldCamera = _dialogueCameraHack;
+
+			_portraitContainer.transform.parent = rootCanvas.transform.parent;
 		}
+
+		GameManager.Instance.UI.dialogueView.characterPortraitContainer.SetParentPreserveLocal(_portraitContainer.transform);
+		GameManager.Instance.UI.dialogueView.characterPortraitContainer.transform.localScale = Vector3.one;
 	}
 }
