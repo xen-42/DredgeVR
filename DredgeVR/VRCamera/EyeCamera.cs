@@ -35,6 +35,9 @@ public class EyeCamera : MonoBehaviour
 		Camera.depthTextureMode = DepthTextureMode.None;
 		_data.requiresDepthOption = CameraOverrideOption.Off;
 
+		// Else it ignores the depth changes
+		Component.Destroy(GetComponent<AntiAliasingSettingResponder>());
+
 		RenderPipelineManager.beginCameraRendering += RenderPipelineManager_beginCameraRendering;
 		RenderPipelineManager.endCameraRendering += RenderPipelineManager_endCameraRendering;
 	}
@@ -63,6 +66,10 @@ public class EyeCamera : MonoBehaviour
 
 	public void SetUpCamera()
 	{
+		// Somehow this was getting set back
+		// Make 100% sure that it is off else it undoes our depth "fix"
+		_data.antialiasing = AntialiasingMode.None;
+
 		var targetEyeMask = left ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
 		var targetEye = left ? Camera.StereoscopicEye.Left : Camera.StereoscopicEye.Right;
 

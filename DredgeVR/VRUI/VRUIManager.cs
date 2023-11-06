@@ -86,13 +86,17 @@ internal class VRUIManager : MonoBehaviour
 		}
 
 		// Some UI has 0 z size - messes up text
-		foreach (var rectTransform in Resources.FindObjectsOfTypeAll(typeof(RectTransform)).Cast<RectTransform>())
+		// Delay for CHFB compat since it makes UI a bit late
+		Delay.FireInNUpdates(2, () =>
 		{
-			if (rectTransform.localScale.z == 0)
+			foreach (var rectTransform in Resources.FindObjectsOfTypeAll(typeof(RectTransform)).Cast<RectTransform>())
 			{
-				rectTransform.localScale = new Vector3(rectTransform.localScale.x, rectTransform.localScale.y, 1);
+				if (rectTransform.localScale.z == 0)
+				{
+					rectTransform.localScale = new Vector3(rectTransform.localScale.x, rectTransform.localScale.y, 1);
+				}
 			}
-		}
+		});
 	}
 
 	private void MakeCanvasWorldSpace(Canvas canvas)
@@ -113,21 +117,28 @@ internal class VRUIManager : MonoBehaviour
 
 	private void OnTitleSceneStart()
 	{
-		// We place the title screen canvas on the beach
-		var canvas = GameObject.Find("Canvases");
-
-		canvas.transform.position = new Vector3(-5.6f, 0.35f, 1f);
-		canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
-		canvas.transform.localScale = Vector3.one * 0.002f;
-
-		// Remove controls tab for now since it doesnt work
-		RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
-
-		// These canvases are on the Manager scene and will persist the way they are
-		if (!_hasInitialized)
+		// Delay for CHFB compat since it makes UI a bit late
+		Delay.FireInNUpdates(2, () =>
 		{
-			InitializeManagerScene();
-		}
+			// We place the title screen canvas on the beach
+			var canvas = GameObject.Find("Canvases");
+
+			canvas.transform.position = new Vector3(-5.3f, 0.45f, 2f);
+			canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
+			canvas.transform.localScale = Vector3.one * 0.002f;
+
+			// Remove controls tab for now since it doesnt work
+			RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
+
+			// These canvases are on the Manager scene and will persist the way they are
+			if (!_hasInitialized)
+			{
+				InitializeManagerScene();
+			}
+
+			// Splash screen scene is still around and the canvas is there but invisible blocking our laser pointer
+			GameObject.FindObjectsOfType<Canvas>().FirstOrDefault(x => x.gameObject.scene.name == "Splash")?.gameObject?.SetActive(false);
+		});
 	}
 
 	private void InitializeManagerScene()

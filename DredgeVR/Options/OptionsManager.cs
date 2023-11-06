@@ -18,8 +18,16 @@ public static class OptionsManager
 			Options = new();
 			if (File.Exists(optionsPath))
 			{
-				JsonConvert.PopulateObject(File.ReadAllText(optionsPath), Options);
-				DredgeVRLogger.Info("Loaded options file");
+				try
+				{
+					JsonConvert.PopulateObject(File.ReadAllText(optionsPath), Options);
+					DredgeVRLogger.Info("Loaded options file");
+				}
+				catch (Exception e)
+				{
+					// Will go on to replace it with the defaults
+					DredgeVRLogger.Error($"Couldn't load options file: {e}");
+				}
 			}
 			else
 			{
@@ -30,7 +38,7 @@ public static class OptionsManager
 		}
 		catch (Exception e)
 		{
-			DredgeVRLogger.Error($"Couldn't load options file: {e}");
+			DredgeVRLogger.Error($"Something went wrong when loading/creating options file: {e}");
 		}
 	}
 }
