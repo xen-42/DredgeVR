@@ -168,6 +168,33 @@
                },
                "mode" : "joystick",
                "path" : "/user/hand/right/input/joystick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/radialselectshow"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/joystick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/repairitem"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/quickmove"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
             }
          ]
       },
@@ -183,7 +210,7 @@
    "controller_type" : "oculus_touch",
    "description" : "",
    "interaction_profile" : "",
-   "name" : "Saved Dredge VR [Testing] configuration for Oculus Touch Controller",
+   "name" : "My Dredge VR [Testing] configuration for Oculus Touch Controller",
    "options" : {},
    "simulated_actions" : []
 }

@@ -76,6 +76,19 @@ public static class VRControlIcons
 			}
 		}
 
+		// TODO: Should have its own icons probably
+		if (inputSource.Contains("squeeze"))
+		{
+			if (hand.Contains("left"))
+			{
+				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Left_Grab.png");
+			}
+			if (hand.Contains("right"))
+			{
+				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Right_Grab.png");
+			}
+		}
+
 		return GetOculusControlIconData(inputSource, hand);
 	}
 
@@ -148,6 +161,17 @@ public static class VRControlIcons
 			if (hand.Contains("right"))
 			{
 				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Right_Stick.png");
+			}
+		}
+		if (inputSource.Contains("grip"))
+		{
+			if (hand.Contains("left"))
+			{
+				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Left_Grab.png");
+			}
+			if (hand.Contains("right"))
+			{
+				return CreateData("AssetBundles/VR Icons/Oculus/Oculus_Right_Grab.png");
 			}
 		}
 		return null;

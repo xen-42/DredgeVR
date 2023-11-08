@@ -23,19 +23,6 @@ public class VRLoadingScene : MonoBehaviour
 
 		gameObject.layer = LayerHelper.UI;
 
-		var sphere = new GameObject("OcclusionSphere").SetParent(transform);
-
-		var mf = sphere.AddComponent<MeshFilter>();
-		mf.mesh = GeometryHelper.MakeMeshDoubleFaced(AssetLoader.PrimitiveSphere);
-
-		_meshRenderer = sphere.AddComponent<MeshRenderer>();
-		_meshRenderer.material = new Material(AssetLoader.UnlitShader)
-		{
-			mainTexture = Texture2D.blackTexture
-		};
-
-		sphere.transform.localScale = Vector3.one * 10f;
-
 		DredgeVRCore.GameSceneStart += OnGameSceneStart;
 		DredgeVRCore.SceneUnloaded += OnSceneUnloaded;
 
@@ -52,7 +39,9 @@ public class VRLoadingScene : MonoBehaviour
 	private void OnSceneUnloaded(string name)
 	{
 		if (name == "Game")
+		{
 			_isInGameScene = false;
+		}
 	}
 
 	public void Update()
