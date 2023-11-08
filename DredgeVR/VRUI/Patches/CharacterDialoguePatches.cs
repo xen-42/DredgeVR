@@ -20,7 +20,8 @@ public static class CharacterDialoguePatches
 		// Bit hacky
 		// Move the background back a bit if it exists
 		var background = __instance.characterPortraitContainer.GetComponentsInChildren<Transform>().FirstOrDefault(x => x.name.Contains("Background"));
-		if (background != null)
+		// Show portrait can be called when it is already showing which then moves it backwards multiple times if we dont check
+		if (background != null && background.transform.localPosition.z == 0f)
 		{
 			background.transform.localPosition += Vector3.forward * 50f;
 		}

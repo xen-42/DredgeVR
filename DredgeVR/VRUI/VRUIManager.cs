@@ -263,6 +263,9 @@ internal class VRUIManager : MonoBehaviour
 			var camera = cutscene.transform.Find("Camera").gameObject.AddComponent<Camera>();
 
 			camera.targetTexture = (RenderTexture)cutsceneRenderer.texture;
+
+			// Disable the post processing
+			GameObject.Find("IntroCutscene/PostProcessing").gameObject.SetActive(false);
 		}
 		catch (Exception e)
 		{
