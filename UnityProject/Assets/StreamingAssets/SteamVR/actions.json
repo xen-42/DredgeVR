@@ -28,24 +28,28 @@
     },
     {
       "name": "/actions/default/in/Accept",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/RadialSelectShow",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/DiscardItem",
       "type": "boolean",
-      "requirement": "suggested"
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/DoAbility",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/Interact",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/Reel",
@@ -57,26 +61,28 @@
     },
     {
       "name": "/actions/default/in/RotateClockwise",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/RotateCounterClockwise",
       "type": "boolean",
-      "requirement": "optional"
+      "requirement": "suggested"
     },
     {
       "name": "/actions/default/in/ToggleCargo",
       "type": "boolean",
-      "requirement": "optional"
+      "requirement": "suggested"
     },
     {
       "name": "/actions/default/in/Pause",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/BuyItem",
       "type": "boolean",
-      "requirement": "optional"
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/RepairItem",
@@ -99,7 +105,8 @@
     },
     {
       "name": "/actions/default/in/ZoomMapOut",
-      "type": "boolean"
+      "type": "boolean",
+      "requirement": "optional"
     },
     {
       "name": "/actions/default/in/RemoveMarker",
@@ -124,7 +131,7 @@
     {
       "name": "/actions/default/in/QuickMove",
       "type": "boolean",
-      "requirement": "optional"
+      "requirement": "mandatory"
     },
     {
       "name": "/actions/default/in/OpenJournal",
