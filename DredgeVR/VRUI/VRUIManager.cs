@@ -123,8 +123,17 @@ internal class VRUIManager : MonoBehaviour
 			// We place the title screen canvas on the beach
 			var canvas = GameObject.Find("Canvases");
 
-			canvas.transform.position = new Vector3(-5.3f, 0.45f, 2f);
-			canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
+			if (DLCHelper.OwnsThePaleReach())
+			{
+				canvas.transform.position = new Vector3(-91f, 1f, -1338f);
+				canvas.transform.rotation = Quaternion.Euler(0, 230, 0);
+			}
+			else
+			{
+				canvas.transform.position = new Vector3(-5.3f, 0.45f, 2f);
+				canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
+			}
+
 			canvas.transform.localScale = Vector3.one * 0.002f;
 
 			// Remove controls tab for now since it doesnt work

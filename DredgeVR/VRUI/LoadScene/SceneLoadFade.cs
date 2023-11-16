@@ -9,7 +9,6 @@ namespace DredgeVR.VRUI;
 [HarmonyPatch]
 public class VRLoadingScene : MonoBehaviour
 {
-	private MeshRenderer _meshRenderer;
 	private int _cameraLayerCache;
 
 	private bool _isInLoadingScreen;
@@ -74,8 +73,6 @@ public class VRLoadingScene : MonoBehaviour
 
 			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Depth;
 			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Depth;
-
-			_meshRenderer.forceRenderingOff = false;
 		}
 	}
 
@@ -89,8 +86,6 @@ public class VRLoadingScene : MonoBehaviour
 
 			VRCameraManager.LeftEye.Camera.clearFlags = CameraClearFlags.Skybox;
 			VRCameraManager.RightEye.Camera.clearFlags = CameraClearFlags.Skybox;
-
-			_meshRenderer.forceRenderingOff = true;
 		}
 	}
 }
