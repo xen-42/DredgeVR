@@ -125,7 +125,7 @@ internal class VRUIManager : MonoBehaviour
 
 			if (DLCHelper.OwnsThePaleReach())
 			{
-				canvas.transform.position = new Vector3(-91f, 1f, -1338f);
+				canvas.transform.position = new Vector3(-91.1f, 1f, -1339.2f);
 				canvas.transform.rotation = Quaternion.Euler(0, 230, 0);
 			}
 			else
