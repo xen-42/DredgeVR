@@ -130,12 +130,22 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnTitleSceneStart()
 	{
-		// Make the player look towards the lighthouse
-		var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
-		var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
+		if (DLCHelper.OwnsThePaleReach())
+		{
+			var camLookAt = GameObject.Find("DLC1Positions/DLC1CamLookAt").transform.position.ProjectOntoPlane(Vector3.up);
 
-		AnchorTransform.position = new Vector3(-6.5f, 0.5f, 0);
-		AnchorTransform.LookAt(worldPos);
+			AnchorTransform.position = new Vector3(-90.6f, 1f, -1337.3f);
+			AnchorTransform.LookAt(camLookAt);
+		}
+		else
+		{
+			// Make the player look towards the lighthouse
+			var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
+			var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
+
+			AnchorTransform.position = new Vector3(-6.5f, 0.5f, 0);
+			AnchorTransform.LookAt(worldPos);
+		}
 	}
 
 	private void OnPlayerSpawned()

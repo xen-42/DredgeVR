@@ -93,6 +93,15 @@ internal class WorldManager : MonoBehaviour
 			// OnDestroy breaks the reference to the culling brain so we reconnect it so other scripts don't NRE
 			GameManager.Instance.CullingBrain = cullingBrain;
 		}
+
+		if (DLCHelper.OwnsThePaleReach())
+		{
+			foreach (var meshRenderer in GameObject.FindObjectsOfType<MeshRenderer>().Where(x => x.material.shader.name.Contains("DLC1TransparentIceShader")))
+			{
+				// Since we break depth textures we have to fix this shader
+				meshRenderer.material.SetFloat("_IceDepth", 0.00025f);
+			}
+		}
 	}
 
 	public void OnPlayerSpawned()

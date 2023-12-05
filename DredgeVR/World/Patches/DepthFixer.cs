@@ -27,9 +27,17 @@ public static class DepthFixer
 
 		if (GameManager.Instance.Player != null)
 		{
-			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 30, GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100));
+			var depth = GameManager.Instance.Player.PlayerDepthMonitor.currentDepth * 100; // m
+
+			var t = Mathf.Clamp01(Mathf.InverseLerp(5, 30, depth));
 			// High "depth" is clearer than low "depth"
 			var realDepth = currentDepth * Mathf.Lerp(1200, 400, t*t);
+
+			// In the middle of the ocean just make the water clear since theres no bottom anyway
+			if (depth >= 100)
+			{
+				realDepth = currentDepth * 1000f;
+			}
 
 			float depthToUse;
 

@@ -12,7 +12,7 @@
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x86</PlatformTarget>
 		<TargetFramework>net48</TargetFramework>
-		<LangVersion>default</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
@@ -25,23 +25,19 @@
 		<None Include="AssetBundles/**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Include="CopyToGame/**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Include="DredgeVR.csproj.user" />
 	</ItemGroup>
 
 	<ItemGroup>
-    <PackageReference Include="DredgeGameLibs" Version="1.3.0" />
+    <PackageReference Include="DredgeGameLibs" Version="1.4.0" />
     <PackageReference Include="HarmonyX" Version="2.10.2" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Winch" Version="0.2.3" />
 		<Reference Include="../dlls/*" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <Compile Remove="VRCamera\NewFolder\**" />
-	  <EmbeddedResource Remove="VRCamera\NewFolder\**" />
-	  <None Remove="VRCamera\NewFolder\**" />
-	  <Reference Remove="VRCamera\NewFolder\**" />
-	</ItemGroup>
 
 </Project>

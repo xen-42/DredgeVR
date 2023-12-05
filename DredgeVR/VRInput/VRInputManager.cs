@@ -89,7 +89,23 @@ public class VRInputManager : MonoBehaviour
 		AddNewBinding(GameManager.Instance.Input.Controls.TabLeft, SteamVR_Actions._default.TabLeft);
 		AddNewBinding(GameManager.Instance.Input.Controls.TabRight, SteamVR_Actions._default.TabRight);
 
+		// These bindings are only really used by the tutorial manager to check if the player is moving
+		AddNewBinding(GameManager.Instance.Input.controls.MoveForward, SteamVR_Actions._default.Move, Vector2.up);
+		AddNewBinding(GameManager.Instance.Input.controls.MoveBack, SteamVR_Actions._default.Move, Vector2.down);
+		AddNewBinding(GameManager.Instance.Input.controls.MoveLeft, SteamVR_Actions._default.Move, Vector2.left);
+		AddNewBinding(GameManager.Instance.Input.controls.MoveRight, SteamVR_Actions._default.Move, Vector2.right);
+
 		new CustomControl(SteamVR_Actions._default.RecenterCamera, VRCameraManager.Instance.RecenterCamera);
+	}
+
+	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Vector2 vrAction, Vector2 direction)
+	{
+		var vrBindingSource = new VRVector2BindingSource(vrAction, direction);
+
+		action.AddDefaultBinding(vrBindingSource);
+		action.AddBinding(vrBindingSource);
+
+		DredgeVRLogger.Debug($"Added new binding for {action.Name} - {vrAction.GetShortName()}");
 	}
 
 	private static void AddNewBinding(PlayerAction action, SteamVR_Action_Boolean vrAction)
