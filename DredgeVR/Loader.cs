@@ -8,11 +8,20 @@ using Unity.XR.OpenVR;
 using UnityEngine;
 using UnityEngine.XR.Management;
 using Valve.VR;
+using System.Runtime.CompilerServices;
 
 namespace DredgeVR
 {
 	public class Loader
 	{
+		// Confuses me that the mod dll counts as the executing assembly
+		// Might change if we were using a different mod loader
+		// Should update Winch to provide these paths if it doesn't already
+		public static string DredgeVRFolder => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+		
+		// Bit hacky but eh
+		public static string DredgeFolder => Directory.GetParent(Assembly.GetExecutingAssembly().Location).Parent.Parent.FullName;
+
 		public static void Initialize()
 		{
 			OptionsManager.Load();
@@ -24,6 +33,14 @@ namespace DredgeVR
 			GameObject.DontDestroyOnLoad(gameObject);
 
 			new Harmony("DredgeVR").PatchAll();
+		}
+
+		/// <summary>
+		/// This runs when the assembly is loaded
+		/// </summary>
+		public static void Preload()
+		{
+			FileHelper.Copy(Path.Combine(DredgeVRFolder, "CopyToGame"), Path.Combine(DredgeFolder, "DREDGE_Data"));
 		}
 
 		private static void SetUpXr()
@@ -54,8 +71,7 @@ namespace DredgeVR
 			// SteamVR_Settings.instance.pauseGameWhenDashboardVisible = true;
 
 			// Makes it so that Dredge appears as a VR game in your Steam Home
-			var dredgeFolder = Directory.GetParent(Assembly.GetExecutingAssembly().Location).Parent.Parent.FullName;
-			var manifestPath = Path.Combine(dredgeFolder, @"DREDGE_Data\StreamingAssets\dredge.vrmanifest");
+			var manifestPath = Path.Combine(DredgeFolder, @"DREDGE_Data\StreamingAssets\dredge.vrmanifest");
 			ApplicationManifestHelper.UpdateManifest(manifestPath,
 													"steam.app.1562430",
 													"https://steamcdn-a.akamaihd.net/steam/apps/1562430/header.jpg",

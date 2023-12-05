@@ -12,7 +12,7 @@
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x86</PlatformTarget>
 		<TargetFramework>net48</TargetFramework>
-		<LangVersion>default</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
@@ -23,6 +23,9 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="AssetBundles/**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="CopyToGame/**">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="DredgeVR.csproj.user" />
@@ -36,12 +39,5 @@
     <PackageReference Include="Winch" Version="0.2.3" />
 		<Reference Include="../dlls/*" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <Compile Remove="VRCamera\NewFolder\**" />
-	  <EmbeddedResource Remove="VRCamera\NewFolder\**" />
-	  <None Remove="VRCamera\NewFolder\**" />
-	  <Reference Remove="VRCamera\NewFolder\**" />
-	</ItemGroup>
 
 </Project>
