@@ -101,6 +101,9 @@ internal class VRUIManager : MonoBehaviour
 
 	private void MakeCanvasWorldSpace(Canvas canvas)
 	{
+		// If already world space, skip over it
+		if (canvas.renderMode == RenderMode.WorldSpace) return;
+
 		canvas.renderMode = RenderMode.WorldSpace;
 		canvas.worldCamera = VRInputModule.Instance.RaycastCamera;
 		canvas.scaleFactor = 1f;
@@ -189,11 +192,12 @@ internal class VRUIManager : MonoBehaviour
 	private void OnGameSceneStart()
 	{
 		// Add a component to orient game UI relative to the player camera
+		// Ignore HarvestablePOIs
 		foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
 		{
 			// When finding objects of type make sure they are in the game scene, could be on Manager or DontDestroyOnLoad or whatever
 			// Also ignore canvases that have parent canvases, since they will inherit their position
-			if (canvas.gameObject.scene.name == "Game" && canvas.isRootCanvas)
+			if (canvas.gameObject.scene.name == "Game" && canvas.isRootCanvas && canvas.transform.parent?.name != "HarvestPOIs")
 			{
 				canvas.gameObject.AddComponent<GameCanvasFixer>();
 			}
