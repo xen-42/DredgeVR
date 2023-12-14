@@ -1,7 +1,7 @@
 {
 	"Name": "DredgeVR",
 	"ModGUID": "xen.DredgeVR",
-	"Version": "0.3.1",
+	"Version": "0.3.2",
 	"ModAssembly": "DredgeVR.dll",
 	"MinWinchVersion": "0.3.0",
 	"Entrypoint": "DredgeVR.Loader/Initialize",
