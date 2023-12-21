@@ -28,14 +28,10 @@ public class VRCameraManager : MonoBehaviour
 	public static Transform AnchorTransform { get; private set; }
 	private Transform _pivot, _rotationPivot, _root;
 
-	private float _gameAnchorYPosition = 0.8f;
-
 	public float minX = 0.5f;
 	private bool _justTurned;
 
 	private bool _inFinaleCutscene;
-
-	public float playerScale = 0.3f;
 
 	public void Awake()
 	{
@@ -47,7 +43,7 @@ public class VRCameraManager : MonoBehaviour
 		leftCamera.transform.parent = transform;
 		leftCamera.transform.localPosition = Vector3.zero;
 		leftCamera.transform.localRotation = Quaternion.identity;
-		leftCamera.nearClipPlane *= playerScale;
+		leftCamera.nearClipPlane *= OptionsManager.Options.playerScale;
 		LeftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
 		LeftEye.left = true;
 
@@ -55,7 +51,7 @@ public class VRCameraManager : MonoBehaviour
 		rightCamera.transform.parent = transform;
 		rightCamera.transform.localPosition = Vector3.zero;
 		rightCamera.transform.localRotation = Quaternion.identity;
-		rightCamera.nearClipPlane *= playerScale;
+		rightCamera.nearClipPlane *= OptionsManager.Options.playerScale;
 		RightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
 		RightEye.left = false;
 
@@ -98,7 +94,7 @@ public class VRCameraManager : MonoBehaviour
 		dataLists.First().rendererFeatures.Insert(0, renderObject);
 
 		// Rescale the character
-		_pivot.transform.localScale = Vector3.one * playerScale;
+		_pivot.transform.localScale = Vector3.one * OptionsManager.Options.playerScale;
 	}
 
 	public void OnDestroy()
@@ -231,12 +227,14 @@ public class VRCameraManager : MonoBehaviour
 	{
 		if (_inFinaleCutscene) return;
 
-		AnchorTransform.localPosition = new Vector3(0, _gameAnchorYPosition + 0.33f, -1.5f);
+		AnchorTransform.localPosition = OptionsManager.Options.PlayerPosition;
 
 		// Helps when you ram into stuff to not bounce around
 		if (OptionsManager.Options.lockCameraYPosition)
 		{
-			AnchorTransform.position = new Vector3(AnchorTransform.position.x, _gameAnchorYPosition, AnchorTransform.position.z);
+			// Subtract 0.33 from the local height to go from local to global
+			var lockedY = OptionsManager.Options.PlayerPosition.y - 0.33f;
+			AnchorTransform.position = new Vector3(AnchorTransform.position.x, lockedY, AnchorTransform.position.z);
 		}
 	}
 
