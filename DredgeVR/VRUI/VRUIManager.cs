@@ -1,5 +1,7 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Items;
+using DredgeVR.Options;
+using DredgeVR.VRCamera;
 using DredgeVR.VRInput;
 using System;
 using System.Linq;
@@ -137,7 +139,12 @@ internal class VRUIManager : MonoBehaviour
 				canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
 			}
 
-			canvas.transform.localScale = Vector3.one * 0.002f;
+			canvas.transform.localScale = Vector3.one * 0.002f * OptionsManager.Options.playerScale;
+
+			// Tweak start canvas position based on player scale
+			var offset = (canvas.transform.position - VRCameraManager.AnchorTransform.position);
+			offset.y = 0;
+			canvas.transform.position += offset * (OptionsManager.Options.playerScale - 1f);
 
 			// Remove controls tab for now since it doesnt work
 			RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());

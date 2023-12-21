@@ -1,4 +1,5 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Options;
+using DredgeVR.VRCamera;
 using UnityEngine;
 
 namespace DredgeVR.VRUI;
@@ -18,9 +19,9 @@ internal class GameCanvasFixer : MonoBehaviour
 
 		if (uiParent != null)
 		{
-			transform.position = uiParent.transform.TransformPoint(Offset);
+			transform.position = uiParent.transform.TransformPoint(Offset * OptionsManager.Options.playerScale);
 			transform.rotation = Quaternion.Euler(0f, uiParent.rotation.eulerAngles.y, 0f);
-			transform.localScale = Vector3.one * scale;
+			transform.localScale = Vector3.one * scale * OptionsManager.Options.playerScale;
 		}
 	}
 }

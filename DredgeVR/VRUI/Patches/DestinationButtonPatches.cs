@@ -1,5 +1,6 @@
 ﻿using Cinemachine.Utility;
 using DredgeVR.Helpers;
+using DredgeVR.Options;
 using HarmonyLib;
 using UnityEngine;
 
@@ -74,6 +75,12 @@ public static class DestinationButtonPatches
 		else if (__instance.destination.name == "Cave")
 		{
 			planeOffset *= 3f;
+		}
+
+		if (OptionsManager.Options.playerScale > 1)
+		{
+			yOffset *= OptionsManager.Options.playerScale;
+			scaleModifier /= OptionsManager.Options.playerScale;
 		}
 
 		__instance.transform.position = __instance.destination.transform.position + yOffset + planeOffset;

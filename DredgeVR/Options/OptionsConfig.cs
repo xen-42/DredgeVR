@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using UnityEngine;
 
 namespace DredgeVR.Options;
 
-[JsonObject]
+[JsonObject(MemberSerialization.OptIn)]
 public class OptionsConfig
 {
 	/// <summary>
@@ -94,4 +95,15 @@ public class OptionsConfig
 	/// </summary>
 	[JsonProperty]
 	public bool smoothRotation = false;
+
+	/// <summary>
+	/// Changes the size of the player in the game world
+	/// </summary>
+	[JsonProperty]
+	public float playerScale = 1f;
+
+	[JsonProperty]
+	public float[] playerPosition = new float[] { 0, 1.13f, -1.5f };
+
+	public Vector3 PlayerPosition => new(playerPosition[0], playerPosition[1], playerPosition[2]);
 }
