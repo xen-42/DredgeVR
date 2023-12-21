@@ -35,6 +35,8 @@ public class VRCameraManager : MonoBehaviour
 
 	private bool _inFinaleCutscene;
 
+	public float playerScale = 0.3f;
+
 	public void Awake()
 	{
 		Instance = this;
@@ -45,6 +47,7 @@ public class VRCameraManager : MonoBehaviour
 		leftCamera.transform.parent = transform;
 		leftCamera.transform.localPosition = Vector3.zero;
 		leftCamera.transform.localRotation = Quaternion.identity;
+		leftCamera.nearClipPlane *= playerScale;
 		LeftEye = leftCamera.gameObject.AddComponent<EyeCamera>();
 		LeftEye.left = true;
 
@@ -52,6 +55,7 @@ public class VRCameraManager : MonoBehaviour
 		rightCamera.transform.parent = transform;
 		rightCamera.transform.localPosition = Vector3.zero;
 		rightCamera.transform.localRotation = Quaternion.identity;
+		rightCamera.nearClipPlane *= playerScale;
 		RightEye = rightCamera.gameObject.AddComponent<EyeCamera>();
 		RightEye.left = false;
 
@@ -92,6 +96,9 @@ public class VRCameraManager : MonoBehaviour
 		var renderObject = new RenderObjects { name = "Flip" };
 		Delay.FireOnNextUpdate(() => renderObject.GetValue<RenderObjectsPass>("renderObjectsPass").renderPassEvent = RenderPassEvent.AfterRendering);
 		dataLists.First().rendererFeatures.Insert(0, renderObject);
+
+		// Rescale the character
+		_pivot.transform.localScale = Vector3.one * playerScale;
 	}
 
 	public void OnDestroy()

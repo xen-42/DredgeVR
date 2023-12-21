@@ -1,4 +1,5 @@
 ﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
 using System.Collections;
 using UnityAsyncAwaitUtil;
 using UnityEngine;
@@ -38,7 +39,7 @@ public class VRHand : MonoBehaviour
 		LaserPointerEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		Component.DestroyImmediate(LaserPointerEnd.GetComponent<SphereCollider>());
 		LaserPointerEnd.transform.parent = RaycastCamera.transform;
-		LaserPointerEnd.transform.localScale = Vector3.one * 0.025f;
+		LaserPointerEnd.transform.localScale = Vector3.one * 0.025f * VRCameraManager.Instance.playerScale;
 		LaserPointerEnd.name = "Dot";
 
 		// Tried using a line renderer for this but it did not behave in VR
@@ -110,7 +111,7 @@ public class VRHand : MonoBehaviour
 
 			IsHoveringUI = inputRaycastDistance > 0;
 
-			var targetLength = IsHoveringUI ? inputRaycastDistance : defaultLength;
+			var targetLength = IsHoveringUI ? inputRaycastDistance : defaultLength * VRCameraManager.Instance.playerScale;
 
 			// Only collide with UI
 			var endPosition = RaycastCamera.transform.position + RaycastCamera.transform.forward * targetLength;
@@ -118,14 +119,16 @@ public class VRHand : MonoBehaviour
 			if (IsHoveringUI)
 			{
 				_line.transform.position = (transform.position + endPosition) / 2f;
-				_line.transform.localScale = new Vector3(0.005f, (transform.position - endPosition).magnitude / 2f, 0.005f);
+				var width = 0.005f * VRCameraManager.Instance.playerScale;
+				_line.transform.localScale = new Vector3(width, (transform.position - endPosition).magnitude / 2f, width);
 
 				LaserPointerEnd.transform.position = endPosition;
 			}
 			else
 			{
 				_fadedLine.transform.position = (transform.position + endPosition) / 2f;
-				_fadedLine.transform.localScale = new Vector3(0.001f, (transform.position - endPosition).magnitude / 2f, 0.001f);
+				var width = 0.001f * VRCameraManager.Instance.playerScale;
+				_fadedLine.transform.localScale = new Vector3(width, (transform.position - endPosition).magnitude / 2f, width);
 			}
 
 			// Should show when colliding with UI

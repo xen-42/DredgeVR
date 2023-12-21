@@ -75,6 +75,7 @@ public class EyeCamera : MonoBehaviour
 
 		// Magic number that some reddit thread told me was right
 		var eyeDistance = 63 / 1000f; //mm
+		//eyeDistance *= VRCameraManager.Instance.playerScale;
 
 		transform.localPosition = left ? Vector3.left * eyeDistance / 2f : Vector3.right * eyeDistance / 2f;
 

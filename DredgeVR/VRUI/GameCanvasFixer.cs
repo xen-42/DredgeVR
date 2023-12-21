@@ -18,9 +18,9 @@ internal class GameCanvasFixer : MonoBehaviour
 
 		if (uiParent != null)
 		{
-			transform.position = uiParent.transform.TransformPoint(Offset);
+			transform.position = uiParent.transform.TransformPoint(Offset * VRCameraManager.Instance.playerScale);
 			transform.rotation = Quaternion.Euler(0f, uiParent.rotation.eulerAngles.y, 0f);
-			transform.localScale = Vector3.one * scale;
+			transform.localScale = Vector3.one * scale * VRCameraManager.Instance.playerScale;
 		}
 	}
 }
