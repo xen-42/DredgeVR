@@ -56,6 +56,7 @@ public static class DestinationButtonPatches
 		// For the pontoon, they're all so close that scaling them looks really off
 		if (GameManager.Instance.Player.CurrentDock.name.Contains("Pontoon"))
 		{
+			scaleModifier = 6f;
 			if (__instance.destination.name == "Fish Market")
 			{
 				yOffset *= -0.5f;
@@ -64,7 +65,10 @@ public static class DestinationButtonPatches
 			{
 				yOffset *= 0.75f;
 			}
-			scaleModifier = 6f;
+			else if (__instance.destination.name == "Icy Worksite")
+			{
+				scaleModifier = 12f;
+			}
 		}
 		// Kinda gross but can't think of a good generic way to fix this one, always blocks the fanatic button
 		else if (GameManager.Instance.Player.CurrentDock.name == "Temple" && __instance.destination.name == "Storage")
