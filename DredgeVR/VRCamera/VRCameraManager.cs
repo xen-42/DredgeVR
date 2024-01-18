@@ -1,9 +1,13 @@
-﻿using Cinemachine.Utility;
+﻿using Cinemachine;
+using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using DredgeVR.VRUI;
 using HarmonyLib;
+using System.Collections;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.Rendering;
@@ -226,7 +230,7 @@ public class VRCameraManager : MonoBehaviour
 		}
 	}
 
-	private void ResetAnchorToBoat()
+	public void ResetAnchorToBoat()
 	{
 		if (_inFinaleCutscene) return;
 
@@ -295,4 +299,34 @@ public class VRCameraManager : MonoBehaviour
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(FinaleCutsceneLogic), nameof(FinaleCutsceneLogic.CutToCredits))]
 	public static void FinaleCutsceneLogic_CutToCredits() => Instance.OnCutToCredits();
+
+	/*
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(CinematicCamera), nameof(CinematicCamera.Play))]
+	public static void CinematicCamera_Play(CinematicCamera __instance)
+	{
+		// Final cutscene has its own separate logic
+		// This is for TPR
+		if (!Instance._inFinaleCutscene)
+		{
+			Instance.StartCoroutine(Instance.WaitForCinematicToFinish(__instance.virtualCamera));
+			VRUIManager.HideHeldUI();
+		}
+	}
+
+	private IEnumerator WaitForCinematicToFinish(CinemachineVirtualCamera camera)
+	{
+		while(camera.enabled)
+		{
+			AnchorTransform.position = camera.transform.position;
+			yield return new WaitForFixedUpdate();
+		}
+
+		// Go back to regular camera
+		ResetAnchorToBoat();
+		VRUIManager.ShowHeldUI();
+	}
+	*/
+
+
 }

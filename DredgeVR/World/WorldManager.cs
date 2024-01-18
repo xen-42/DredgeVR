@@ -96,10 +96,10 @@ internal class WorldManager : MonoBehaviour
 
 		if (DLCHelper.OwnsThePaleReach())
 		{
-			foreach (var meshRenderer in GameObject.FindObjectsOfType<MeshRenderer>().Where(x => x.material.shader.name.Contains("DLC1TransparentIceShader")))
+			foreach (var meshRenderer in GameObject.FindObjectsOfType<MeshRenderer>(true).Where(x => x.material.shader.name.Contains("DLC1TransparentIceShader")))
 			{
 				// Since we break depth textures we have to fix this shader
-				meshRenderer.material.SetFloat("_IceDepth", 0.00025f);
+				meshRenderer.material.SetFloat("_IceDepth", 0.00017f);
 			}
 		}
 	}
