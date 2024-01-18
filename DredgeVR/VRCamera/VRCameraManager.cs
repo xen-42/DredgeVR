@@ -139,6 +139,9 @@ public class VRCameraManager : MonoBehaviour
 
 			AnchorTransform.position = new Vector3(-90.6f, 1f, -1337.3f);
 			AnchorTransform.LookAt(camLookAt);
+
+			// Move snow particles to the anchor position
+			GameObject.Find("VCam/Snow").transform.position = AnchorTransform.position;
 		}
 		else
 		{
