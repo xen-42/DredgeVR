@@ -52,6 +52,10 @@ namespace DredgeVR
 			gameObject.AddComponent<WorldManager>();
 			gameObject.AddComponent<VRTutorialManager>();
 
+#if DEBUG
+			gameObject.AddComponent<DebugCommands>();
+#endif
+
 			SceneManager.sceneUnloaded += OnActiveSceneUnloaded;
 			SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
