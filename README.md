@@ -17,10 +17,8 @@ Has built in controller bindings for Oculus and Valve Index. You might have to s
 ## Features:
 - 6DOF tracking and full motion controller support
 - The game is playable start to finish in VR
-- The DLC is not fully supported (see roadmap) but is playable
 
 ## Roadmap (todo list):
-- The Pale Reach DLC uses cinematic camera views for some cutscenes - need to reimplement them in VR
 - The depth buffer is broken, meaning that the ocean and ice shaders don't look as good as they should - need to fix this
 - Need to reimplement the photo camera ability in VR (it isn't essential to beat the game, but still a fun feature)
 - Need to make the mod settings accessible in-game instead of just through a json file
