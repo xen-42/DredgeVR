@@ -76,14 +76,6 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnGameSceneStart()
 	{
-		if (OptionsManager.Options.disableDistantParticleEffects)
-		{
-			foreach (var harvestable in GameObject.FindObjectsOfType<HarvestableParticles>(true))
-			{
-				harvestable.gameObject.AddComponent<LODChildCuller>();
-			}
-		}
-
 		if (OptionsManager.Options.disableCullingBrain)
 		{
 			// Actually destroying this breaks loading screens

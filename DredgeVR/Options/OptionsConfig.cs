@@ -67,12 +67,6 @@ public class OptionsConfig
 	public bool disableExtraParticleEffects = false;
 
 	/// <summary>
-	/// Disables particles effects over 100m away. Improves performance
-	/// </summary>
-	[JsonProperty]
-	public bool disableDistantParticleEffects = true;
-
-	/// <summary>
 	/// Not ideal for now because it makes some rocks literally invisible, but helps with performance.
 	/// </summary>
 	[JsonProperty]
