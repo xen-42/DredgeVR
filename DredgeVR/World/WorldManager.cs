@@ -108,7 +108,7 @@ internal class WorldManager : MonoBehaviour
 	{
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
-		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 
 		// This has to happen here else the shader is null
 		// Put a giant black square at the bottom of the sea
