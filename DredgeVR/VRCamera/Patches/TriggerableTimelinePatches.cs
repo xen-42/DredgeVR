@@ -40,6 +40,7 @@ public static class TriggerableTimelinePatches
 	private static IEnumerator TriggerableTimelineLogic(TriggerableTimeline __instance)
 	{
 		VRUIManager.HideHeldUI();
+		VRCameraManager.Instance.InCutscene = true;
 
 		while (_playing)
 		{
@@ -69,6 +70,8 @@ public static class TriggerableTimelinePatches
 		}
 
 		yield return ShowLoadingScreen(true);
+
+		VRCameraManager.Instance.InCutscene = false;
 
 		VRCameraManager.Instance.ResetAnchorToBoat();
 

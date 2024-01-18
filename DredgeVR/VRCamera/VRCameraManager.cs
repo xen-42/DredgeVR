@@ -35,7 +35,7 @@ public class VRCameraManager : MonoBehaviour
 	public float minX = 0.5f;
 	private bool _justTurned;
 
-	private bool _inFinaleCutscene;
+	public bool InCutscene;
 
 	public void Awake()
 	{
@@ -160,7 +160,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnPlayerSpawned()
 	{
-		_inFinaleCutscene = false;
+		InCutscene = false;
 
 		// Make the player follow the boat
 		AnchorTransform.parent = GameManager.Instance.Player.transform;
@@ -184,7 +184,7 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (_inFinaleCutscene)
+				if (InCutscene)
 				{
 
 				}
@@ -232,7 +232,7 @@ public class VRCameraManager : MonoBehaviour
 
 	public void ResetAnchorToBoat()
 	{
-		if (_inFinaleCutscene) return;
+		if (InCutscene) return;
 
 		AnchorTransform.localPosition = OptionsManager.Options.PlayerPosition;
 
@@ -277,7 +277,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnCutToCredits()
 	{
-		_inFinaleCutscene = true;
+		InCutscene = true;
 		AnchorTransform.parent = null;
 		AnchorTransform.transform.position = new Vector3(18, 7, 4);
 		AnchorTransform.transform.rotation = Quaternion.Euler(0, 270, 0);
