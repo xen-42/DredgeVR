@@ -1,9 +1,13 @@
-﻿using Cinemachine.Utility;
+﻿using Cinemachine;
+using Cinemachine.Utility;
 using DredgeVR.Helpers;
 using DredgeVR.Options;
 using DredgeVR.VRInput;
+using DredgeVR.VRUI;
 using HarmonyLib;
+using System.Collections;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.Rendering;
@@ -31,7 +35,7 @@ public class VRCameraManager : MonoBehaviour
 	public float minX = 0.5f;
 	private bool _justTurned;
 
-	private bool _inFinaleCutscene;
+	public bool InCutscene;
 
 	public void Awake()
 	{
@@ -139,6 +143,9 @@ public class VRCameraManager : MonoBehaviour
 
 			AnchorTransform.position = new Vector3(-90.6f, 1f, -1337.3f);
 			AnchorTransform.LookAt(camLookAt);
+
+			// Move snow particles to the anchor position
+			GameObject.Find("VCam/Snow").transform.position = AnchorTransform.position;
 		}
 		else
 		{
@@ -153,7 +160,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnPlayerSpawned()
 	{
-		_inFinaleCutscene = false;
+		InCutscene = false;
 
 		// Make the player follow the boat
 		AnchorTransform.parent = GameManager.Instance.Player.transform;
@@ -177,7 +184,7 @@ public class VRCameraManager : MonoBehaviour
 			// Else you bump into something and dear god
 			if (SceneManager.GetActiveScene().name == "Game")
 			{
-				if (_inFinaleCutscene)
+				if (InCutscene)
 				{
 
 				}
@@ -223,9 +230,9 @@ public class VRCameraManager : MonoBehaviour
 		}
 	}
 
-	private void ResetAnchorToBoat()
+	public void ResetAnchorToBoat()
 	{
-		if (_inFinaleCutscene) return;
+		if (InCutscene) return;
 
 		AnchorTransform.localPosition = OptionsManager.Options.PlayerPosition;
 
@@ -270,7 +277,7 @@ public class VRCameraManager : MonoBehaviour
 
 	private void OnCutToCredits()
 	{
-		_inFinaleCutscene = true;
+		InCutscene = true;
 		AnchorTransform.parent = null;
 		AnchorTransform.transform.position = new Vector3(18, 7, 4);
 		AnchorTransform.transform.rotation = Quaternion.Euler(0, 270, 0);
@@ -292,4 +299,34 @@ public class VRCameraManager : MonoBehaviour
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(FinaleCutsceneLogic), nameof(FinaleCutsceneLogic.CutToCredits))]
 	public static void FinaleCutsceneLogic_CutToCredits() => Instance.OnCutToCredits();
+
+	/*
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(CinematicCamera), nameof(CinematicCamera.Play))]
+	public static void CinematicCamera_Play(CinematicCamera __instance)
+	{
+		// Final cutscene has its own separate logic
+		// This is for TPR
+		if (!Instance._inFinaleCutscene)
+		{
+			Instance.StartCoroutine(Instance.WaitForCinematicToFinish(__instance.virtualCamera));
+			VRUIManager.HideHeldUI();
+		}
+	}
+
+	private IEnumerator WaitForCinematicToFinish(CinemachineVirtualCamera camera)
+	{
+		while(camera.enabled)
+		{
+			AnchorTransform.position = camera.transform.position;
+			yield return new WaitForFixedUpdate();
+		}
+
+		// Go back to regular camera
+		ResetAnchorToBoat();
+		VRUIManager.ShowHeldUI();
+	}
+	*/
+
+
 }

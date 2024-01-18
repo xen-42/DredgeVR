@@ -32,6 +32,8 @@ public static class DestinationButtonPatches
 		// Want them to be moved up and a bit towards the camera, since a lot clip into walls and stuff
 		// The farther away they are, the farther up they can go to ensure closer ones dont block them
 
+		// This is super scuffed but seems to work well enough
+
 		var directionToPlayer = (__instance.destination.transform.position - GameManager.Instance.Player.transform.position).ProjectOntoPlane(Vector3.up);
 		var distance = directionToPlayer.magnitude;
 
@@ -56,6 +58,7 @@ public static class DestinationButtonPatches
 		// For the pontoon, they're all so close that scaling them looks really off
 		if (GameManager.Instance.Player.CurrentDock.name.Contains("Pontoon"))
 		{
+			scaleModifier = 6f;
 			if (__instance.destination.name == "Fish Market")
 			{
 				yOffset *= -0.5f;
@@ -64,7 +67,10 @@ public static class DestinationButtonPatches
 			{
 				yOffset *= 0.75f;
 			}
-			scaleModifier = 6f;
+			else if (__instance.destination.name == "Icy Worksite")
+			{
+				scaleModifier = 12f;
+			}
 		}
 		// Kinda gross but can't think of a good generic way to fix this one, always blocks the fanatic button
 		else if (GameManager.Instance.Player.CurrentDock.name == "Temple" && __instance.destination.name == "Storage")
@@ -75,6 +81,18 @@ public static class DestinationButtonPatches
 		else if (__instance.destination.name == "Cave")
 		{
 			planeOffset *= 3f;
+		}
+		else if (GameManager.Instance.Player.CurrentDock.name.StartsWith("TPR "))
+		{
+			// TPR stuff is all way too high up in the air, since we tend to be docked very close 
+			yOffset *= 0.33f;
+			if (__instance.destination.name == "Ice Shard")
+			{
+				yOffset *= 0.5f;
+				scaleModifier *= 0.5f;
+			}
+			// Again since we're docked so close set a max size
+			scaleModifier = Mathf.Min(scaleModifier, 12f);
 		}
 
 		if (OptionsManager.Options.playerScale > 1)

@@ -76,14 +76,6 @@ internal class WorldManager : MonoBehaviour
 
 	private void OnGameSceneStart()
 	{
-		if (OptionsManager.Options.disableDistantParticleEffects)
-		{
-			foreach (var harvestable in GameObject.FindObjectsOfType<HarvestableParticles>(true))
-			{
-				harvestable.gameObject.AddComponent<LODChildCuller>();
-			}
-		}
-
 		if (OptionsManager.Options.disableCullingBrain)
 		{
 			// Actually destroying this breaks loading screens
@@ -96,10 +88,10 @@ internal class WorldManager : MonoBehaviour
 
 		if (DLCHelper.OwnsThePaleReach())
 		{
-			foreach (var meshRenderer in GameObject.FindObjectsOfType<MeshRenderer>().Where(x => x.material.shader.name.Contains("DLC1TransparentIceShader")))
+			foreach (var meshRenderer in GameObject.FindObjectsOfType<MeshRenderer>(true).Where(x => x.material.shader.name.Contains("DLC1TransparentIceShader")))
 			{
 				// Since we break depth textures we have to fix this shader
-				meshRenderer.material.SetFloat("_IceDepth", 0.00025f);
+				meshRenderer.material.SetFloat("_IceDepth", 0.00017f);
 			}
 		}
 	}
@@ -108,7 +100,7 @@ internal class WorldManager : MonoBehaviour
 	{
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
-		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(450, 50);
+		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 
 		// This has to happen here else the shader is null
 		// Put a giant black square at the bottom of the sea

@@ -1,5 +1,7 @@
-﻿using DredgeVR.VRCamera;
+﻿using DredgeVR.Helpers;
+using DredgeVR.VRCamera;
 using HarmonyLib;
+using System.Linq;
 using UnityEngine;
 
 namespace DredgeVR.VRUI.Patches;
@@ -37,13 +39,35 @@ public static class GridObjectPatches
 		// Need to put them in the proper positions
 		// Also need to factor in the scale of the world space canvas
 		var cellSize = GameManager.Instance.GridManager.ScaledCellSize / __instance.transform.lossyScale.x;
+		
+		// Hacky but the infected cell isn't stored anywhere after being generated
+		var infectedCells = __instance.transform.GetComponentsInChildren<Transform>()
+			.Where(x => x.name.Contains(__instance.infectedObjectCellPrefab.name))
+			.ToArray();
+
+		var isInfected = infectedCells.Any();
+
 		for (int i = 0; i < __instance.ItemData.dimensions.Count; i++)
 		{
 			var cell = __instance.ItemData.dimensions[i];
 			var localX = (cell.x * cellSize) + (cellSize / 2f);
 			var localY = (cell.y * cellSize) + (cellSize / 2f);
 
-			__instance.gridObjectCells[i].transform.localPosition = new Vector3(localX, -localY, 0f);
+			var localPosition = new Vector3(localX, -localY, 0f);
+
+			__instance.gridObjectCells[i].transform.localPosition = localPosition;
+
+			if (isInfected)
+			{
+				// The lengths must always be equal
+				infectedCells[i].localPosition = localPosition;
+
+				// By default its billboard (looks at the player hands)
+				var psr = infectedCells[i].GetComponentInChildren<ParticleSystemRenderer>();
+				psr.mesh = AssetLoader.PrimitiveQuad;
+				psr.renderMode = ParticleSystemRenderMode.Mesh;
+				psr.alignment = ParticleSystemRenderSpace.Local;
+			}
 		}
 	}
 }

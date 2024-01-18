@@ -12,7 +12,7 @@ namespace DredgeVR.VRInput;
 public class VRHand : MonoBehaviour
 {
 	public Camera RaycastCamera { get; private set; }
-	private GameObject _line, _fadedLine;
+	private GameObject _laserPointerParent, _line, _fadedLine;
 	public GameObject LaserPointerEnd { get; private set; }
 
 	public float defaultLength = 0.5f;
@@ -24,6 +24,8 @@ public class VRHand : MonoBehaviour
 	public bool IsHoveringUI { get; private set; }
 
 	public bool IsDominantHand { get; private set; }
+
+	private bool _hidingLaserPointers;
 
 	public void Start()
 	{
@@ -38,22 +40,24 @@ public class VRHand : MonoBehaviour
 		RaycastCamera.farClipPlane = 1000f;
 		RaycastCamera.enabled = false;
 
+		_laserPointerParent = new GameObject("LaserPointer").SetParent(RaycastCamera.transform);
+
 		LaserPointerEnd = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		Component.DestroyImmediate(LaserPointerEnd.GetComponent<SphereCollider>());
-		LaserPointerEnd.transform.parent = RaycastCamera.transform;
+		LaserPointerEnd.transform.parent = _laserPointerParent.transform;
 		LaserPointerEnd.transform.localScale = Vector3.one * 0.025f * OptionsManager.Options.playerScale;
 		LaserPointerEnd.name = "Dot";
 
 		// Tried using a line renderer for this but it did not behave in VR
 		_line = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		Component.DestroyImmediate(_line.GetComponent<Collider>());
-		_line.transform.parent = RaycastCamera.transform;
+		_line.transform.parent = _laserPointerParent.transform;
 		_line.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 		_line.name = "Line";
 
 		_fadedLine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		Component.DestroyImmediate(_fadedLine.GetComponent<Collider>());
-		_fadedLine.transform.parent = RaycastCamera.transform;
+		_fadedLine.transform.parent = _laserPointerParent.transform;
 		_fadedLine.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 		_fadedLine.name = "FadedLine";
 
@@ -67,26 +71,25 @@ public class VRHand : MonoBehaviour
 
 	private void OnHeldUIHidden(bool hidden)
 	{
+		_hidingLaserPointers = hidden;
 
+		if (hidden)
+		{
+			_laserPointerParent.SetActive(!hidden);
+		}
+		else
+		{
+			_laserPointerParent.SetActive(IsDominantHand);
+		}
 	}
 
 	private void OnDominantHandChanged(SteamVR_Input_Sources dominantHand)
 	{
 		IsDominantHand = dominantHand == hand;
 
-		if (LaserPointerEnd.activeInHierarchy != IsDominantHand)
+		if (!_hidingLaserPointers && _laserPointerParent.activeInHierarchy != IsDominantHand)
 		{
-			LaserPointerEnd.SetActive(IsDominantHand);
-		}
-
-		if (_line.activeInHierarchy != IsDominantHand)
-		{
-			_line.SetActive(IsDominantHand);
-		}
-
-		if (_fadedLine.activeInHierarchy != IsDominantHand)
-		{
-			_fadedLine.SetActive(IsDominantHand);
+			_laserPointerParent.SetActive(IsDominantHand);
 		}
 	}
 
