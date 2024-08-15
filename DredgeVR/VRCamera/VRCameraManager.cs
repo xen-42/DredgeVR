@@ -79,7 +79,6 @@ public class VRCameraManager : MonoBehaviour
 		RightHand.transform.parent = _pivot;
 
 		DredgeVRCore.SceneStart += OnSceneStart;
-		DredgeVRCore.TitleSceneStart += OnTitleSceneStart;
 		DredgeVRCore.PlayerSpawned += OnPlayerSpawned;
 
 		gameObject.AddComponent<RenderToScreen>();
@@ -104,7 +103,6 @@ public class VRCameraManager : MonoBehaviour
 	public void OnDestroy()
 	{
 		DredgeVRCore.SceneStart -= OnSceneStart;
-		DredgeVRCore.TitleSceneStart -= OnTitleSceneStart;
 		DredgeVRCore.PlayerSpawned -= OnPlayerSpawned;
 	}
 
@@ -133,29 +131,6 @@ public class VRCameraManager : MonoBehaviour
 
 		// Weird timing on this
 		Delay.FireInNUpdates(2, RecenterCamera);
-	}
-
-	private void OnTitleSceneStart()
-	{
-		if (DLCHelper.OwnsThePaleReach())
-		{
-			var camLookAt = GameObject.Find("DLC1Positions/DLC1CamLookAt").transform.position.ProjectOntoPlane(Vector3.up);
-
-			AnchorTransform.position = new Vector3(-90.6f, 1f, -1337.3f);
-			AnchorTransform.LookAt(camLookAt);
-
-			// Move snow particles to the anchor position
-			GameObject.Find("VCam/Snow").transform.position = AnchorTransform.position;
-		}
-		else
-		{
-			// Make the player look towards the lighthouse
-			var lightHouse = GameObject.Find("TheMarrows/Islands/LittleMarrow").transform;
-			var worldPos = new Vector3(lightHouse.position.x, 0.5f, lightHouse.position.z);
-
-			AnchorTransform.position = new Vector3(-6.5f, 0.5f, 0);
-			AnchorTransform.LookAt(worldPos);
-		}
 	}
 
 	private void OnPlayerSpawned()
