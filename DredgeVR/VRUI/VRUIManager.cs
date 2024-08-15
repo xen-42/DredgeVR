@@ -125,27 +125,6 @@ internal class VRUIManager : MonoBehaviour
 		// Delay for CHFB compat since it makes UI a bit late
 		Delay.FireInNUpdates(2, () =>
 		{
-			// We place the title screen canvas on the beach
-			var canvas = GameObject.Find("Canvases");
-
-			if (DLCHelper.OwnsThePaleReach())
-			{
-				canvas.transform.position = new Vector3(-91.1f, 1f, -1339.2f);
-				canvas.transform.rotation = Quaternion.Euler(0, 230, 0);
-			}
-			else
-			{
-				canvas.transform.position = new Vector3(-5.3f, 0.45f, 2f);
-				canvas.transform.rotation = Quaternion.Euler(0, 70, 0);
-			}
-
-			canvas.transform.localScale = Vector3.one * 0.002f * OptionsManager.Options.playerScale;
-
-			// Tweak start canvas position based on player scale
-			var offset = (canvas.transform.position - VRCameraManager.AnchorTransform.position);
-			offset.y = 0;
-			canvas.transform.position += offset * (OptionsManager.Options.playerScale - 1f);
-
 			// Remove controls tab for now since it doesnt work
 			RemoveControlsTab(GameObject.Find("Canvases/SettingsDialog/TabbedPanelContainer").GetComponent<TabbedPanelContainer>());
 
@@ -157,7 +136,14 @@ internal class VRUIManager : MonoBehaviour
 
 			// Splash screen scene is still around and the canvas is there but invisible blocking our laser pointer
 			GameObject.FindObjectsOfType<Canvas>().FirstOrDefault(x => x.gameObject.scene.name == "Splash")?.gameObject?.SetActive(false);
-		});
+
+            // Once we're done setting up we refresh the title screen view to run our patches
+            var titleScreenView = GameObject.FindObjectOfType<TitleScreenView>();
+
+            // Have to reset current title theme else it returns early
+            titleScreenView.currentTitleTheme = -1;
+            titleScreenView.RefreshLayout();
+        });
 	}
 
 	private void InitializeManagerScene()
