@@ -163,7 +163,7 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 				}
 				_itemNameString.StringReference.RefreshString();
 				_itemImage.sprite = ((_firstHarvestableItem.itemSubtype == ItemSubtype.TRINKET) ? _hiddenItemSprite : _firstHarvestableItem.sprite);
-				_harvestableTypeTagUI.Init(_firstHarvestableItem.harvestableType);
+				_harvestableTypeTagUI.Init(_firstHarvestableItem.harvestableType, _firstHarvestableItem.requiresAdvancedEquipment);
 				_invalidEquipmentImage.gameObject.SetActive(!GameManager.Instance.PlayerStats.HarvestableTypes.Contains(_firstHarvestableItem.harvestableType));
 			}
 		}
