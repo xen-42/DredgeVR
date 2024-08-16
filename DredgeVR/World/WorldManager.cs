@@ -1,4 +1,5 @@
-﻿using DredgeVR.Helpers;
+﻿using DredgeVR.DockNavigation;
+using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
 using System.Linq;
@@ -47,7 +48,7 @@ internal class WorldManager : MonoBehaviour
 			{
 				terrain.heightmapMaximumLOD = Mathf.Max(terrain.heightmapMaximumLOD, 3);
 			}
-			if (OptionsManager.Options.disableUnderseaDetails) 
+			if (OptionsManager.Options.disableUnderseaDetails)
 			{
 				// The "trees and foliage" are actually rocks on the sea floor
 				terrain.drawTreesAndFoliage = false;
@@ -101,6 +102,7 @@ internal class WorldManager : MonoBehaviour
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
+		GameObject.FindObjectOfType<Player>().gameObject.AddComponent<DockNavigationHandler>();
 
 		// This has to happen here else the shader is null
 		// Put a giant black square at the bottom of the sea
@@ -115,5 +117,13 @@ internal class WorldManager : MonoBehaviour
 		var material = new Material(AssetLoader.UnlitShader);
 		seaFloorCover.AddComponent<MeshRenderer>().material = material;
 		material.mainTexture = Texture2D.blackTexture;
+
+		if (OptionsManager.Options.removeSmoke)
+		{
+			foreach (var smoke in GameObject.FindObjectsOfType<SmokeColumn>(true))
+			{
+				smoke.gameObject.GetComponent<LineRenderer>().forceRenderingOff = true;
+			}
+		}
 	}
 }
