@@ -97,7 +97,13 @@ public class OptionsConfig
 	public float playerScale = 1f;
 
 	[JsonProperty]
-	public float[] playerPosition = new float[] { 0, 1.13f, -1.5f };
+	public float[] playerPosition = new float[] { 0, 1.5f, -1.8f };
+
+	/// <summary>
+	/// Don't render the smoke columns coming from the ship
+	/// </summary>
+	[JsonProperty]
+	public bool removeSmoke = true;
 
 	public Vector3 PlayerPosition => new(playerPosition[0], playerPosition[1], playerPosition[2]);
 }

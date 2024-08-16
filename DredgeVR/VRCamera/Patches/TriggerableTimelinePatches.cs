@@ -1,5 +1,6 @@
 ﻿using Cinemachine;
 using Cinemachine.Utility;
+using DredgeVR.DockNavigation;
 using DredgeVR.VRUI;
 using HarmonyLib;
 using System.Collections;
@@ -41,7 +42,7 @@ public static class TriggerableTimelinePatches
 		while (_playing)
 		{
 			var prevCamera = _camera;
-		
+
 			if (_camera == null || !_camera.gameObject.activeInHierarchy)
 			{
 				// Try to update the camera to an active one
@@ -69,7 +70,14 @@ public static class TriggerableTimelinePatches
 
 		VRCameraManager.Instance.InCutscene = false;
 
-		VRCameraManager.Instance.ResetAnchorToBoat();
+		if (DockNavigationHandler.Instance.CurrentDockPosition != DockNavigationHandler.DockPosition.Unknown)
+		{
+			DockNavigationHandler.Instance.RefreshPosition();
+		}
+		else
+		{
+			VRCameraManager.Instance.ResetAnchorToBoat();
+		}
 
 		yield return ShowLoadingScreen(false);
 

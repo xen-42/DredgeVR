@@ -94,6 +94,15 @@ public static class DestinationButtonPatches
 			// Again since we're docked so close set a max size
 			scaleModifier = Mathf.Min(scaleModifier, 12f);
 		}
+		else if (GameManager.Instance.Player.CurrentDock.name.Contains("Iron Rig"))
+		{
+			scaleModifier *= 0.3f;
+			if (__instance.destination.name.Contains("RigBase"))
+			{
+				planeOffset *= 2.5f;
+				yOffset = Vector3.zero;
+			}
+		}
 
 		if (OptionsManager.Options.playerScale > 1)
 		{

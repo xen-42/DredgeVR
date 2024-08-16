@@ -1,8 +1,6 @@
 ﻿using DredgeVR.Helpers;
 using DredgeVR.Options;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.XR;
 
 namespace DredgeVR.VRCamera;

@@ -173,7 +173,7 @@ public class VRCameraManager : MonoBehaviour
 					}
 
 					// If the camera y is locked but the boat is moving around the anchor point gets offset
-					if (OptionsManager.Options.lockCameraYPosition && !OptionsManager.Options.removeWaves)
+					if (OptionsManager.Options.lockCameraYPosition)
 					{
 						ResetAnchorToBoat();
 					}

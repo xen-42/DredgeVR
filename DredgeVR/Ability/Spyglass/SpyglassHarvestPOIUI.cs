@@ -30,9 +30,11 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 
 	private AbilityData _spyglassAbilityData;
 	private bool _usingSpyglass;
-	
+
 	private float _updateTimer;
 	public const float UPDATE_TIME = 1f;
+
+	private SpyglassUI _spyglassUI;
 
 	private void Awake()
 	{
@@ -46,12 +48,12 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 
 	public void Start()
 	{
-		var spyglassUI = GameManager.Instance.UI.spyglassUI;
-		_spyglassAbilityData = spyglassUI.spyglassAbilityData;
+		_spyglassUI = GameManager.Instance.UI.spyglassUI;
+		_spyglassAbilityData = _spyglassUI.spyglassAbilityData;
 
 		if (_prefab == null)
 		{
-			_prefab = GameObject.Instantiate(spyglassUI.container);
+			_prefab = GameObject.Instantiate(_spyglassUI.container);
 			_prefab.SetActive(false);
 			// Needs to be worldspace
 			var canvas = _prefab.AddComponent<Canvas>();
@@ -67,12 +69,12 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 		_container.transform.localScale = Vector3.zero;
 
 		// Grab all the components
-		_itemNameString = _container.transform.Find("Backplate/BackplateInner/NameText").GetComponent<LocalizeStringEvent>();
-		_itemImage = _container.transform.Find("Backplate/BackplateInner/Image").GetComponent<Image>();
-		_invalidEquipmentImage = _container.transform.Find("Backplate/BackplateInner/InvalidEquipmentImage").GetComponent<Image>();
-		_hiddenItemSprite = spyglassUI.hiddenItemSprite;
+		_itemNameString = _container.transform.Find("Backplate/BasicContainer/NameText").GetComponent<LocalizeStringEvent>();
+		_itemImage = _container.transform.Find("Backplate/BasicContainer/Image").GetComponent<Image>();
+		_invalidEquipmentImage = _container.transform.Find("Backplate/BasicContainer/InvalidEquipmentImage").GetComponent<Image>();
+		_hiddenItemSprite = _spyglassUI.hiddenItemSprite;
 		_harvestableTypeTagUI = _container.transform.Find("Backplate/HarvestableTypeTag").GetComponent<HarvestableTypeTagUI>();
-		_obscuredString = spyglassUI.obscuredString;
+		_obscuredString = _spyglassUI.obscuredString;
 
 		_updateTimer = Random.Range(0, UPDATE_TIME);
 	}
@@ -93,7 +95,7 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 		}
 
 		// Lerp scale based on if active
-		var targetScale = _shouldShowContainer ? Vector3.one * _containerScale : Vector3.zero;
+		var targetScale = _shouldShowContainer ? 2f * Vector3.one * _containerScale : Vector3.zero;
 		if (_container.transform.localScale != targetScale)
 		{
 			var t = Mathf.Clamp01(Mathf.InverseLerp(_shouldShowContainer ? 0f : _containerScale, targetScale.x, _container.transform.localScale.x) + Time.deltaTime);
@@ -104,12 +106,20 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 				_container.SetActive(false);
 			}
 		}
+
+		if (_container.activeInHierarchy)
+		{
+			// LookAt makes them backwards though
+			_container.transform.LookAt(VRCameraManager.VRPlayer.transform.position);
+			_container.transform.Rotate(Vector3.up, 180f);
+		}
+
 	}
 
 	private void CheckPlayerPosition()
 	{
 		// Only show objects within a certain range
-		if ((GameManager.Instance.Player.transform.position - transform.position).magnitude < 60)
+		if ((GameManager.Instance.Player.transform.position - transform.position).magnitude < (_spyglassUI.hasAdvancedSpyglass ? 90 : 60))
 		{
 			_shouldShowContainer = true;
 
@@ -130,10 +140,6 @@ public class SpyglassHarvestPOIUI : MonoBehaviour
 				// TODO: Ideally we'd also check that you're looking towards it
 				GameManager.Instance.SaveData.SetHasSpiedHarvestCategory(_firstHarvestableItem.harvestableType, true);
 				GameManager.Instance.AchievementManager.EvaluateAchievement(DredgeAchievementId.ABILITY_SPYGLASS);
-
-				// LookAt makes them backwards though
-				_container.transform.LookAt(VRCameraManager.VRPlayer.transform.position);
-				_container.transform.Rotate(Vector3.up, 180f);
 			}
 		}
 		else
