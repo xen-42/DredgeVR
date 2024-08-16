@@ -157,7 +157,7 @@ public class VRCameraManager : MonoBehaviour
 
 			// In the game scene force a constant ResetTransform y position
 			// Else you bump into something and dear god
-			if (SceneManager.GetActiveScene().name == "Game")
+			if (SceneManager.GetActiveScene().name == "Game" && !GameManager.Instance.Player.IsDocked)
 			{
 				if (InCutscene)
 				{
@@ -275,7 +275,22 @@ public class VRCameraManager : MonoBehaviour
 	[HarmonyPatch(typeof(FinaleCutsceneLogic), nameof(FinaleCutsceneLogic.CutToCredits))]
 	public static void FinaleCutsceneLogic_CutToCredits() => Instance.OnCutToCredits();
 
-	/*
+    public static void MoveCameraTo(Vector3 globalPosition, Quaternion rotation)
+    {
+        VRCameraManager.Instance.StartCoroutine(CoroutineMoveCameraTo(globalPosition, rotation));
+    }
+
+    private static IEnumerator CoroutineMoveCameraTo(Vector3 globalPosition, Quaternion rotation)
+    {
+        GameManager.Instance.Loader.loadingScreen.Fade(true, true);
+        yield return new WaitForSeconds(1f);
+        AnchorTransform.position = globalPosition;
+        AnchorTransform.rotation = rotation;
+
+        GameManager.Instance.Loader.loadingScreen.Fade(false, true);
+    }
+
+    /*
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(CinematicCamera), nameof(CinematicCamera.Play))]
 	public static void CinematicCamera_Play(CinematicCamera __instance)

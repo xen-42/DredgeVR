@@ -57,8 +57,8 @@ public static class TitleScreenPatches
     {
         DredgeVRLogger.Info("All DLC title screen");
 
-        var camLookAt = new Vector3(86.9563f, 1.2f, -119.7114f);
-        var camPos = new Vector3(80.7999f, 1.2f, -115.8387f);
+        var camLookAt = new Vector3(86.9563f, 2f, -119.7114f);
+        var camPos = new Vector3(80.7999f, 2f, -115.8387f);
 
         SetUpTitleScreen(camPos, camLookAt);
     }

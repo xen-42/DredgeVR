@@ -1,4 +1,5 @@
-﻿using DredgeVR.Helpers;
+﻿using DredgeVR.DockNavigation;
+using DredgeVR.Helpers;
 using DredgeVR.Items;
 using DredgeVR.Options;
 using System.Linq;
@@ -101,6 +102,7 @@ internal class WorldManager : MonoBehaviour
 		// Set up held items
 		GameObject.FindObjectOfType<MapWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
 		GameObject.FindObjectOfType<MessageDetailWindow>().gameObject.AddComponent<HeldUI>().SetOffset(650, 300);
+        GameObject.FindObjectOfType<Player>().gameObject.AddComponent<DockNavigationHandler>();
 
 		// This has to happen here else the shader is null
 		// Put a giant black square at the bottom of the sea
