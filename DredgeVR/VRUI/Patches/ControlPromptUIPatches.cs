@@ -46,6 +46,7 @@ public static class ControlPromptUIPatches
 			controlPrompt.gameObject.transform.parent = hand;
 			controlPrompt.gameObject.transform.localPosition = Vector3.zero + (Vector3.up * 60f * promptIndex);
 			controlPrompt.gameObject.transform.localRotation = Quaternion.identity;
+			controlPrompt.gameObject.transform.localScale = Vector3.one;
 		}
 	}
 }

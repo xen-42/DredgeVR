@@ -1,6 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<DredgePath>E:\SteamLibrary\steamapps\common\DREDGE</DredgePath>
+		<!--DredgePath>C:\Program Files\Epic Games\DREDGEmKMzx</DredgePath-->
 		<OutputPath>$(DredgePath)\Mods\xen.DredgeVR</OutputPath>
 	</PropertyGroup>
 </Project>
