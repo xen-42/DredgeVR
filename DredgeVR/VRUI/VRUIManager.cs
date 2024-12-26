@@ -156,8 +156,8 @@ internal class VRUIManager : MonoBehaviour
 		var leftHandPrompts = CreatePromptContainer("LeftHand", controlPromptPanel);
 		var rightHandPrompts = CreatePromptContainer("RightHand", controlPromptPanel);
 
-		leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 1f);
-		rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 1f);
+		leftHandPrompts.AddComponent<UIHandAttachment>().Init(false, new Vector3(0, 90, 45), new Vector3(0.3f, 0.05f, 0f), 0.001f);
+		rightHandPrompts.AddComponent<UIHandAttachment>().Init(true, new Vector3(0, 90, 45), new Vector3(0.2f, 0.05f, 0f), 0.001f);
 
 		LeftHandPromptsContainer = leftHandPrompts.transform.Find("Container");
 		RightHandPromptsContainer = rightHandPrompts.transform.Find("Container");
